@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <name>Sakai ScormCloud Tool</name>
+   <groupId>org.sakaiproject.scormcloud</groupId>
+   <artifactId>scormcloud-tool</artifactId>
+   <organization>
+      <name>Sakai Project</name>
+      <url>http://sakaiproject.org/</url>
+   </organization>
+   <inceptionYear>2008</inceptionYear>
+   <description>ScormCloud webapp (tool)</description>
+   <packaging>war</packaging>
+
+   <!-- the base is the parent pom -->
+   <parent>
+      <groupId>org.sakaiproject</groupId>
+      <artifactId>scormcloud</artifactId>
+      <version>0.1</version><!--ScormCloud.version-->
+   </parent>
+
+   <dependencies>
+
+      <!-- internal dependencies -->
+      <dependency>
+         <groupId>org.sakaiproject.scormcloud</groupId>
+         <artifactId>scormcloud-api</artifactId>
+      </dependency>
+
+      <!-- we are running a webapp in tomcat so we need the servlet api -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>servlet-api</artifactId>
+      </dependency>
+
+      <!-- We need this special package to run the jsps in Sakai -->
+      <dependency>
+         <groupId>org.sakaiproject</groupId>
+         <artifactId>sakai-jsp-adapter</artifactId>
+         <version>0.9-K1</version>
+         <scope>runtime</scope>
+      </dependency>
+
+      <!-- Sakai util dependency -->
+    <dependency>
+      <groupId>org.sakaiproject.kernel</groupId>
+      <artifactId>sakai-kernel-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sakaiproject.kernel</groupId>
+      <artifactId>sakai-kernel-util</artifactId>
+      <!--<version>1.0RC2-SNAPSHOT</version>-->
+    </dependency>
+     <!-- <dependency>
+         <groupId>org.sakaiproject</groupId>
+         <artifactId>sakai-util</artifactId>
+         <version>${sakai.version}</version>
+         <scope>runtime</scope>
+      </dependency>-->
+
+      <!-- standard tag libraries -->
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jstl</artifactId>
+         <version>1.1.2</version>
+      </dependency>
+
+      <dependency>
+         <groupId>taglibs</groupId>
+         <artifactId>standard</artifactId>
+         <version>1.1.2</version>
+      </dependency>
+
+      <dependency>
+         <groupId>javax.servlet</groupId>
+         <artifactId>jsp-api</artifactId>
+         <version>2.0</version>
+      </dependency>
+
+      <!-- apache commons logging -->
+      <dependency>
+         <groupId>commons-logging</groupId>
+         <artifactId>commons-logging</artifactId>
+      </dependency>
+
+   </dependencies>
+
+
+   <build>
+      <sourceDirectory>src/java</sourceDirectory>
+      <resources>
+         <resource>
+            <directory>${basedir}/src/bundle</directory>
+            <includes>
+               <include>**/*.properties</include>
+            </includes>
+         </resource>
+         <resource>
+            <directory>${basedir}/src/java</directory>
+            <includes>
+               <include>**/*.xml</include>
+            </includes>
+         </resource>
+      </resources>
+   </build>
+</project>

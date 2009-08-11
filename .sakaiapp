@@ -1,0 +1,13 @@
+This project initially constructed by Sakai App Builder Plugin
+Used the following settings:
+Project Name: scorm-cloud
+Project Key: scormcloud
+Project CamelCase Key: ScormCloud
+Project lowerCamelCase Key: scormCloud
+Project Type: JSP
+Maven version: Maven2
+Sakai version: K1
+Project Impl: CRUD
+
+Sakai App Builder by Aaron Zeckoski (aaronz@vt.edu)
+Wicket and K1 support by Steve Swisnburg (steve.swinsburg@gmail.com)
