@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudItem;

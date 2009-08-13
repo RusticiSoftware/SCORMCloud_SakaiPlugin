@@ -1,0 +1,8 @@
+<classpath>
+  <classpathentry kind="src" path="src/test" output="target/test-classes"/>
+  <classpathentry kind="src" path="/home/devuser/Projects/Sakai/branches/2-6-x.cafe/scorm-cloud/pack/src/webapp/WEB-INF" output="target/test-classes" including="spring-hibernate.xml|logic-support.xml" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="con" path="org.maven.ide.eclipse.MAVEN2_CLASSPATH_CONTAINER"/>
+</classpath>

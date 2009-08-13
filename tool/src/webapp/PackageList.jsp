@@ -51,7 +51,8 @@
 <div class="portletBody">
 
 <div class="navIntraTool">
-	<a href="AddItem.jsp">Import Package</a>
+	<a href="PackageList.jsp">List Packages</a>
+	<a href="ImportPackage.jsp">Import Package</a>
 </div>
 
 <h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
@@ -66,6 +67,7 @@
 </div>
 <% } bean.messages.clear(); %>
 
+
 <div class="instruction">Hello, <%= bean.getCurrentUserDisplayName() %></div>
 
 <form name="listItemsForm" action="StartPage.jsp" method="post">
@@ -74,8 +76,9 @@
 			<tr>
 				<th class="firstHeader"></th>
 				<th class="secondHeader">Title</th>
-				<th class="thirdHeader">Hidden</th>
-				<th class="fourthHeader">Creation Date</th>
+				<th class="thirdHeader">SCORM Cloud ID</th>
+				<th class="fourthHeader">Hidden</th>
+				<th class="fifthHeader">Creation Date</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -93,7 +96,7 @@
 				</td>
 				<td class="secondColumn">
 					<% if (deletable) { %>
-						<a href="AddItem.jsp?id=<%= pkg.getId() %>">
+						<a href="controller?action=launchPackage&id=<%= pkg.getId() %>">
 							<%= pkg.getTitle() %>
 						</a>
 					<% } else { %>
@@ -101,13 +104,16 @@
 					<% }%>						
 				</td>
 				<td class="thirdColumn">
+					<span><%= pkg.getScormCloudId() %></span>
+				</td>
+				<td class="fourthColumn">
 					<% if (pkg.getHidden().booleanValue()) { %>
 						<input name="item-hidden" type="checkbox" disabled="true" checked="true" />
 					<% } else { %>
 						<input name="item-hidden" type="checkbox" disabled="true" />
 					<% }%>
 				</td>
-				<td class="fourthColumn">
+				<td class="fifthColumn">
 					<%= df.format(pkg.getDateCreated()) %>
 				</td>
 			</tr>

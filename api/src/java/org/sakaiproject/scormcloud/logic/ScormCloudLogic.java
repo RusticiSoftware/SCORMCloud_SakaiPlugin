@@ -11,17 +11,21 @@
 
 package org.sakaiproject.scormcloud.logic;
 
+import java.io.File;
 import java.util.List;
 
 import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
+import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
+
+import com.rusticisoftware.hostedengine.client.ScormEngineService;
 
 /**
  * This is the interface for the app Logic, 
  * @author Sakai App Builder -AZ
  */
 public interface ScormCloudLogic {
-
+	
    /**
     * This returns an item based on an id
     * @param id the id of the item to fetch
@@ -84,16 +88,26 @@ public interface ScormCloudLogic {
     */
    public List<ScormCloudPackage> getAllVisiblePackages(String locationId, String userId);
 
+   public void addNewPackage(ScormCloudPackage pkg, File packageZip) throws Exception;
+   
    /**
     * Save (Create or Update) an item (uses the current site)
     * @param item the ScormCloudItem to create or update
     */
-   public void savePackage(ScormCloudPackage pkg);
+   public void updatePackage(ScormCloudPackage pkg);
 
    /**
     * Remove an item
     * @param item the ScormCloudItem to remove
     */
    public void removePackage(ScormCloudPackage pkg);
+   
+   
+   public String getLaunchUrl(ScormCloudPackage pkg);
+   
+   public ScormCloudRegistration getRegistrationForUser(String userId);
+   public boolean canWriteRegistration(ScormCloudRegistration reg);
+   public void updateRegistration(ScormCloudRegistration reg);
+   public void removeRegistration(ScormCloudRegistration reg);
 
 }

@@ -22,6 +22,14 @@
             ref="org.sakaiproject.user.api.UserDirectoryService" />
     </bean>
 
+	<!-- create bean to hold reference to scorm engine service -->
+    <bean id="com.rusticisoftware.hostedengine.client.ScormEngineService"
+    	  class="com.rusticisoftware.hostedengine.client.ScormEngineService">
+    	  <constructor-arg index="0" value="http://dev.cloud.scorm.com/EngineWebServices/" />
+    	  <constructor-arg index="1" value="dave" />
+    	  <constructor-arg index="2" value="y7bxwHapEWuOz3ODfZJ2je0DPJaFP8kHqDrQ4Bld" />
+   	</bean>
+
     <!-- create a logic bean, give it the dao from above -->
     <bean id="org.sakaiproject.scormcloud.logic.ScormCloudLogic"
         class="org.sakaiproject.scormcloud.logic.ScormCloudLogicImpl"
@@ -30,7 +38,15 @@
             ref="org.sakaiproject.scormcloud.dao.ScormCloudDao" />
         <property name="externalLogic"
             ref="org.sakaiproject.scormcloud.logic.ExternalLogic" />
+        <property name="scormEngineService"
+        	ref="com.rusticisoftware.hostedengine.client.ScormEngineService" />
     </bean>
+    
+    
+    
+    
+    
+    
     <!-- create an entity provider bean -->
     <bean class="org.sakaiproject.scormcloud.logic.entity.ScormCloudEntityProvider">
         <property name="logic" ref="org.sakaiproject.scormcloud.logic.ScormCloudLogic" />

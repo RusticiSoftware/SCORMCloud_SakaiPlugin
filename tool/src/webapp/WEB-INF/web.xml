@@ -40,6 +40,18 @@
 		-->
 		<load-on-startup>2</load-on-startup>
 	</servlet>
+	
+	<servlet>
+		<description>Servlet for processing requests</description>
+		<display-name>controller</display-name>
+		<servlet-name>controller</servlet-name>
+		<servlet-class>org.sakaiproject.scormcloud.tool.RequestController</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+		<servlet-name>controller</servlet-name>
+		<url-pattern>/controller</url-pattern>
+	</servlet-mapping>
 
 	<!-- Sakai listeners -->
 	<listener>

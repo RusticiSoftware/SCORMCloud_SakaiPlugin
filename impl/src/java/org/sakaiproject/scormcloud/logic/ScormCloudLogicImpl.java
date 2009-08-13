@@ -11,8 +11,10 @@
 
 package org.sakaiproject.scormcloud.logic;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +26,9 @@ import org.sakaiproject.scormcloud.dao.ScormCloudDao;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
+import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
+
+import com.rusticisoftware.hostedengine.client.ScormEngineService;
 
 /**
  * This is the implementation of the business logic interface
@@ -42,6 +47,12 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
    public void setExternalLogic(ExternalLogic externalLogic) {
       this.externalLogic = externalLogic;
    }
+   
+   private ScormEngineService scormEngineService;
+   public void setScormEngineService(ScormEngineService service){
+	   this.scormEngineService = service;
+   }
+
 
    /**
     * Place any code that should run when this class is initialized by spring here
@@ -209,7 +220,33 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
       }
    }
    
-   public void savePackage(ScormCloudPackage pkg) {
+   public void addNewPackage(ScormCloudPackage pkg, File packageZip) throws Exception
+   {
+	   log.debug("In addNewPackage with package:" + pkg.getTitle());
+	      // set the owner and site to current if they are not set
+	      if (pkg.getOwnerId() == null) {
+	         pkg.setOwnerId( externalLogic.getCurrentUserId() );
+	      }
+	      if (pkg.getLocationId() == null) {
+	         pkg.setLocationId( externalLogic.getCurrentLocationId() );
+	      }
+	      if (pkg.getDateCreated() == null) {
+	         pkg.setDateCreated( new Date() );
+	      }
+	      // save pkg if new OR check if the current user can update the existing pkg
+	      if (pkg.getId() == null) {
+	    	  scormEngineService.getCourseService().ImportCourse(pkg.getScormCloudId(), packageZip.getAbsolutePath());
+	  		 
+	         dao.save(pkg);
+	         log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
+	      } else {
+	         throw new SecurityException("Current user cannot update package " + 
+	               pkg.getId() + " because they do not have permission");
+	      }
+   }
+   
+   
+   public void updatePackage(ScormCloudPackage pkg) {
       log.debug("In saveItem with item:" + pkg.getTitle());
       // set the owner and site to current if they are not set
       if (pkg.getOwnerId() == null) {
@@ -222,8 +259,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
          pkg.setDateCreated( new Date() );
       }
       // save pkg if new OR check if the current user can update the existing pkg
-      if ( (pkg.getId() == null) || 
-            canWritePackage(pkg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
+      if ( canWritePackage(pkg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
          dao.save(pkg);
          log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
       } else {
@@ -231,5 +267,117 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
                pkg.getId() + " because they do not have permission");
       }
    }
+   
+   
+   public String getLaunchUrl(ScormCloudPackage pkg) {
+	   
+	   //TODO: implement a does reg exist type functionality on the cloud
+	   String currentUserId = externalLogic.getCurrentUserId();
+	   String userDisplayName = externalLogic.getUserDisplayName(currentUserId);
+	   String firstName = "sakai";
+	   String lastName = "learner";
+	   
+	   if (userDisplayName != null && userDisplayName.contains(" ")){
+		   String[] nameParts = userDisplayName.split(" ");
+		   firstName = nameParts[0];
+		   lastName = nameParts[1];
+	   }
+		   
+	   try {
+		   scormEngineService.getRegistrationService().CreateRegistration(currentUserId, pkg.getScormCloudId(), currentUserId, firstName, lastName);
+	   } catch (Exception e) {
+		   log.debug("exception thrown creating reg (probably already exists)", e);
+	   }
+	   try {
+		   return scormEngineService.getRegistrationService().GetLaunchUrl(currentUserId);
+	   } catch (Exception e){
+		   return "error.jsp";
+	   }
+   }
+
+   
+    public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
+    	//TODO: implement a does reg exist type functionality on the cloud
+ 	   String userDisplayName = externalLogic.getUserDisplayName(userId);
+ 	   String firstName = "sakai";
+ 	   String lastName = "learner";
+ 	   
+ 	   if (userDisplayName != null && userDisplayName.contains(" ")){
+ 		   String[] nameParts = userDisplayName.split(" ");
+ 		   firstName = nameParts[0];
+ 		   lastName = nameParts[1];
+ 	   }
+ 		   
+ 	   try {
+ 		   String cloudRegId = "sakai-reg-" + userId + "-" + UUID.randomUUID().toString();
+ 		   scormEngineService.getRegistrationService().CreateRegistration(cloudRegId, pkg.getScormCloudId(), userId, firstName, lastName);
+ 		   ScormCloudRegistration reg = new ScormCloudRegistration();
+ 		   reg.setDateCreated(new Date());
+ 		   reg.setLocationId(externalLogic.getCurrentLocationId());
+ 		   reg.setOwnerId(externalLogic.getCurrentUserId());
+ 		   reg.setScormCloudId(cloudRegId);
+ 		   dao.save(reg);
+ 		   return reg;
+ 	   } catch (Exception e) {
+ 		   log.debug("exception thrown creating reg", e);
+ 		   return null;
+ 	   }
+    }
+   
+	public ScormCloudRegistration getRegistrationForUser(String userId) {
+		   log.debug("Getting registration for user with id: " + userId);
+		   return dao.findById(ScormCloudRegistration.class, userId);
+	}
+	
+	 public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId) {
+	      log.debug("checking if can write for: " + userId + ", " + locationId);
+	      if (reg.getOwnerId().equals( userId ) ) {
+	         // owner can always modify an item
+	         return true;
+	      } else if ( externalLogic.isUserAdmin(userId) ) {
+	         // the system super user can modify any item
+	         return true;
+	      } else if ( locationId.equals(reg.getLocationId()) &&
+	            externalLogic.isUserAllowedInLocation(userId, ExternalLogic.ITEM_WRITE_ANY, locationId) ) {
+	         // users with permission in the specified site can modify items from that site
+	         return true;
+	      }
+	      return false;
+	   }
+	
+	public void removeRegistration(ScormCloudRegistration reg) {
+		log.debug("In regmoveRegistration with regId:" + reg.getId());
+	      // check if current user can remove this item
+	      if ( canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId() ) ) {
+	         dao.delete(reg);
+	         log.info("Removing reg with id: " + reg.getId());
+	      } else {
+	         throw new SecurityException("Current user cannot remove item " + 
+	               reg.getId() + " because they do not have permission");
+	      }
+	}
+	
+	
+	public void updateRegistration(ScormCloudRegistration reg) {
+		log.debug("In updateRegistration with reg id:" + reg.getId());
+	      // set the owner and site to current if they are not set
+	      if (reg.getOwnerId() == null) {
+	         reg.setOwnerId( externalLogic.getCurrentUserId() );
+	      }
+	      if (reg.getLocationId() == null) {
+	         reg.setLocationId( externalLogic.getCurrentLocationId() );
+	      }
+	      if (reg.getDateCreated() == null) {
+	         reg.setDateCreated( new Date() );
+	      }
+	      // save pkg if new OR check if the current user can update the existing pkg
+	      if ( canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
+	         dao.save(reg);
+	         log.info("Saving registration: " + reg.getId());
+	      } else {
+	         throw new SecurityException("Current user cannot update package " + 
+	               reg.getId() + " because they do not have permission");
+	      }
+	}
 
 }

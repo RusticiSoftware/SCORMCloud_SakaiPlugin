@@ -18,5 +18,6 @@
 		<property name="locationId" type="string" length="255" not-null="true" />
 		<property name="hidden" type="java.lang.Boolean" not-null="true" />
 		<property name="dateCreated" type="java.util.Date" />
+		<property name="scormCloudId" type="string" length="255" not-null="true" />
 	</class>
 </hibernate-mapping>

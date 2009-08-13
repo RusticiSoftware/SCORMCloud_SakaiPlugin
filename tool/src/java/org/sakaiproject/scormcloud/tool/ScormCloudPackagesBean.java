@@ -1,5 +1,6 @@
 package org.sakaiproject.scormcloud.tool;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,9 @@ public class ScormCloudPackagesBean {
 	}
 
 	public ArrayList messages = new ArrayList();
+	public ArrayList getMessages() {
+		return messages;
+	}
 
 	public void init() {
 		log.debug("init");
@@ -67,10 +71,18 @@ public class ScormCloudPackagesBean {
 		return logic.getPackageById(id);
 	}
 
-	public void addOrUpdateItem(ScormCloudPackage pkg) {
-		logic.savePackage(pkg);
+	public void updatePackage(ScormCloudPackage pkg) {
+		logic.updatePackage(pkg);
 	}
-
+	
+	public void addNewPackage(ScormCloudPackage pkg, File zipFile) throws Exception {
+		logic.addNewPackage(pkg, zipFile);
+	}
+	
+	public String getLaunchUrl(ScormCloudPackage pkg){
+		return logic.getLaunchUrl(pkg);
+	}
+	
 	/**
 	 * @param item a ScormCloudPackage to remove
 	 * @return true if the item can be removed by the current user, false otherwise
