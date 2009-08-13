@@ -13,6 +13,7 @@ import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
+import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 
 public class ScormCloudPackagesBean {
 	private static Log log = LogFactory.getLog(ScormCloudItemsBean.class);
@@ -79,10 +80,6 @@ public class ScormCloudPackagesBean {
 		logic.addNewPackage(pkg, zipFile);
 	}
 	
-	public String getLaunchUrl(ScormCloudPackage pkg){
-		return logic.getLaunchUrl(pkg);
-	}
-	
 	/**
 	 * @param item a ScormCloudPackage to remove
 	 * @return true if the item can be removed by the current user, false otherwise
@@ -93,6 +90,74 @@ public class ScormCloudPackagesBean {
 		if ( item != null && 
 				logic.canWritePackage(item, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
 			logic.removePackage(item);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	//--------------Registrations-------------------
+	
+	/**
+	 * @param item a ScormCloudPackage to check
+	 * @return true if the current user can remove or update the item
+	 */
+	public boolean canDelete(ScormCloudRegistration reg) {
+		log.debug("check Delete for: " + reg.getId());
+		return logic.canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId());
+	}
+
+	/**
+	 * @return a List of ScormCloudPackage objects visible to the current user in the current site
+	 */
+	/*public List getAllVisibleRegistrations() {
+		return logic.getAllVisibleRegistrations(externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId());
+	}*/
+
+	/**
+	 * @param id the unique id of the item
+	 * @return a ScormCloudPackage or null if not found
+	 */
+	public ScormCloudRegistration getRegistrationById(String id) {
+		return logic.getRegistrationById(id);
+	}
+	
+	public ScormCloudRegistration findOrCreateUserRegistrationFor(ScormCloudPackage pkg){
+		ScormCloudRegistration reg = logic.findRegistrationFor(externalLogic.getCurrentUserId(), pkg.getId());
+		if(reg == null){
+			reg = logic.addNewRegistration(externalLogic.getCurrentUserId(), pkg);
+		}
+		return reg;
+	}
+
+	public void updateRegistration(ScormCloudRegistration reg) {
+		logic.updateRegistration(reg);
+	}
+	
+	public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
+		return logic.addNewRegistration(userId, pkg);
+	}
+	
+	public String getLaunchUrl(ScormCloudRegistration reg){
+		return logic.getLaunchUrl(reg);
+	}
+	
+	/**
+	 * @param item a ScormCloudPackage to remove
+	 * @return true if the item can be removed by the current user, false otherwise
+	 */
+	public boolean checkRemoveRegistrationById(String id) {
+		log.debug("check and Remove for: " + id);
+		ScormCloudRegistration reg = logic.getRegistrationById(id);
+		if ( reg != null && 
+				logic.canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
+			logic.removeRegistration(reg);
 			return true;
 		}
 		return false;

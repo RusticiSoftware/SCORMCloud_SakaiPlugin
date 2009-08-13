@@ -11,6 +11,7 @@
             <list>
                 <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudItem.hbm.xml</value>
                 <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudPackage.hbm.xml</value>
+                <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudRegistration.hbm.xml</value>
             </list>
         </constructor-arg>
     </bean>
@@ -25,6 +26,7 @@
             <list>
                 <value>org.sakaiproject.scormcloud.model.ScormCloudItem</value>
                 <value>org.sakaiproject.scormcloud.model.ScormCloudPackage</value>
+                <value>org.sakaiproject.scormcloud.model.ScormCloudRegistration</value>
             </list>
         </property>
     </bean>

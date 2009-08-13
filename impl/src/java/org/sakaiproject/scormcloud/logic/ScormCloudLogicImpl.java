@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.sakaiproject.genericdao.api.search.Restriction;
 import org.sakaiproject.genericdao.api.search.Search;
 
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
@@ -269,29 +270,13 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
    }
    
    
-   public String getLaunchUrl(ScormCloudPackage pkg) {
-	   
-	   //TODO: implement a does reg exist type functionality on the cloud
-	   String currentUserId = externalLogic.getCurrentUserId();
-	   String userDisplayName = externalLogic.getUserDisplayName(currentUserId);
-	   String firstName = "sakai";
-	   String lastName = "learner";
-	   
-	   if (userDisplayName != null && userDisplayName.contains(" ")){
-		   String[] nameParts = userDisplayName.split(" ");
-		   firstName = nameParts[0];
-		   lastName = nameParts[1];
-	   }
-		   
+   public String getLaunchUrl(ScormCloudRegistration reg) {
 	   try {
-		   scormEngineService.getRegistrationService().CreateRegistration(currentUserId, pkg.getScormCloudId(), currentUserId, firstName, lastName);
-	   } catch (Exception e) {
-		   log.debug("exception thrown creating reg (probably already exists)", e);
+		   return scormEngineService.getRegistrationService().GetLaunchUrl(reg.getScormCloudId());
 	   }
-	   try {
-		   return scormEngineService.getRegistrationService().GetLaunchUrl(currentUserId);
-	   } catch (Exception e){
-		   return "error.jsp";
+	   catch (Exception e){
+		   log.error("Encountered an exception while trying to get launch url from SCORM Cloud", e);
+		   return null;
 	   }
    }
 
@@ -316,6 +301,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
  		   reg.setLocationId(externalLogic.getCurrentLocationId());
  		   reg.setOwnerId(externalLogic.getCurrentUserId());
  		   reg.setScormCloudId(cloudRegId);
+ 		   reg.setPackageId(pkg.getId());
  		   dao.save(reg);
  		   return reg;
  	   } catch (Exception e) {
@@ -324,9 +310,25 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
  	   }
     }
    
-	public ScormCloudRegistration getRegistrationForUser(String userId) {
-		   log.debug("Getting registration for user with id: " + userId);
-		   return dao.findById(ScormCloudRegistration.class, userId);
+	public ScormCloudRegistration getRegistrationById(String id) {
+		   log.debug("Getting registration with id: " + id);
+		   return dao.findById(ScormCloudRegistration.class, id);
+	}
+	
+	public ScormCloudRegistration findRegistrationFor(String userId, String pkgId){
+		log.debug("Finding registration with userId = " + userId + ", packageId = " + pkgId);
+		Search s = new Search();
+		s.addRestriction(new Restriction("ownerId", userId));
+		s.addRestriction(new Restriction("packageId", pkgId));
+		List<ScormCloudRegistration> regs = dao.findBySearch(ScormCloudRegistration.class, s);
+		if(regs.size() >= 1){
+			if(regs.size() > 1){
+				log.debug("Found more than one registration with userId = " + userId + " and packageId = " + pkgId);
+			}
+			return regs.get(0);
+		}
+		log.debug("Couldn't find any regs, returning null");
+		return null;
 	}
 	
 	 public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId) {

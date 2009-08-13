@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
+import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -46,7 +47,18 @@ public class RequestController extends HttpServlet {
 			if(action.equals("launchPackage")){
 				String packageId = request.getParameter("id");
 				log.debug("action launchPackage requested with packageId = " + packageId);
-				String launchUrl = getLaunchUrl(packageId);
+				
+				ScormCloudPackage pkg = getScormCloudPackagesBean().getPackageById(packageId);
+				if(pkg == null){
+					log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
+					request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
+					RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+					rd.forward(request, response);
+				}
+				
+				ScormCloudRegistration reg = getScormCloudPackagesBean().findOrCreateUserRegistrationFor(pkg);
+				String launchUrl = getScormCloudPackagesBean().getLaunchUrl(reg);
+				
 				log.debug("launchUrl = " + launchUrl);
 				request.setAttribute("url", launchUrl);
 				RequestDispatcher rd = request.getRequestDispatcher("Launch.jsp");
@@ -64,14 +76,6 @@ public class RequestController extends HttpServlet {
 		catch (Exception e){
 			throw new ServletException(e);
 		}
-	}
-	
-	private String getLaunchUrl(String packageId) {
-		ScormCloudPackage pkg = getScormCloudPackagesBean().getPackageById(packageId);
-		if(pkg == null){
-			return "error.jsp";
-		}
-		return getScormCloudPackagesBean().getLaunchUrl(pkg);
 	}
 
 	public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {

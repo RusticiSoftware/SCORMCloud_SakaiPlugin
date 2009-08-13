@@ -12,6 +12,7 @@ public class ScormCloudRegistration implements Serializable {
 	private String locationId; // Sakai locationId
 	private Date dateCreated;
 	private String scormCloudId;
+	private String packageId;
 	
 	public ScormCloudRegistration () {
 		
@@ -67,5 +68,12 @@ public class ScormCloudRegistration implements Serializable {
 	}
 	public void setScormCloudId(String scormCloudId){
 		this.scormCloudId = scormCloudId;
+	}
+	
+	public String getPackageId() {
+		return packageId;
+	}
+	public void setPackageId(String packageId) {
+		this.packageId = packageId;
 	}
 }

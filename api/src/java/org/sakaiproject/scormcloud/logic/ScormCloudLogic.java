@@ -103,10 +103,14 @@ public interface ScormCloudLogic {
    public void removePackage(ScormCloudPackage pkg);
    
    
-   public String getLaunchUrl(ScormCloudPackage pkg);
    
-   public ScormCloudRegistration getRegistrationForUser(String userId);
-   public boolean canWriteRegistration(ScormCloudRegistration reg);
+   
+   public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg);
+   public ScormCloudRegistration getRegistrationById(String id);
+   public ScormCloudRegistration findRegistrationFor(String userId, String pkgId);
+   public String getLaunchUrl(ScormCloudRegistration reg);
+   
+   public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId);
    public void updateRegistration(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
 

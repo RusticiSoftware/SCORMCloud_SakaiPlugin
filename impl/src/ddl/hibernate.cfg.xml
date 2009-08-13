@@ -8,5 +8,6 @@
             this should be the classpath location (typically after the src directory) -->
         <mapping resource="org/sakaiproject/scormcloud/dao/hbm/ScormCloudItem.hbm.xml" />
         <mapping resource="org/sakaiproject/scormcloud/dao/hbm/ScormCloudPackage.hbm.xml" />
+        <mapping resource="org/sakaiproject/scormcloud/dao/hbm/ScormCloudRegistration.hbm.xml" />
     </session-factory>
 </hibernate-configuration>
