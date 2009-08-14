@@ -35,43 +35,23 @@ public class RequestController extends HttpServlet {
 			}
 			
 			if(action.equals("importPackage")){
-				output.println(action);
-				output.println(processImportRequest(request, response));
-				return;
-//				ClientData client = getClientData(request.getParameter("appid"));
-//				request.setAttribute("client", client);
-//				RequestDispatcher rd = request.getRequestDispatcher("ClientDetail.jsp");
-//				rd.forward(request, response);
+				processImportRequest(request, response);
 			}
-			
 			if(action.equals("launchPackage")){
-				String packageId = request.getParameter("id");
-				log.debug("action launchPackage requested with packageId = " + packageId);
-				
-				ScormCloudPackage pkg = getScormCloudPackagesBean().getPackageById(packageId);
-				if(pkg == null){
-					log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
-					request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
-					RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-					rd.forward(request, response);
-				}
-				
-				ScormCloudRegistration reg = getScormCloudPackagesBean().findOrCreateUserRegistrationFor(pkg);
-				String launchUrl = getScormCloudPackagesBean().getLaunchUrl(reg);
-				
-				log.debug("launchUrl = " + launchUrl);
-				request.setAttribute("url", launchUrl);
-				RequestDispatcher rd = request.getRequestDispatcher("Launch.jsp");
-				rd.forward(request, response);
+				processLaunchRequest(request, response);
+			}
+			if(action.equals("updatePackage")){
+				/* Not implemented yet */
+			}
+			if(action.equals("updateRegSummaryData")){
+				/* Not implemented yet */
+			}
+			if(action.equals("showPackageProperties")){
+				/* Not implemented yet */
 			}
 			
-			if(action.equals("deleteClientData")){
-//				(new AccountManager()).deleteClientData(request.getParameter("appid"));
-//				response.sendRedirect("ClientSummary.jsp");
-			}
 			
 			output.println("error: Action " + action + " not found");
-			
 		}
 		catch (Exception e){
 			throw new ServletException(e);
@@ -82,8 +62,11 @@ public class RequestController extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	public String processImportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		
+	/**
+	 * Create a new package record and import posted file to the cloud.
+	 */
+	public void processImportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		//These params will be set to the request params after we parse the file upload request
 		HashMap<String, String> params = new HashMap<String, String>();
 		
 		//Write upload data to temp file
@@ -108,10 +91,45 @@ public class RequestController extends HttpServlet {
         
         //Clean up the temp file now that we're done
         tempFile.delete();
-        
-        return pkg.getScormCloudId();
+
+        //Send the user back to the package list page
+		response.sendRedirect("PackageList.jsp");
+	}
+	
+	/**
+	 * Create or find a registration for the current user and the specified package,
+	 * and redirect the user to the launch page
+	 */
+	public void processLaunchRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		String packageId = request.getParameter("id");
+		log.debug("action launchPackage requested with packageId = " + packageId);
+		
+		//Grab the packages bean
+		ScormCloudPackagesBean pkgsBean = getScormCloudPackagesBean();
+		
+		//Go get the package specified by the id in the request
+		ScormCloudPackage pkg = pkgsBean.getPackageById(packageId);
+		if(pkg == null){
+			log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
+			request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
+			RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
+			rd.forward(request, response);
+		}
+		
+		//Find (or create) a registration for the current user and the given package
+		ScormCloudRegistration reg = pkgsBean.findOrCreateUserRegistrationFor(pkg);
+		String launchUrl = pkgsBean.getLaunchUrl(reg);
+		
+		//Forward the user to the launch page, now that a registration exists for them
+		log.debug("launchUrl = " + launchUrl);
+		request.setAttribute("url", launchUrl);
+		RequestDispatcher rd = request.getRequestDispatcher("Launch.jsp");
+		rd.forward(request, response);
 	}
 
+	/**
+	 * Get the scorm cloud packages bean
+	 */
 	private ScormCloudPackagesBean getScormCloudPackagesBean()
 	{
 		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
