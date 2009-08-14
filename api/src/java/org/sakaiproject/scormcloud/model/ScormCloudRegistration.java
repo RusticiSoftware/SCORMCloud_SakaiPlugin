@@ -13,6 +13,7 @@ public class ScormCloudRegistration implements Serializable {
 	private Date dateCreated;
 	private String scormCloudId;
 	private String packageId;
+	private String userName;
 	
 	private String complete;
 	private String success;
@@ -81,6 +82,12 @@ public class ScormCloudRegistration implements Serializable {
 	}
 	public void setPackageId(String packageId) {
 		this.packageId = packageId;
+	}
+	public String getUserName() {
+	    return userName;
+	}
+	public void setUserName(String userName) {
+	    this.userName = userName;
 	}
 
     public String getComplete() {

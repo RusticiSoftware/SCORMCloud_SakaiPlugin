@@ -7,6 +7,7 @@
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
+<%@ page import="org.sakaiproject.scormcloud.model.ScormCloudRegistration" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -18,7 +19,6 @@
     ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
     pageContext.setAttribute("bean", bean);
 %>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -27,7 +27,7 @@
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Packages</title>
+<title>SCORM Cloud Registrations</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
@@ -37,7 +37,7 @@
     <a href="ImportPackage.jsp">Import Package</a>
 </div>
 
-<h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
+<h3 class="insColor insBak insBorder">SCORM Cloud Registrations for Package ${pkg.title}</h3>
 
 <c:if test="${fn:length(bean.messages) > 0}">
     <div class="alertMessage">
@@ -53,56 +53,67 @@
 
 <div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
 
-<form name="listItemsForm" action="controller?action=processPackageListAction" method="post">
+<form name="listItemsForm" action="controller?action=processRegistrationListAction" method="post">
     <table class="listHier">
         <thead>
             <tr>
                 <th class="firstHeader"></th>
-                <th class="secondHeader">Title</th>
+                <th class="secondHeader">Username</th>
                 <th class="thirdHeader">SCORM Cloud ID</th>
-                <th class="fourthHeader">Hidden</th>
-                <th class="fifthHeader">Results</th>
-                <th class="sixthHeader">Creation Date</th>
+                <th class="fourthColumn">Complete</th>
+                <th class="fifthColumn">Success</th>
+                <th class="sixthColumn">Score</th>
+                <th class="seventhColumn">Time Spent</th>
+                <th class="eighthColumn">Creation Date</th>
             </tr>
         </thead>
         <tbody>
-            <c:forEach var="pkg" items="${bean.allVisiblePackages}">
-                <% ScormCloudPackage pkg = (ScormCloudPackage)pageContext.getAttribute("pkg"); %>
-                <c:set var="deletable"><%= bean.canDelete(pkg) %></c:set>
+            <c:forEach var="reg" items="${regList}">
+            <% ScormCloudRegistration reg = (ScormCloudRegistration)pageContext.getAttribute("reg"); %>
+                <c:set var="deletable"><%= bean.canDelete(reg) %></c:set>
                 <tr>
                     <td class="firstColumn">
                         <c:if test="${deletable}">
-                            <input name="select-item" value="${pkg.id}" type="checkbox" />
+                            <input name="select-item" value="${reg.id}" type="checkbox" />
                         </c:if>
                     </td>
                     <td class="secondColumn">
                         <c:choose>
                             <c:when test="${deletable}">
-                                <a href="controller?action=launchPackage&id=${pkg.id}">
-                                    ${pkg.title}
+                                <a href="controller?action=viewDetailedRegistrationReport&id=${reg.id}">
+                                    ${reg.userName}
                                 </a>
                             </c:when><c:otherwise>
-                                ${pkg.title}
+                                ${reg.userName}
                             </c:otherwise>      
                         </c:choose>             
                     </td>
                     <td class="thirdColumn">
-                        <span>${pkg.scormCloudId}</span>
+                        <span>${reg.scormCloudId}</span>
                     </td>
-                    <td class="fourthColumn">
+                    <%-- <td class="fourthColumn">
                         <c:choose>
-                            <c:when test="${pkg.hidden}">
+                            <c:when test="${reg.hidden}">
                                 <input name="item-hidden" type="checkbox" disabled="true" checked="true" />
                             </c:when><c:otherwise>
                                 <input name="item-hidden" type="checkbox" disabled="true" />
                             </c:otherwise>
                         </c:choose>
+                    </td> --%>
+                    <td class="fourthColumn">
+                    	<span>${reg.complete}</span>
                     </td>
                     <td class="fifthColumn">
-                        <a href="controller?action=viewRegistrations&id=${pkg.id}">Results</a>
+                    	<span>${reg.success}</span>
                     </td>
                     <td class="sixthColumn">
-                        <fmt:formatDate value="${pkg.dateCreated}" type="both" 
+                    	<span>${reg.score}</span>
+                    </td>
+                    <td class="seventhColumn">
+                    	<span>${reg.totalTime}</span>
+                    </td>
+                    <td class="eighthColumn">
+                        <fmt:formatDate value="${reg.dateCreated}" type="both" 
                             dateStyle="medium" timeStyle="medium" />
                     </td>
                 </tr>
@@ -111,6 +122,7 @@
     </table>
 
     <p class="act">
+    	<input name="update-items" type="submit" value="Update Results" />
         <input name="delete-items" type="submit" value="Delete" />
     </p>
 </form>

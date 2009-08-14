@@ -16,7 +16,7 @@ import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 
 public class ScormCloudPackagesBean {
-	private static Log log = LogFactory.getLog(ScormCloudItemsBean.class);
+	private static Log log = LogFactory.getLog(ScormCloudPackagesBean.class);
 
 	public ScormCloudPackage newItem = new ScormCloudPackage();
 	public Map selectedIds = new HashMap();
@@ -103,15 +103,6 @@ public class ScormCloudPackagesBean {
 	
 	
 	//--------------Registrations-------------------
-	
-	/**
-	 * @param item a ScormCloudPackage to check
-	 * @return true if the current user can remove or update the item
-	 */
-	public boolean canDelete(ScormCloudRegistration reg) {
-		log.debug("check Delete for: " + reg.getId());
-		return logic.canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId());
-	}
 
 	/**
 	 * @return a List of ScormCloudPackage objects visible to the current user in the current site
@@ -128,6 +119,10 @@ public class ScormCloudPackagesBean {
 		return logic.getRegistrationById(id);
 	}
 	
+	public List<ScormCloudRegistration> getRegistrationsByPackageId(String packageId) {
+	    return logic.getRegistrationsByPackageId(packageId);
+	}
+	
 	public ScormCloudRegistration findOrCreateUserRegistrationFor(ScormCloudPackage pkg){
 		ScormCloudRegistration reg = logic.findRegistrationFor(externalLogic.getCurrentUserId(), pkg.getId());
 		if(reg == null){
@@ -135,9 +130,20 @@ public class ScormCloudPackagesBean {
 		}
 		return reg;
 	}
+	
+	public boolean canDelete(ScormCloudRegistration reg) {
+        log.debug("check Delete for: " + reg.getId());
+        return logic.canWriteRegistration(reg, 
+                    externalLogic.getCurrentLocationId(), 
+                    externalLogic.getCurrentUserId());
+    }
 
 	public void updateRegistration(ScormCloudRegistration reg) {
 		logic.updateRegistration(reg);
+	}
+	
+	public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg) {
+	    logic.updateRegistrationResultsFromCloud(reg);
 	}
 	
 	public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){

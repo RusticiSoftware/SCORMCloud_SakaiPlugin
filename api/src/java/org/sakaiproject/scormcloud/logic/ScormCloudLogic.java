@@ -107,6 +107,7 @@ public interface ScormCloudLogic {
    
    public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg);
    public ScormCloudRegistration getRegistrationById(String id);
+   public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
    public ScormCloudRegistration findRegistrationFor(String userId, String pkgId);
    public String getLaunchUrl(ScormCloudRegistration reg);
    

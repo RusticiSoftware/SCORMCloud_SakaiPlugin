@@ -270,7 +270,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
                                 + pkg.getScormCloudId(), e);
             }
             dao.delete(pkg);
-            log.info("Removing item: " + pkg.getId() + ":" + pkg.getTitle());
+            log.info("Removing package: " + pkg.getId() + ":" + pkg.getTitle());
         } else {
             throw new SecurityException("Current user cannot remove item "
                     + pkg.getId() + " because they do not have permission");
@@ -362,6 +362,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setDateCreated(new Date());
             reg.setLocationId(externalLogic.getCurrentLocationId());
             reg.setOwnerId(externalLogic.getCurrentUserId());
+            reg.setUserName(userDisplayName);
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
             dao.save(reg);
@@ -375,6 +376,19 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
     public ScormCloudRegistration getRegistrationById(String id) {
         log.debug("Getting registration with id: " + id);
         return dao.findById(ScormCloudRegistration.class, id);
+    }
+    
+    public List<ScormCloudRegistration> getRegistrationsByPackageId(String packageId) {
+        log.debug("Getting registrations for package with id = " + packageId);
+        ScormCloudPackage pkg = this.getPackageById(packageId);
+        if(pkg == null){
+            log.debug("Error finding registrations for package, " +
+                      "no package found with id = " + packageId);
+            return null;
+        }
+        Search s = new Search();
+        s.addRestriction(new Restriction("packageId", packageId));
+        return dao.findBySearch(ScormCloudRegistration.class, s);
     }
 
     public ScormCloudRegistration findRegistrationFor(String userId,
@@ -462,7 +476,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         try {
             RegistrationSummary sum = scormEngineService
                                         .getRegistrationService()
-                                        .GetRegistrationSummary(reg.getScormCloudId());
+                                        .GetRegistrationSummary(
+                                                reg.getScormCloudId());
             reg.setComplete(sum.getComplete());
             reg.setSuccess(sum.getSuccess());
             reg.setScore(sum.getScore());

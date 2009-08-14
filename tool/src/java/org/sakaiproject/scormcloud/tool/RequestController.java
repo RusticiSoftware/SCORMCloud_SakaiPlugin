@@ -1,8 +1,10 @@
 package org.sakaiproject.scormcloud.tool;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.RequestDispatcher;
@@ -40,8 +42,21 @@ public class RequestController extends HttpServlet {
 			if(action.equals("launchPackage")){
 				processLaunchRequest(request, response);
 			}
-			if(action.equals("deletePackages")){
-			    processDeletePackagesRequest(request, response);
+			if(action.equals("processPackageListAction")){
+			    if (request.getParameterValues("delete-items") != null) {
+			        processDeletePackagesRequest(request, response);
+			    }
+			}
+			if(action.equals("processRegistrationListAction")){
+			    if(request.getParameter("delete-items") != null){
+			        processDeleteRegistrationsRequest(request, response);
+			    }
+			    else if (request.getParameter("update-items") != null){
+			        processUpdateRegistrationsRequest(request, response);
+			    }
+			}
+			if(action.equals("viewRegistrations")){
+			    processViewRegistrationsRequest(request, response);
 			}
 			if(action.equals("updatePackage")){
 				/* Not implemented yet */
@@ -61,29 +76,80 @@ public class RequestController extends HttpServlet {
 		}
 	}
 
+    private void processUpdateRegistrationsRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+        String[] selectedItems = request.getParameterValues("select-item");
+        if (selectedItems != null && selectedItems.length > 0) {
+            int itemsUpdated = 0;
+            for (String id : selectedItems){
+                ScormCloudRegistration reg = bean.getRegistrationById(id);
+                bean.updateRegistrationResultsFromCloud(reg);
+            }
+            bean.messages.add("Updated " + itemsUpdated + " items");
+        }
+        RequestDispatcher rd = request.getRequestDispatcher("RegistrationList.jsp");
+        rd.forward(request, response);
+    }
+
+    private void processDeleteRegistrationsRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+        String[] selectedItems = request.getParameterValues("select-item");
+        if (selectedItems != null && selectedItems.length > 0) {
+            int itemsRemoved = 0;
+            for (int i=0; i<selectedItems.length; i++) {
+                String id = selectedItems[i];
+                if (bean.checkRemoveRegistrationById(id)) {
+                    itemsRemoved++;
+                } else {
+                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
+                }
+            }
+            bean.messages.add("Removed " + itemsRemoved + " items");
+        }
+        RequestDispatcher rd = request.getRequestDispatcher("RegistrationList.jsp");
+        rd.forward(request, response);
+    }
+
+    private void processViewRegistrationsRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        String packageId = request.getParameter("id");
+        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+        ScormCloudPackage pkg = (ScormCloudPackage)bean.getPackageById(packageId);
+        if(pkg == null){
+            log.debug("Error processing view registration request, " +
+                      "package with id = " + packageId + " not found!");
+            response.sendRedirect("PackageList.jsp");
+        }
+        List<ScormCloudRegistration> regList = bean.getRegistrationsByPackageId(pkg.getId());
+        
+        request.setAttribute("pkg", pkg);
+        request.setAttribute("regList", regList);
+        RequestDispatcher rd = request.getRequestDispatcher("RegistrationList.jsp");
+        rd.forward(request, response);
+    }
+
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
         doGet(request, response);
     }
 
 	public void processDeletePackagesRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	    ScormCloudPackagesBean bean = getScormCloudPackagesBean();
-	    if (request.getParameterValues("delete-items") != null) {
-	        // user clicked the submit
-	        String[] selectedItems = request.getParameterValues("select-item");
-	        if (selectedItems != null && selectedItems.length > 0) {
-	            int itemsRemoved = 0;
-	            for (int i=0; i<selectedItems.length; i++) {
-	                String id = selectedItems[i];
-	                if (bean.checkRemovePackageById(id)) {
-	                    itemsRemoved++;
-	                } else {
-	                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
-	                }
-	            }
-	            bean.messages.add("Removed " + itemsRemoved + " items");
-	        }
-	    }
-	    response.sendRedirect("PackagesList.jsp");
+        String[] selectedItems = request.getParameterValues("select-item");
+        if (selectedItems != null && selectedItems.length > 0) {
+            int itemsRemoved = 0;
+            for (int i=0; i<selectedItems.length; i++) {
+                String id = selectedItems[i];
+                if (bean.checkRemovePackageById(id)) {
+                    itemsRemoved++;
+                } else {
+                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
+                }
+            }
+            bean.messages.add("Removed " + itemsRemoved + " items");
+        }
+	    response.sendRedirect("PackageList.jsp");
     }
 
 	
