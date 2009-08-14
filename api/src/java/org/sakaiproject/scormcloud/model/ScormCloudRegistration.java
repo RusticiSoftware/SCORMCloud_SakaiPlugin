@@ -14,6 +14,12 @@ public class ScormCloudRegistration implements Serializable {
 	private String scormCloudId;
 	private String packageId;
 	
+	private String complete;
+	private String success;
+	private String score;
+	private String totalTime;
+	
+	
 	public ScormCloudRegistration () {
 		
 	}
@@ -76,4 +82,36 @@ public class ScormCloudRegistration implements Serializable {
 	public void setPackageId(String packageId) {
 		this.packageId = packageId;
 	}
+
+    public String getComplete() {
+        return complete;
+    }
+
+    public void setComplete(String complete) {
+        this.complete = complete;
+    }
+
+    public String getSuccess() {
+        return success;
+    }
+
+    public void setSuccess(String success) {
+        this.success = success;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public void setScore(String score) {
+        this.score = score;
+    }
+
+    public String getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(String totalTime) {
+        this.totalTime = totalTime;
+    }
 }

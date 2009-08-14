@@ -40,6 +40,9 @@ public class RequestController extends HttpServlet {
 			if(action.equals("launchPackage")){
 				processLaunchRequest(request, response);
 			}
+			if(action.equals("deletePackages")){
+			    processDeletePackagesRequest(request, response);
+			}
 			if(action.equals("updatePackage")){
 				/* Not implemented yet */
 			}
@@ -58,9 +61,31 @@ public class RequestController extends HttpServlet {
 		}
 	}
 
-	public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
-		doGet(request, response);
-	}
+    public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        doGet(request, response);
+    }
+
+	public void processDeletePackagesRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	    ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+	    if (request.getParameterValues("delete-items") != null) {
+	        // user clicked the submit
+	        String[] selectedItems = request.getParameterValues("select-item");
+	        if (selectedItems != null && selectedItems.length > 0) {
+	            int itemsRemoved = 0;
+	            for (int i=0; i<selectedItems.length; i++) {
+	                String id = selectedItems[i];
+	                if (bean.checkRemovePackageById(id)) {
+	                    itemsRemoved++;
+	                } else {
+	                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
+	                }
+	            }
+	            bean.messages.add("Removed " + itemsRemoved + " items");
+	        }
+	    }
+	    response.sendRedirect("PackagesList.jsp");
+    }
+
 	
 	/**
 	 * Create a new package record and import posted file to the cloud.

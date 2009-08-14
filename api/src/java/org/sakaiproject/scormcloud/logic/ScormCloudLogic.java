@@ -112,6 +112,7 @@ public interface ScormCloudLogic {
    
    public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId);
    public void updateRegistration(ScormCloudRegistration reg);
+   public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
 
 }

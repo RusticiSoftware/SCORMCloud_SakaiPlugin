@@ -11,14 +11,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml" %>
-<%
-	// Get the backing bean from the spring context
-	//WebApplicationContext context = 
-	//	WebApplicationContextUtils.getWebApplicationContext(application);
-	//ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
 
-	String url = (String)request.getAttribute("url");
-%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -36,9 +29,9 @@
 <h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
 
 	<script>
-         window.open("<%= url %>", "_blank", "");
+         window.open("${url}", "_blank", "");
     </script>
-<div class="instruction">Your course is launching, if you do not see it in a new window click <a href="<%= url %>" target="_blank">here</a>.</div>
+<div class="instruction">Your course is launching, if you do not see it in a new window click <a href="${url}" target="_blank">here</a>.</div>
 
 </div>
 </body>

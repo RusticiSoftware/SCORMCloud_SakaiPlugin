@@ -17,24 +17,8 @@
         WebApplicationContextUtils.getWebApplicationContext(application);
     ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
     pageContext.setAttribute("bean", bean);
-
-    if (request.getParameterValues("delete-items") != null) {
-        // user clicked the submit
-        String[] selectedItems = request.getParameterValues("select-item");
-        if (selectedItems != null && selectedItems.length > 0) {
-            int itemsRemoved = 0;
-            for (int i=0; i<selectedItems.length; i++) {
-                String id = selectedItems[i];
-                if (bean.checkRemovePackageById(id)) {
-                    itemsRemoved++;
-                } else {
-                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
-                }
-            }
-            bean.messages.add("Removed " + itemsRemoved + " items");
-        }
-    }
 %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -69,7 +53,7 @@
 
 <div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
 
-<form name="listItemsForm" action="StartPage.jsp" method="post">
+<form name="listItemsForm" action="controller?action=deletePackages" method="post">
     <table class="listHier">
         <thead>
             <tr>

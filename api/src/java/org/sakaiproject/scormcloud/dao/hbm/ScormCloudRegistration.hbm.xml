@@ -20,5 +20,11 @@
 		<property name="dateCreated" type="java.util.Date" />
 		<property name="scormCloudId" type="string" length="255" not-null="true" />
 		<property name="packageId" type="string" length="255" not-null="true" />
+		
+		<property name="complete" type="string" length="255" />
+		<property name="success" type="string" length="255" />
+		<property name="score" type="string" length="255" />
+		<property name="totalTime" type="string" length="255" />
+		
 	</class>
 </hibernate-mapping>
