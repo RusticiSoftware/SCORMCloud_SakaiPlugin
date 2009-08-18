@@ -63,7 +63,7 @@
 
 	<!-- define the starting page for this app -->
 	<welcome-file-list>
-		<welcome-file>StartPage.jsp</welcome-file>
+		<welcome-file>PackageList.jsp</welcome-file>
 	</welcome-file-list>
 
 </web-app>

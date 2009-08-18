@@ -150,8 +150,8 @@ public class ScormCloudPackagesBean {
 		return logic.addNewRegistration(userId, pkg);
 	}
 	
-	public String getLaunchUrl(ScormCloudRegistration reg){
-		return logic.getLaunchUrl(reg);
+	public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl){
+		return logic.getLaunchUrl(reg, redirectOnExitUrl);
 	}
 	
 	/**

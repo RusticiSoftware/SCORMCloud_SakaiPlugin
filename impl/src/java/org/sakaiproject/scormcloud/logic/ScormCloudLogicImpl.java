@@ -328,10 +328,10 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
     }
 
-    public String getLaunchUrl(ScormCloudRegistration reg) {
+    public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl) {
         try {
             return scormEngineService.getRegistrationService().GetLaunchUrl(
-                    reg.getScormCloudId());
+                    reg.getScormCloudId(), redirectOnExitUrl);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
                       "launch url from SCORM Cloud", e);
@@ -435,6 +435,13 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         // check if current user can remove this item
         if (canWriteRegistration(reg, externalLogic.getCurrentLocationId(),
                 externalLogic.getCurrentUserId())) {
+            try {
+                scormEngineService.getRegistrationService().DeleteRegistration(reg.getScormCloudId());
+            }
+            catch (Exception e){
+                log.debug("Exception thrown trying to delete registration with id = " +
+                          reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
+            }
             dao.delete(reg);
             log.info("Removing reg with id: " + reg.getId());
         } else {

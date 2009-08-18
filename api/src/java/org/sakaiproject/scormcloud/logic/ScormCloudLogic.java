@@ -109,7 +109,7 @@ public interface ScormCloudLogic {
    public ScormCloudRegistration getRegistrationById(String id);
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
    public ScormCloudRegistration findRegistrationFor(String userId, String pkgId);
-   public String getLaunchUrl(ScormCloudRegistration reg);
+   public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
    
    public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId);
    public void updateRegistration(ScormCloudRegistration reg);

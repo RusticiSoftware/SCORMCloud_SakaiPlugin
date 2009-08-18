@@ -3,6 +3,7 @@ package org.sakaiproject.scormcloud.tool;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -48,15 +49,13 @@ public class RequestController extends HttpServlet {
 			    }
 			}
 			if(action.equals("processRegistrationListAction")){
-			    if(request.getParameter("delete-items") != null){
-			        processDeleteRegistrationsRequest(request, response);
-			    }
-			    else if (request.getParameter("update-items") != null){
-			        processUpdateRegistrationsRequest(request, response);
-			    }
+			    processRegistrationListRequest(request, response);
 			}
 			if(action.equals("viewRegistrations")){
 			    processViewRegistrationsRequest(request, response);
+			}
+			if(action.equals("postLaunchRegUpdate")){
+			    processPostLaunchRegUpdateRequest(request, response);
 			}
 			if(action.equals("updatePackage")){
 				/* Not implemented yet */
@@ -74,6 +73,42 @@ public class RequestController extends HttpServlet {
 		catch (Exception e){
 			throw new ServletException(e);
 		}
+	}
+	
+	private void processPostLaunchRegUpdateRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        String regId = request.getParameter("regId");
+        log.debug("processPostLaunchRegUpdateRequest called with regId = " + regId);
+        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+        ScormCloudRegistration reg = bean.getRegistrationById(regId);
+        if (reg != null){
+            bean.updateRegistrationResultsFromCloud(reg);  
+        } else {
+            log.debug("Error! Registration with id " + regId + "not found!");
+        }
+        response.sendRedirect("Closer.html");
+    }
+
+    private void processRegistrationListRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+	  //Make sure to recreate the "state" of the reg list page
+        String packageId = request.getParameter("packageId");
+        
+        request.setAttribute("pkg", 
+                getScormCloudPackagesBean()
+                    .getPackageById(packageId));
+        
+        request.setAttribute("regList",
+                getScormCloudPackagesBean()
+                    .getRegistrationsByPackageId(packageId));
+        
+        //Delete or update, based on button pressed
+        if(request.getParameter("delete-items") != null){
+            processDeleteRegistrationsRequest(request, response);
+        }
+        else if (request.getParameter("update-items") != null){
+            processUpdateRegistrationsRequest(request, response);
+        }
 	}
 
     private void processUpdateRegistrationsRequest(HttpServletRequest request,
@@ -209,7 +244,10 @@ public class RequestController extends HttpServlet {
 		
 		//Find (or create) a registration for the current user and the given package
 		ScormCloudRegistration reg = pkgsBean.findOrCreateUserRegistrationFor(pkg);
-		String launchUrl = pkgsBean.getLaunchUrl(reg);
+		String launchUrl = pkgsBean.getLaunchUrl(reg, 
+                                		        getAbsoluteUrlToSelf(request) + 
+                                		            "?action=postLaunchRegUpdate&regId=" + 
+                                		            reg.getId());
 		
 		//Forward the user to the launch page, now that a registration exists for them
 		log.debug("launchUrl = " + launchUrl);
@@ -225,6 +263,15 @@ public class RequestController extends HttpServlet {
 	{
 		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		return (ScormCloudPackagesBean)context.getBean("packagesBean");
+	}
+	
+	private String getAbsoluteUrlToSelf(HttpServletRequest request) throws Exception {
+	    
+	    URL controllerUrl = new URL(request.getScheme(),
+	                                   request.getServerName(),
+	                                   request.getServerPort(),
+	                                   request.getRequestURI());
+	    return controllerUrl.toString();
 	}
 	
 }

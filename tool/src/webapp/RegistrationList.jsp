@@ -54,6 +54,7 @@
 <div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
 
 <form name="listItemsForm" action="controller?action=processRegistrationListAction" method="post">
+	<input type="hidden" name="pkgId" value="${pkg.id}" />
     <table class="listHier">
         <thead>
             <tr>
