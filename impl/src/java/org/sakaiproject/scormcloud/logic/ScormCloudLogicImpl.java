@@ -327,11 +327,35 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
                     + pkg.getId() + " because they do not have permission");
         }
     }
+    
+    public String getPackagePropertiesUrl(ScormCloudPackage pkg){
+        try {
+            return scormEngineService
+                    .getCourseService()
+                        .GetPropertyEditorUrl(pkg.getScormCloudId());
+        } catch (Exception e) {
+            log.error("Encountered exception while trying to get " +
+                      "property editor url for package with SCORM " +
+                      "cloud id = " + pkg.getScormCloudId(), e);
+            return null;
+        }
+    }
+    
+    public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl){
+        try {
+            return scormEngineService.getCourseService()
+                        .GetPreviewUrl(pkg.getScormCloudId(), redirectOnExitUrl);
+        } catch (Exception e) {
+            log.error("Encountered an exception while trying to get " +
+                      "preview url from SCORM Cloud", e);
+          return null;
+       }
+    }
 
     public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl) {
         try {
-            return scormEngineService.getRegistrationService().GetLaunchUrl(
-                    reg.getScormCloudId(), redirectOnExitUrl);
+            return scormEngineService.getRegistrationService()
+                        .GetLaunchUrl(reg.getScormCloudId(), redirectOnExitUrl);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
                       "launch url from SCORM Cloud", e);
@@ -431,7 +455,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
     }
 
     public void removeRegistration(ScormCloudRegistration reg) {
-        log.debug("In regmoveRegistration with regId:" + reg.getId());
+        log.debug("In removeRegistration with regId:" + reg.getId());
         // check if current user can remove this item
         if (canWriteRegistration(reg, externalLogic.getCurrentLocationId(),
                 externalLogic.getCurrentUserId())) {
@@ -446,6 +470,30 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             log.info("Removing reg with id: " + reg.getId());
         } else {
             throw new SecurityException("Current user cannot remove item "
+                    + reg.getId() + " because they do not have permission");
+        }
+    }
+    
+    public void resetRegistration(ScormCloudRegistration reg) {
+        log.debug("In resetRegistration with regId:" + reg.getId());
+        // check if current user can remove this item
+        if (canWriteRegistration(reg, externalLogic.getCurrentLocationId(),
+                externalLogic.getCurrentUserId())) {
+            try {
+                log.info("Resetting reg with id: " + reg.getId());
+                scormEngineService.getRegistrationService().ResetRegistration(reg.getScormCloudId());
+                reg.setComplete("unknown");
+                reg.setSuccess("unknown");
+                reg.setScore("unknown");
+                reg.setTotalTime("0");
+                dao.save(reg);
+            }
+            catch (Exception e){
+                log.debug("Exception thrown trying to reset registration with id = " +
+                          reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
+            }
+        } else {
+            throw new SecurityException("Current user cannot reset registration "
                     + reg.getId() + " because they do not have permission");
         }
     }

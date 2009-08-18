@@ -80,6 +80,14 @@ public class ScormCloudPackagesBean {
 		logic.addNewPackage(pkg, zipFile);
 	}
 	
+	public String getPackagePropertiesUrl(ScormCloudPackage pkg) throws Exception {
+	    return logic.getPackagePropertiesUrl(pkg);
+	}
+	
+	public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl) throws Exception {
+	    return logic.getPackagePreviewUrl(pkg, redirectOnExitUrl);
+	}
+	
 	/**
 	 * @param item a ScormCloudPackage to remove
 	 * @return true if the item can be removed by the current user, false otherwise
@@ -168,4 +176,15 @@ public class ScormCloudPackagesBean {
 		}
 		return false;
 	}
+	
+	public boolean checkResetRegistrationById(String id) {
+        log.debug("check and Remove for: " + id);
+        ScormCloudRegistration reg = logic.getRegistrationById(id);
+        if ( reg != null && 
+                logic.canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
+            logic.resetRegistration(reg);
+            return true;
+        }
+        return false;
+    }
 }

@@ -54,13 +54,13 @@
 <div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
 
 <form name="listItemsForm" action="controller?action=processRegistrationListAction" method="post">
-	<input type="hidden" name="pkgId" value="${pkg.id}" />
+	<input type="hidden" name="packageId" value="${pkg.id}" />
     <table class="listHier">
         <thead>
             <tr>
                 <th class="firstHeader"></th>
                 <th class="secondHeader">Username</th>
-                <th class="thirdHeader">SCORM Cloud ID</th>
+                <!-- <th class="thirdHeader">SCORM Cloud ID</th> -->
                 <th class="fourthColumn">Complete</th>
                 <th class="fifthColumn">Success</th>
                 <th class="sixthColumn">Score</th>
@@ -89,9 +89,9 @@
                             </c:otherwise>      
                         </c:choose>             
                     </td>
-                    <td class="thirdColumn">
+                    <!-- <td class="thirdColumn">
                         <span>${reg.scormCloudId}</span>
-                    </td>
+                    </td> -->
                     <%-- <td class="fourthColumn">
                         <c:choose>
                             <c:when test="${reg.hidden}">
@@ -108,7 +108,7 @@
                     	<span>${reg.success}</span>
                     </td>
                     <td class="sixthColumn">
-                    	<span>${reg.score}</span>
+                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score * 100.0}</span>
                     </td>
                     <td class="seventhColumn">
                     	<span>${reg.totalTime}</span>
@@ -124,6 +124,7 @@
 
     <p class="act">
     	<input name="update-items" type="submit" value="Update Results" />
+    	<input name="reset-items" type="submit" value="Reset" />
         <input name="delete-items" type="submit" value="Delete" />
     </p>
 </form>

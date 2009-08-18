@@ -59,9 +59,11 @@
             <tr>
                 <th class="firstHeader"></th>
                 <th class="secondHeader">Title</th>
-                <th class="thirdHeader">SCORM Cloud ID</th>
+                <!-- <th class="thirdHeader">SCORM Cloud ID</th> -->
                 <th class="fourthHeader">Hidden</th>
-                <th class="fifthHeader">Results</th>
+                <th class="fifthHeader">Configure Package</th>
+                <th class="fifthHeader">Preview Package</th>
+                <th class="fifthHeader">Registration Results</th>
                 <th class="sixthHeader">Creation Date</th>
             </tr>
         </thead>
@@ -69,6 +71,7 @@
             <c:forEach var="pkg" items="${bean.allVisiblePackages}">
                 <% ScormCloudPackage pkg = (ScormCloudPackage)pageContext.getAttribute("pkg"); %>
                 <c:set var="deletable"><%= bean.canDelete(pkg) %></c:set>
+                <%-- <c:set var="launchable"><%= bean.canLaunch(pkg) %></c:set> --%>
                 <tr>
                     <td class="firstColumn">
                         <c:if test="${deletable}">
@@ -77,18 +80,19 @@
                     </td>
                     <td class="secondColumn">
                         <c:choose>
-                            <c:when test="${deletable}">
+                            <%--<c:when test="${launchable}">--%>
+                            <c:when test="<%= true %>">
                                 <a href="controller?action=launchPackage&id=${pkg.id}">
                                     ${pkg.title}
                                 </a>
                             </c:when><c:otherwise>
                                 ${pkg.title}
-                            </c:otherwise>      
+                            </c:otherwise>    
                         </c:choose>             
                     </td>
-                    <td class="thirdColumn">
+                    <!-- <td class="thirdColumn">
                         <span>${pkg.scormCloudId}</span>
-                    </td>
+                    </td> -->
                     <td class="fourthColumn">
                         <c:choose>
                             <c:when test="${pkg.hidden}">
@@ -97,6 +101,12 @@
                                 <input name="item-hidden" type="checkbox" disabled="true" />
                             </c:otherwise>
                         </c:choose>
+                    </td>
+                    <td>
+                    	<a href="controller?action=viewPackageProperties&id=${pkg.id}">Configure</a>
+                    </td>
+                    <td>
+                    	<a href="controller?action=previewPackage&id=${pkg.id}">Preview</a>
                     </td>
                     <td class="fifthColumn">
                         <a href="controller?action=viewRegistrations&id=${pkg.id}">Results</a>

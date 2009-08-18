@@ -102,6 +102,9 @@ public interface ScormCloudLogic {
     */
    public void removePackage(ScormCloudPackage pkg);
    
+   public String getPackagePropertiesUrl(ScormCloudPackage pkg);
+   public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl);
+   
    
    
    
@@ -115,5 +118,6 @@ public interface ScormCloudLogic {
    public void updateRegistration(ScormCloudRegistration reg);
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
+   public void resetRegistration(ScormCloudRegistration reg);
 
 }
