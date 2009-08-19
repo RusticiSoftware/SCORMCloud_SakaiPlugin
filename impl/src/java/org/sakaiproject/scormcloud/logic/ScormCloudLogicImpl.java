@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.genericdao.api.search.Restriction;
 import org.sakaiproject.genericdao.api.search.Search;
 
+
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.dao.ScormCloudDao;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;

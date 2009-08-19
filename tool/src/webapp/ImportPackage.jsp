@@ -47,9 +47,12 @@
 </div>
 <% } bean.messages.clear(); %>
 
-<div class="instruction">Hello, <%= bean.getCurrentUserDisplayName() %></div>
+<div class="instruction">Hello, <%= bean.getCurrentUserDisplayName() %>
+	<a href="ImportPackage.jsp">Go here</a>
+</div>
 
 <form name="importPackageForm" action="controller?action=importPackage" method="post" enctype="multipart/form-data">
+	<input name="helper" id="helper" type="hidden" value="${param.helper}" />
 	<table border="0" cellspacing="0" class="chefEditItem">
 		<tbody>
 			<tr>

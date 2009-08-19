@@ -39,6 +39,11 @@
          <artifactId>servlet-api</artifactId>
       </dependency>
 
+      <dependency>
+        <groupId>javax.portlet</groupId>
+        <artifactId>portlet-api</artifactId>
+      </dependency>
+
       <!-- We need this special package to run the jsps in Sakai -->
       <dependency>
          <groupId>org.sakaiproject</groupId>

@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.RequestDispatcher;
@@ -16,8 +17,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.content.api.ContentEntity;
+import org.sakaiproject.content.api.ContentResourceEdit;
+import org.sakaiproject.content.api.ResourceToolAction;
+import org.sakaiproject.content.api.ResourceToolActionPipe;
+import org.sakaiproject.content.api.ContentHostingService;
+import org.sakaiproject.entity.api.Entity;
+import org.sakaiproject.entity.api.ResourceProperties;
+import org.sakaiproject.entity.api.ResourcePropertiesEdit;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
+import org.sakaiproject.tool.api.Tool;
+import org.sakaiproject.tool.api.ToolSession;
+import org.sakaiproject.tool.cover.SessionManager;
+import org.sakaiproject.tool.cover.ToolManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -29,6 +42,7 @@ public class RequestController extends HttpServlet {
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try{
+		    log.debug("paramaterMap size = " + request.getParameterMap().size());
 			PrintWriter output = response.getWriter();
 			String action = request.getParameter("action");
 			
@@ -71,6 +85,13 @@ public class RequestController extends HttpServlet {
 			}
 			if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
+			}
+			if(action.equals("debugParams")){
+			    log.debug("Debugging params sent");
+			    Map params = request.getParameterMap();
+			    for (Object key : params.keySet()){
+			        log.debug((String)key + " = " + (String)request.getParameter((String)key));
+			    }
 			}
 			
 			
@@ -249,14 +270,69 @@ public class RequestController extends HttpServlet {
 		pkg.setScormCloudId("sakai-" + cloudId);
 		
 		//Add package through packages bean
-        getScormCloudPackagesBean().addNewPackage(pkg, tempFile);
+        getScormCloudPackagesBean().addNewPackage(pkg, tempFile);     
         
         //Clean up the temp file now that we're done
         tempFile.delete();
 
+        //String helper = params.get("helper");
+        //if (helper != null && helper == "true") {
+        //    log.debug("Helper mode for import, creating resource type");
+            processImportHelperActions(pkg, request, response);
+        //}
         //Send the user back to the package list page
 		response.sendRedirect("PackageList.jsp");
 	}
+	
+	private void processImportHelperActions(ScormCloudPackage pkg, HttpServletRequest request, HttpServletResponse response) throws Exception {
+	       ToolSession toolSession = SessionManager.getCurrentToolSession();
+	       ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+	       ContentEntity contentEntity = pipe.getContentEntity();
+
+	       try {
+	          ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), pkg.getTitle(), "scormcloud", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
+	          ResourcePropertiesEdit properties = resource.getPropertiesEdit();
+	          properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, pkg.getTitle());
+	          properties.addProperty(org.sakaiproject.content.api.ContentHostingService.PROP_ALTERNATE_REFERENCE, Entity.SEPARATOR + "scormcloud");
+	          //resource.setContent(file.get());
+	          resource.setContent(new byte[]{0,0,0,1});
+	          resource.setContentType("application/zip");
+	          resource.setResourceType("scormcloud.type");
+	          getContentHostingService().commitResource(resource);
+
+	          pipe.setActionCompleted(true);
+	          pipe.setActionCanceled(false);
+
+	             //getContentHostingService().setPubView(resource.getId(), pubview);
+	          }
+	          catch (Exception e) {
+	             throw new RuntimeException(e);
+	          }
+
+	        // leave helper mode
+	       pipe.setActionCanceled(false);
+	       pipe.setErrorEncountered(false);
+	       pipe.setActionCompleted(true);
+
+	       toolSession.setAttribute(ResourceToolAction.DONE, Boolean.TRUE);
+	       toolSession.removeAttribute(ResourceToolAction.STARTED);
+	       Tool tool = ToolManager.getCurrentTool();
+	       String url = (String) toolSession.getAttribute(tool.getId() + Tool.HELPER_DONE_URL);
+	       toolSession.removeAttribute(tool.getId() + Tool.HELPER_DONE_URL);
+
+	       try
+	       {
+	          response.sendRedirect(url);
+	       }
+	       catch (IOException e)
+	       {
+	          log.warn("IOException", e);
+	       }
+	}
+	
+	public ContentHostingService getContentHostingService() {
+      return org.sakaiproject.content.cover.ContentHostingService.getInstance();
+   }
 	
 	/**
 	 * Create or find a registration for the current user and the specified package,

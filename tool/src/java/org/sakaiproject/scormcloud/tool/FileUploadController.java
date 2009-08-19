@@ -37,12 +37,12 @@ public class FileUploadController extends SimpleFormController {
 
         FileItem file = (FileItem) request.getAttribute("file");
         
-        ScormCloud.setConfiguration(new Configuration("http://dev.cloud.scorm.com/EngineWebServices/", "dave", "y7bxwHapEWuOz3ODfZJ2je0DPJaFP8kHqDrQ4Bld"));
+        //ScormCloud.setConfiguration(new Configuration("http://dev.cloud.scorm.com/EngineWebServices/", "dave", "y7bxwHapEWuOz3ODfZJ2je0DPJaFP8kHqDrQ4Bld"));
         File tempFile = File.createTempFile("sakai-scorm-cloud", "package-file");
         file.write(tempFile);
         
-        String id = UUID.randomUUID().toString();
-        ScormCloud.getCourseService().ImportCourse("sakai-" + id, tempFile.getAbsolutePath());
+        //String id = UUID.randomUUID().toString();
+        //ScormCloud.getCourseService().ImportCourse("sakai-" + id, tempFile.getAbsolutePath());
         
       //TODO validate is zip file, has imsmanifest.xml etc.
 
@@ -50,28 +50,28 @@ public class FileUploadController extends SimpleFormController {
        ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
        ContentEntity contentEntity = pipe.getContentEntity();
 
-//      try {
+      try {
+
+          ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), file.getName(), "zip", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
+          ResourcePropertiesEdit properties = resource.getPropertiesEdit();
+          properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, file.getName());
+          properties.addProperty (ResourceProperties.PROP_DISPLAY_NAME, file.getName());
+          properties.addProperty(org.sakaiproject.content.cover.ContentHostingService.PROP_ALTERNATE_REFERENCE, Entity.SEPARATOR + "scorm");
+          resource.setContent(file.get());
+          resource.setContentType("application/zip");
+          resource.setResourceType("scorm.type");
+          getContentHostingService().commitResource(resource);
 //
-//          ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), file.getName(), "zip", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
-//          ResourcePropertiesEdit properties = resource.getPropertiesEdit();
-//          properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, file.getName());
-//          properties.addProperty (ResourceProperties.PROP_DISPLAY_NAME, file.getName());
-//          properties.addProperty(org.sakaiproject.content.cover.ContentHostingService.PROP_ALTERNATE_REFERENCE, Entity.SEPARATOR + "scorm");
-//          resource.setContent(file.get());
-//          resource.setContentType("application/zip");
-//          resource.setResourceType("scorm.type");
-//          getContentHostingService().commitResource(resource);
-////
-//          pipe.setActionCompleted(true);
-//          pipe.setActionCanceled(false);
-////
-////
-////
-//             //getContentHostingService().setPubView(resource.getId(), pubview);
-//          }
-//          catch (Exception e) {
-//             throw new RuntimeException(e);
-//          }
+          pipe.setActionCompleted(true);
+          pipe.setActionCanceled(false);
+//
+//
+//
+             //getContentHostingService().setPubView(resource.getId(), pubview);
+          }
+          catch (Exception e) {
+             throw new RuntimeException(e);
+          }
 
 
 

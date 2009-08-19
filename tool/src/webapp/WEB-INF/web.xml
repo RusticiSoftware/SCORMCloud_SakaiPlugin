@@ -17,9 +17,26 @@
 			<param-value>false</param-value>
 		</init-param>
 	</filter>
+	
 	<filter-mapping>
 		<filter-name>sakai.request</filter-name>
 		<servlet-name>sakai.scormcloud</servlet-name>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>sakai.request</filter-name>
+		<servlet-name>sakai.scormcloud.upload.helper</servlet-name>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>sakai.request</filter-name>
+		<servlet-name>ScormCloudRequestController</servlet-name>
 		<dispatcher>REQUEST</dispatcher>
 		<dispatcher>FORWARD</dispatcher>
 		<dispatcher>INCLUDE</dispatcher>
@@ -42,14 +59,29 @@
 	</servlet>
 	
 	<servlet>
+		<servlet-name>sakai.scormcloud.upload.helper</servlet-name>
+		<servlet-class>
+			uk.ac.cam.caret.sakai.WebappToolServlet
+		</servlet-class>
+
+		<init-param>
+			<param-name>main-page</param-name>
+			<param-value>/ImportPackage.jsp</param-value>
+		</init-param>
+		
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet>
 		<description>Servlet for processing requests</description>
-		<display-name>controller</display-name>
-		<servlet-name>controller</servlet-name>
+		<display-name>ScormCloudRequestController</display-name>
+		<servlet-name>ScormCloudRequestController</servlet-name>
 		<servlet-class>org.sakaiproject.scormcloud.tool.RequestController</servlet-class>
 	</servlet>
 	
+	
 	<servlet-mapping>
-		<servlet-name>controller</servlet-name>
+		<servlet-name>ScormCloudRequestController</servlet-name>
 		<url-pattern>/controller</url-pattern>
 	</servlet-mapping>
 

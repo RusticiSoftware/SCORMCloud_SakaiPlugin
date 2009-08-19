@@ -6,32 +6,64 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.rusticisoftware.hostedengine.client.Configuration;
 import com.rusticisoftware.hostedengine.client.ScormCloud;
 
 public class FileUploadUtils {
-	
+    private static Log log = LogFactory.getLog(FileUploadUtils.class);
+    
 	public static boolean parseFileUploadRequest(HttpServletRequest request, File outputFile, Map<String, String> params) throws Exception
 	{
-		FileItemFactory factory = new DiskFileItemFactory();
-		ServletFileUpload upload = new ServletFileUpload(factory);
-		//upload.setSizeMax(Globals.MAX_UPLOAD_SIZE);
+		log.debug("Request class? " + request.getClass().toString());
+		log.debug("Request is multipart? " + ServletFileUpload.isMultipartContent(request));
+		log.debug("Request method: " + request.getMethod());
+		log.debug("Request params: ");
+		for (Object key : request.getParameterMap().keySet()){
+		    log.debug((String)key);
+		}
+		log.debug("Request attribute names: ");
 		
+		boolean filedataInAttributes = false;
+		Enumeration attrNames = request.getAttributeNames();
+		while(attrNames.hasMoreElements()){
+		    String attrName = (String)attrNames.nextElement();
+		    log.debug(attrName);
+		    if("filedata".equals(attrName)){
+		        filedataInAttributes = true;
+		    }
+		}
+		
+		if(filedataInAttributes){
+		    log.debug("Found filedata in request attributes, getting it out...");
+		    log.debug("filedata class? " + request.getAttribute("filedata").getClass().toString());
+		    FileItem item = (FileItem)request.getAttribute("filedata");
+		    item.write(outputFile);
+		    for (Object key : request.getParameterMap().keySet()){
+		        params.put((String)key, request.getParameter((String)key));
+		    }
+		    return true;
+		}
+		
+		
+		ServletFileUpload upload = new ServletFileUpload();
+		//upload.setSizeMax(Globals.MAX_UPLOAD_SIZE);
 		FileItemIterator iter = upload.getItemIterator(request);
 		while(iter.hasNext()){
 			FileItemStream item = iter.next();
@@ -39,6 +71,9 @@ public class FileUploadUtils {
 			
 			//If this item is a file
 			if(!item.isFormField()){
+			    
+			    log.debug("Found non form field in upload request with field name = " + item.getFieldName());
+			    
 			    String name = item.getName();
 			    if(name == null){
 			        throw new Exception("File upload did not have filename specified");

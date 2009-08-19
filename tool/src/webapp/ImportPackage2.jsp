@@ -56,7 +56,7 @@
                 <li>IMS Content Packages</li>
                 </ul>
          </p>
-         <form method="post" action="uploadFile.form" enctype="multipart/form-data">
+         <form method="post" action="controller?action=importPackage&helper=true" enctype="multipart/form-data">
              <input type="file" name="file" /> <input class="active" accesskey="s" type="submit" value="Upload"/>
          </form>
       </div>
