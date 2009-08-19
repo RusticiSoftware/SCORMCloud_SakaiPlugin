@@ -16,5 +16,13 @@
 			<category name="project" /> -->
 		<!-- <category name="myworkspace" /> -->
 		<!-- <category name="sakai.admin" /> -->
-	</tool>	
+	</tool>
+	<tool id="sakai.scormcloud.remove.helper"
+		title="SCORM Cloud Remove Helper"
+		description="SCORM Cloud Resource Type Helper">
+		<!-- <category name="course" />
+			<category name="project" /> -->
+		<!-- <category name="myworkspace" /> -->
+		<!-- <category name="sakai.admin" /> -->
+	</tool>
 </registration>

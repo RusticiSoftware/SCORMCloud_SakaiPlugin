@@ -10,6 +10,7 @@ public class ScormCloudRegistration implements Serializable {
 	//private String title;
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
+	private String context; //Sakai tool context id
 	private Date dateCreated;
 	private String scormCloudId;
 	private String packageId;
@@ -69,6 +70,12 @@ public class ScormCloudRegistration implements Serializable {
 	public void setLocationId(String locationId) {
 		this.locationId = locationId;
 	}
+	public String getContext(){
+        return context;
+    }
+    public void setContext(String context){
+        this.context = context;
+    }
 	
 	public String getScormCloudId() {
 		return scormCloudId;

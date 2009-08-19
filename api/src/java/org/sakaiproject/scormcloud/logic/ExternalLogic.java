@@ -11,6 +11,8 @@
 
 package org.sakaiproject.scormcloud.logic;
 
+import java.util.Date;
+
 
 /**
  * This is the interface for logic which is external to our app logic
@@ -64,5 +66,12 @@ public interface ExternalLogic {
 	 * @return true if allowed, false otherwise
 	 */
 	public boolean isUserAllowedInLocation(String userId, String permission, String locationId);
-
+	
+	
+	public boolean isGradebookAvailable();
+	public void addGrade(String context, String gradeId, String externalUrl,
+            String title, Double points, Date dueDate, String externalServiceDescription, Boolean ungraded);
+    public void deleteGrade(String context, String gradeId);
+    public void addScore(String context, String gradeId, String userId, String score);
+    public String getCurrentContext();
 }

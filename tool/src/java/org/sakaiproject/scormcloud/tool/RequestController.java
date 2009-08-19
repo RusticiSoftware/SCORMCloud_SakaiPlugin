@@ -36,8 +36,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 
 public class RequestController extends HttpServlet {
-	private static Log log = LogFactory.getLog(RequestController.class);
-
+    private static final String PROP_SCORMCLOUD_PACKAGE_ID = "packageId";
+    private static Log log = LogFactory.getLog(RequestController.class);
 	private static final long serialVersionUID = 1L;
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException {
@@ -47,12 +47,26 @@ public class RequestController extends HttpServlet {
 			String action = request.getParameter("action");
 			
 			if(action == null || action.length() < 1){
-				output.println("error: No action specified.");
-				return;
+				log.debug("No action specified. Looking for one in servlet init params");
+				try { 
+				    action = getServletConfig().getInitParameter("action"); 
+				    log.debug("Found action " + action + " in init params");
+				}
+				catch (Exception e) {
+				    log.debug("Exception looking for action in init params", e);
+				}
 			}
+			
+            if(action == null || action.length() < 1){
+                log.error("No action specified, returning!");
+                return;
+            }
 			
 			if(action.equals("importPackage")){
 				processImportRequest(request, response);
+			}
+			if(action.equals("deletePackageResource")){
+			    processDeletePackageResourceRequest(request, response);
 			}
 			if(action.equals("previewPackage")){
 			    processPreviewRequest(request, response);
@@ -244,6 +258,26 @@ public class RequestController extends HttpServlet {
 	    response.sendRedirect("PackageList.jsp");
     }
 
+	private void processDeletePackageResourceRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	       ToolSession toolSession = SessionManager.getCurrentToolSession();
+	       ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+	       ContentEntity contentEntity = pipe.getContentEntity();
+
+	       try {
+	           ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+	           String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
+	           ScormCloudPackage pkg = bean.getPackageById(packageId);
+	           if(bean.canDelete(pkg)){
+    	           getContentHostingService().removeResource(contentEntity.getId());
+    	           getScormCloudPackagesBean().checkRemovePackageById(packageId);
+	           }
+	       }
+	       catch (Exception e) {
+	           throw new RuntimeException(e);
+	       }
+	       
+	       endToolHelperSession(toolSession, pipe, response);
+	}
 	
 	/**
 	 * Create a new package record and import posted file to the cloud.
@@ -275,64 +309,75 @@ public class RequestController extends HttpServlet {
         //Clean up the temp file now that we're done
         tempFile.delete();
 
-        //String helper = params.get("helper");
-        //if (helper != null && helper == "true") {
-        //    log.debug("Helper mode for import, creating resource type");
+        String helper = params.get("helper");
+        log.debug("helper = " + helper);
+        if ("true".equals(helper)) {
+            log.debug("Helper mode for import, creating resource type");
             processImportHelperActions(pkg, request, response);
-        //}
+        }
         //Send the user back to the package list page
 		response.sendRedirect("PackageList.jsp");
 	}
 	
-	private void processImportHelperActions(ScormCloudPackage pkg, HttpServletRequest request, HttpServletResponse response) throws Exception {
-	       ToolSession toolSession = SessionManager.getCurrentToolSession();
-	       ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
-	       ContentEntity contentEntity = pipe.getContentEntity();
-
-	       try {
-	          ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), pkg.getTitle(), "scormcloud", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
-	          ResourcePropertiesEdit properties = resource.getPropertiesEdit();
-	          properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, pkg.getTitle());
-	          properties.addProperty(org.sakaiproject.content.api.ContentHostingService.PROP_ALTERNATE_REFERENCE, Entity.SEPARATOR + "scormcloud");
-	          //resource.setContent(file.get());
-	          resource.setContent(new byte[]{0,0,0,1});
-	          resource.setContentType("application/zip");
-	          resource.setResourceType("scormcloud.type");
-	          getContentHostingService().commitResource(resource);
-
-	          pipe.setActionCompleted(true);
-	          pipe.setActionCanceled(false);
-
-	             //getContentHostingService().setPubView(resource.getId(), pubview);
-	          }
-	          catch (Exception e) {
-	             throw new RuntimeException(e);
-	          }
-
-	        // leave helper mode
-	       pipe.setActionCanceled(false);
-	       pipe.setErrorEncountered(false);
-	       pipe.setActionCompleted(true);
-
-	       toolSession.setAttribute(ResourceToolAction.DONE, Boolean.TRUE);
-	       toolSession.removeAttribute(ResourceToolAction.STARTED);
-	       Tool tool = ToolManager.getCurrentTool();
-	       String url = (String) toolSession.getAttribute(tool.getId() + Tool.HELPER_DONE_URL);
-	       toolSession.removeAttribute(tool.getId() + Tool.HELPER_DONE_URL);
-
-	       try
-	       {
-	          response.sendRedirect(url);
-	       }
-	       catch (IOException e)
-	       {
-	          log.warn("IOException", e);
-	       }
+	
+	
+	private void addResourceForScormCloudEntity(ContentEntity contentEntity, ScormCloudPackage pkg) throws Exception {
+	    ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), pkg.getTitle(), "scormcloud", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
+        ResourcePropertiesEdit properties = resource.getPropertiesEdit();
+        properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, pkg.getTitle());
+        properties.addProperty(org.sakaiproject.content.api.ContentHostingService.PROP_ALTERNATE_REFERENCE, Entity.SEPARATOR + "scormcloud");
+        properties.addProperty(PROP_SCORMCLOUD_PACKAGE_ID, pkg.getId());
+        resource.setContent(new byte[]{0,0,0,0});  //Dummy content, we don't need it...
+        resource.setContentType("application/zip");
+        resource.setResourceType("scormcloud.type");
+        resource.setHidden();
+        getContentHostingService().commitResource(resource);
 	}
+	
+	private void endToolHelperSession(ToolSession toolSession, ResourceToolActionPipe pipe, HttpServletResponse response) {
+	    // Set the action completed in the action pipe
+        pipe.setActionCanceled(false);
+        pipe.setErrorEncountered(false);
+        pipe.setActionCompleted(true);
+
+        //Set the session to done
+        toolSession.setAttribute(ResourceToolAction.DONE, Boolean.TRUE);
+        toolSession.removeAttribute(ResourceToolAction.STARTED);
+        
+        //Redirect to the "done" url ourselves
+        Tool tool = ToolManager.getCurrentTool();
+        String url = (String) toolSession.getAttribute(tool.getId() + Tool.HELPER_DONE_URL);
+        toolSession.removeAttribute(tool.getId() + Tool.HELPER_DONE_URL);
+        
+        try {
+           response.sendRedirect(url);
+        }
+        catch (IOException e) {
+           log.warn("IOException", e);
+        }
+        
+	}
+	
+	private void processImportHelperActions(ScormCloudPackage pkg, HttpServletRequest request, HttpServletResponse response) throws Exception {
+       ToolSession toolSession = SessionManager.getCurrentToolSession();
+       ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+       ContentEntity contentEntity = pipe.getContentEntity();
+
+       try {
+          //Add the resource
+           addResourceForScormCloudEntity(contentEntity, pkg);
+       }
+       catch (Exception e) {
+           throw new RuntimeException(e);
+       }
+       
+       endToolHelperSession(toolSession, pipe, response);
+	}
+	
 	
 	public ContentHostingService getContentHostingService() {
       return org.sakaiproject.content.cover.ContentHostingService.getInstance();
-   }
+    }
 	
 	/**
 	 * Create or find a registration for the current user and the specified package,

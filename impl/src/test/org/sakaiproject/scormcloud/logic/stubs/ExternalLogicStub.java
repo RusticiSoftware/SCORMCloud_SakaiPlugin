@@ -11,6 +11,8 @@
 
 package org.sakaiproject.scormcloud.logic.stubs;
 
+import java.util.Date;
+
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.logic.FakeDataPreload;
 
@@ -117,6 +119,37 @@ public class ExternalLogicStub implements ExternalLogic {
             return true;
         }
         return false;
+    }
+    
+    public boolean isGradebookAvailable(){
+        return true;
+    }
+
+    public void addGrade(String context, String gradeId, String externalUrl, String title,
+            Double points, Date dueDate, String externalServiceDescription,
+            Boolean ungraded) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void deleteGrade(String context, String gradeId) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void updateGrade(String context, String gradeId, String externalUrl, String title,
+            Double points, Date dueDate, String externalServiceDescription,
+            Boolean ungraded) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+    public void addScore(String context, String gradeId, String userId, String score){
+        
+    }
+    
+    public String getCurrentContext(){
+        return "";
     }
 
 }

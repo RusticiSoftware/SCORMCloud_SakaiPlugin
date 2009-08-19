@@ -187,4 +187,9 @@ public class ScormCloudPackagesBean {
         }
         return false;
     }
+	
+	
+	public boolean isGradebookAvailable(){
+	    return logic.isGradebookAvailable();
+	}
 }

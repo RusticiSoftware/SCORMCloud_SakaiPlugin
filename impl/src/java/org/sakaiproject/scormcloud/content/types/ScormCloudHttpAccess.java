@@ -20,8 +20,11 @@ import org.sakaiproject.tool.cover.SessionManager;
 public class ScormCloudHttpAccess implements HttpAccess {
     public void handleAccess(HttpServletRequest req, HttpServletResponse res, Reference ref, Collection copyrightAcceptedRefs) throws EntityPermissionException, EntityNotDefinedException, EntityAccessOverloadException, EntityCopyrightException {
         try {
-            String packageId = ref.getId();
-           //String uuid = ContentHostingService.getUuid(ref.getId());
+            //String packageId = ref.getId();
+           //String packageId = ContentHostingService.getUuid(ref.getId());
+            String packageId = (String)ref.getEntity()
+                                        .getProperties()
+                                        .get(ScormCollectionType.PROP_SCORMCLOUD_PACKAGE_ID);
            //String sessionId = SessionManager.getCurrentSession().getId();
            //String learnerId = SessionManager.getCurrentSession().getUserId();
            redirectToLaunchPage(req, res, packageId);

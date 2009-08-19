@@ -10,6 +10,7 @@ private static final long serialVersionUID = 1L;
 	private String title;
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
+	private String context; //Sakai tool context
 	private Boolean hidden; // only visible to owner if true
 	private Date dateCreated;
 	
@@ -82,6 +83,12 @@ private static final long serialVersionUID = 1L;
 	}
 	public void setLocationId(String locationId) {
 		this.locationId = locationId;
+	}
+	public String getContext(){
+	    return context;
+	}
+	public void setContext(String context){
+	    this.context = context;
 	}
 	
 	public String getScormCloudId() {

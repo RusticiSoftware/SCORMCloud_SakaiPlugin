@@ -288,6 +288,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         if (pkg.getLocationId() == null) {
             pkg.setLocationId(externalLogic.getCurrentLocationId());
         }
+        if (pkg.getContext() == null) {
+            pkg.setContext(externalLogic.getCurrentContext());
+        }
         if (pkg.getDateCreated() == null) {
             pkg.setDateCreated(new Date());
         }
@@ -298,6 +301,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
                     pkg.getScormCloudId(), packageZip.getAbsolutePath());
 
             dao.save(pkg);
+            addGradeToGradebook(pkg);
             log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
         } else {
             throw new SecurityException("Current user cannot update package "
@@ -313,6 +317,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
         if (pkg.getLocationId() == null) {
             pkg.setLocationId(externalLogic.getCurrentLocationId());
+        }
+        if (pkg.getContext() == null){
+            pkg.setContext(externalLogic.getCurrentContext());
         }
         if (pkg.getDateCreated() == null) {
             pkg.setDateCreated(new Date());
@@ -387,6 +394,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setDateCreated(new Date());
             reg.setLocationId(externalLogic.getCurrentLocationId());
             reg.setOwnerId(externalLogic.getCurrentUserId());
+            reg.setContext(externalLogic.getCurrentContext());
             reg.setUserName(userDisplayName);
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
@@ -508,6 +516,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         if (reg.getLocationId() == null) {
             reg.setLocationId(externalLogic.getCurrentLocationId());
         }
+        if (reg.getContext() == null) {
+            reg.setContext(externalLogic.getCurrentContext());
+        }
         if (reg.getDateCreated() == null) {
             reg.setDateCreated(new Date());
         }
@@ -539,11 +550,26 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setScore(sum.getScore());
             reg.setTotalTime(sum.getTotalTime());
             dao.save(reg);
+            addScoreToGradebook(reg);
         } catch (Exception e) {
             log.debug("Exception getting registration results for " +
                       "reg with id = " + reg.getId() + 
                       " cloud id = " + reg.getScormCloudId(), e);
         }
+    }
+    
+    public boolean isGradebookAvailable(){
+        return externalLogic.isGradebookAvailable();
+    }
+    
+    public void addScoreToGradebook(ScormCloudRegistration reg){
+        log.debug("Requesting to add to gradebook with reg id = " + reg.getId() + ", score = " + reg.getScore());
+        externalLogic.addScore(reg.getContext(), reg.getPackageId(), reg.getOwnerId(), reg.getScore());
+    }
+    public void addGradeToGradebook(ScormCloudPackage pkg){
+        externalLogic.addGrade(pkg.getContext(), pkg.getId(), 
+                "http://www.google.com/#hl=en&q=package+detail+url", 
+                pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", true);
     }
 
 }

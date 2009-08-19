@@ -43,6 +43,8 @@ import org.sakaiproject.entity.api.ResourceProperties;
 public class ScormCollectionType extends ZipCollectionType {
 	protected ResourceTypeRegistry resourceTypeRegistry;
     protected static Log log = LogFactory.getLog(ScormCollectionType.class);
+    
+    public static final String PROP_SCORMCLOUD_PACKAGE_ID = "packageId";
 			
 	public static final String SCORM_CONTENT_LABEL="SCORM Cloud Package";
 	public static final String SCORM_CONTENT_TYPE_ID="scormcloud.type";
@@ -55,7 +57,7 @@ public class ScormCollectionType extends ZipCollectionType {
 	//public static final String SCORM_UPLOAD_HELPER_ID="sakai.resource.type.helper";
 	public static final String SCORM_LAUNCH_TOOL_ID="sakai.scormcloud";
     public static final String SCORM_ACCESS_HELPER_ID="sakai.scormcloud";
-    public static final String SCORM_REMOVE_HELPER_ID="sakai.scormcloud";
+    public static final String SCORM_REMOVE_HELPER_ID="sakai.scormcloud.remove.helper";
 	
 	/*public static final String SCORM_UPLOAD_HELPER_ID="sakai.scorm.helper"; //="sakai.resource.type.helper";
 	public static final String SCORM_LAUNCH_TOOL_ID="sakai.scorm.helper";
@@ -93,12 +95,12 @@ public class ScormCollectionType extends ZipCollectionType {
 	    	
 	    	
 	    actionMap.put(create.getActionType(), makeList(create));
-	    actionMap.put(launch.getActionType(), makeList(launch));
+	    //actionMap.put(launch.getActionType(), makeList(launch));
 	    actionMap.put(remove.getActionType(), makeList(remove));
 	    //actionMap.put(intercept.getActionType(), makeList(intercept));
 	    
 	    actions.put(create.getId(), create);
-	    actions.put(launch.getId(), launch);
+	    //actions.put(launch.getId(), launch);
 	    actions.put(remove.getId(), remove);
 	    //actions.put(intercept.getId(), intercept);
 	    

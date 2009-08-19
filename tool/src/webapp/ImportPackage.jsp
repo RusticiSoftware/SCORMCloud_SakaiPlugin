@@ -31,9 +31,11 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-<div class="navIntraTool">
-	<a href="PackageList.jsp">List Packages</a>
-</div>
+<c:if test="${empty param.helper}">
+	<div class="navIntraTool">
+		<a href="PackageList.jsp">List Packages</a>
+	</div>
+</c:if>
 
 <h3 class="insColor insBak insBorder">Import Package</h3>
 
@@ -47,29 +49,27 @@
 </div>
 <% } bean.messages.clear(); %>
 
-<div class="instruction">Hello, <%= bean.getCurrentUserDisplayName() %>
-	<a href="ImportPackage.jsp">Go here</a>
-</div>
+<div class="instruction">Choose a zip file containing SCORM content</div>
 
 <form name="importPackageForm" action="controller?action=importPackage" method="post" enctype="multipart/form-data">
 	<input name="helper" id="helper" type="hidden" value="${param.helper}" />
 	<table border="0" cellspacing="0" class="chefEditItem">
 		<tbody>
 			<tr>
+				<td>File</td>
+				<td>
+					<input id="filedata" name="filedata" type="file" size="40" />
+				</td>
+			</tr>
+			<tr>
 				<td>Title</td>
 				<td>
-					<input name="item-title" id="item-title" type="text" size="70" value="<%= item.getTitle() %>" />
+					<input name="item-title" id="item-title" type="text" size="70" value="" />
 					<script type="text/javascript" language="JavaScript">
 					<!--
 						document.getElementById("item-title").focus();
 					// -->
 					</script>
-				</td>
-			</tr>
-			<tr>
-				<td>File</td>
-				<td>
-					<input id="filedata" name="filedata" type="file" size="70" />
 				</td>
 			</tr>
 			<tr>
@@ -89,9 +89,6 @@
 	</table>
 
 	<p class="act">
-		<% if (item.getId() != null) { %>
-			<input name="id" type="hidden" value="<%= item.getId() %>" />
-		<% } %>
 		<input name="import-package" type="submit" value="Import" />
 	</p>
 </form>

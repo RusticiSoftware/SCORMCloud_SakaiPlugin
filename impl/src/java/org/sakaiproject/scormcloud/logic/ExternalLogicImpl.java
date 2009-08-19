@@ -11,11 +11,14 @@
 
 package org.sakaiproject.scormcloud.logic;
 
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.authz.api.FunctionManager;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
+import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
@@ -60,6 +63,11 @@ public class ExternalLogicImpl implements ExternalLogic {
 	private UserDirectoryService userDirectoryService;
 	public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
 		this.userDirectoryService = userDirectoryService;
+	}
+	
+	private GradebookExternalAssessmentService gradeBookExternalAssessmentService;
+	public void setGradebookExternalAssessmentService(GradebookExternalAssessmentService service){
+	    this.gradeBookExternalAssessmentService = service;
 	}
 
 
@@ -143,5 +151,40 @@ public class ExternalLogicImpl implements ExternalLogic {
 		}
 		return false;
 	}
+	
+	public boolean isGradebookAvailable() {
+	    String context = toolManager.getCurrentPlacement().getContext();
+	    return gradeBookExternalAssessmentService.isGradebookDefined(context);
+	}
+	
+	public void addGrade(String context, String gradeId, String externalUrl,
+            String title, Double points, Date dueDate, String externalServiceDescription, Boolean ungraded){
+	    if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
+    	    if(!gradeBookExternalAssessmentService.isAssignmentDefined(context, gradeId)){
+    	        gradeBookExternalAssessmentService.addExternalAssessment(context, gradeId, externalUrl, title, points, dueDate, externalServiceDescription, ungraded);
+    	    } else {
+    	        gradeBookExternalAssessmentService.updateExternalAssessment(context, gradeId, externalUrl, title, points, dueDate, ungraded);
+    	    }
+	    }
+	}
+    public void updateGrade(String context, String gradeId, String externalUrl,
+            String title, Double points, Date dueDate, String externalServiceDescription, Boolean ungraded){
+        gradeBookExternalAssessmentService.updateExternalAssessment(context, gradeId, externalUrl, title, points, dueDate, ungraded);
+    }
+    public void deleteGrade(String context, String gradeId){
+        gradeBookExternalAssessmentService.removeExternalAssessment(context, gradeId);
+    }
+    
+    public void addScore(String context, String gradeId, String userId, String score){
+        if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
+            if(gradeBookExternalAssessmentService.isAssignmentDefined(context, gradeId)){
+                gradeBookExternalAssessmentService.updateExternalAssessmentScore(context, gradeId, userId, score);
+            }
+        }
+    }
+    
+    public String getCurrentContext(){
+        return toolManager.getCurrentPlacement().getContext();
+    }
 
 }

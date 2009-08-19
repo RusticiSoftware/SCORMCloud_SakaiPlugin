@@ -51,7 +51,7 @@
 </c:if>
 
 
-<div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
+<div class="instruction">Hello, ${bean.currentUserDisplayName}. Is gradebook available? <%= bean.isGradebookAvailable() %></div>
 
 <form name="listItemsForm" action="controller?action=processPackageListAction" method="post">
     <table class="listHier">

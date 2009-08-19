@@ -66,10 +66,21 @@
 
 		<init-param>
 			<param-name>main-page</param-name>
-			<param-value>/ImportPackage.jsp</param-value>
+			<param-value>/ImportPackage.jsp?helper=true</param-value>
 		</init-param>
 		
 		<load-on-startup>2</load-on-startup>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>sakai.scormcloud.remove.helper</servlet-name>
+		<servlet-class>
+			org.sakaiproject.scormcloud.tool.RequestController
+		</servlet-class>
+		<init-param>
+			<param-name>action</param-name>
+			<param-value>deletePackageResource</param-value>
+		</init-param>
 	</servlet>
 	
 	<servlet>

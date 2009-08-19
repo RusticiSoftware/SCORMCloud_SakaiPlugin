@@ -119,5 +119,7 @@ public interface ScormCloudLogic {
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
    public void resetRegistration(ScormCloudRegistration reg);
+   
+   public boolean isGradebookAvailable();
 
 }

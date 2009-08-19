@@ -20,6 +20,8 @@
         <property name="toolManager" ref="org.sakaiproject.tool.api.ToolManager" />
         <property name="userDirectoryService"
             ref="org.sakaiproject.user.api.UserDirectoryService" />
+        <property name="gradebookExternalAssessmentService"
+        	ref="org.sakaiproject.service.gradebook.GradebookExternalAssessmentService" />
     </bean>
 
 	<!-- create bean to hold reference to scorm engine service -->
