@@ -74,4 +74,6 @@ public interface ExternalLogic {
     public void deleteGrade(String context, String gradeId);
     public void addScore(String context, String gradeId, String userId, String score);
     public String getCurrentContext();
+
+    public String getUserDisplayId(String userId);
 }

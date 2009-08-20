@@ -375,6 +375,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             ScormCloudPackage pkg) {
         // TODO: implement a does reg exist type functionality on the cloud
         String userDisplayName = externalLogic.getUserDisplayName(userId);
+        String userDisplayId = externalLogic.getUserDisplayId(userId);
         String firstName = "sakai";
         String lastName = "learner";
 
@@ -385,7 +386,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
 
         try {
-            String cloudRegId = "sakai-reg-" + userId + "-"
+            String cloudRegId = "sakai-reg-" + userDisplayId + "-"
                     + UUID.randomUUID().toString();
             scormEngineService.getRegistrationService().CreateRegistration(
                     cloudRegId, pkg.getScormCloudId(), userId, firstName,
@@ -395,7 +396,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setLocationId(externalLogic.getCurrentLocationId());
             reg.setOwnerId(externalLogic.getCurrentUserId());
             reg.setContext(externalLogic.getCurrentContext());
-            reg.setUserName(userDisplayName);
+            reg.setUserName(userDisplayId);
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
             dao.save(reg);
@@ -563,13 +564,18 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
     }
     
     public void addScoreToGradebook(ScormCloudRegistration reg){
-        log.debug("Requesting to add to gradebook with reg id = " + reg.getId() + ", score = " + reg.getScore());
+        log.debug("Requesting to add to gradebook with " + 
+                  "reg id = " + reg.getId() + 
+                  ", context = " + reg.getContext() +
+                  ", owner id = " + reg.getOwnerId() +
+                  ", user name (display id) = " + reg.getUserName() + 
+                  ", score = " + reg.getScore());
         externalLogic.addScore(reg.getContext(), reg.getPackageId(), reg.getOwnerId(), reg.getScore());
     }
     public void addGradeToGradebook(ScormCloudPackage pkg){
         externalLogic.addGrade(pkg.getContext(), pkg.getId(), 
                 "http://www.google.com/#hl=en&q=package+detail+url", 
-                pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", true);
+                pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", false);
     }
 
 }

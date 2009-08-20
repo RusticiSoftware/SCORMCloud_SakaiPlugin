@@ -123,6 +123,17 @@ public class ExternalLogicImpl implements ExternalLogic {
 	public String getCurrentUserId() {
 		return sessionManager.getCurrentSessionUserId();
 	}
+	
+	public String getUserDisplayId(String userId) {
+	    String displayId = null;
+        try {
+            displayId = userDirectoryService.getUser(userId).getDisplayId();
+        } catch (UserNotDefinedException e) {
+            log.warn("Cannot get user display id for id: " + userId);
+            displayId = "--------";
+        }
+        return displayId;
+	}
 
 	public String getUserDisplayName(String userId) {
 	   String name = null;
@@ -176,11 +187,12 @@ public class ExternalLogicImpl implements ExternalLogic {
     }
     
     public void addScore(String context, String gradeId, String userId, String score){
-        if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
-            if(gradeBookExternalAssessmentService.isAssignmentDefined(context, gradeId)){
+        //if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
+        //    if(gradeBookExternalAssessmentService.isAssignmentDefined(context, gradeId)){
+                log.debug("external logic addScore: context = " + context + ", gradeId = " + gradeId + ", userId = " + userId + ", score = " + score);
                 gradeBookExternalAssessmentService.updateExternalAssessmentScore(context, gradeId, userId, score);
-            }
-        }
+        //    }
+        //}
     }
     
     public String getCurrentContext(){

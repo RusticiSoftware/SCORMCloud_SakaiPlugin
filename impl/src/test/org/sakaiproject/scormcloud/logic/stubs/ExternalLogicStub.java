@@ -68,6 +68,7 @@ public class ExternalLogicStub implements ExternalLogic {
     public String getCurrentUserId() {
         return currentUserId;
     }
+    
 
     /* (non-Javadoc)
      * @see org.sakaiproject.scormcloud.logic.ExternalLogic#getUserDisplayName(java.lang.String)
@@ -83,6 +84,10 @@ public class ExternalLogicStub implements ExternalLogic {
             return FakeDataPreload.ADMIN_USER_DISPLAY;
         }
         return "----------";
+    }
+    
+    public String getUserDisplayId(String userId){
+        return "";
     }
 
     /* (non-Javadoc)
