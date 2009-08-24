@@ -109,10 +109,11 @@ public interface ScormCloudLogic {
    
    
    
-   public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg);
    public ScormCloudRegistration getRegistrationById(String id);
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
-   public ScormCloudRegistration findRegistrationFor(String userId, String pkgId);
+   public ScormCloudRegistration findRegistrationFor(String pkgId, String userId, String assignmentKey);
+   public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg, String userId, String assignmentKey);
+   
    public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
    
    public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId);
@@ -120,8 +121,6 @@ public interface ScormCloudLogic {
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
    public void resetRegistration(ScormCloudRegistration reg);
-   
-   public boolean isGradebookAvailable();
    
    public void setScormCloudConfiguration(ScormCloudConfiguration config);
    public ScormCloudConfiguration getScormCloudConfiguration();

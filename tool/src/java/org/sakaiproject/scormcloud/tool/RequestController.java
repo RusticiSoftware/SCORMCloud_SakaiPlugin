@@ -25,6 +25,8 @@ import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
+import org.sakaiproject.scormcloud.logic.ExternalLogic;
+import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
@@ -34,6 +36,7 @@ import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
 
 
 public class RequestController extends HttpServlet {
@@ -420,7 +423,9 @@ public class RequestController extends HttpServlet {
 	 */
 	public void processLaunchRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String packageId = request.getParameter("id");
-		log.debug("action launchPackage requested with packageId = " + packageId);
+		String assignmentKey = request.getParameter("assignmentKey");
+		log.debug("action launchPackage requested with packageId = " + packageId +
+		          " assignmentKey = " + assignmentKey);
 		
 		//Grab the packages bean
 		ScormCloudPackagesBean pkgsBean = getScormCloudPackagesBean();
@@ -434,24 +439,20 @@ public class RequestController extends HttpServlet {
 			rd.forward(request, response);
 		}
 		
+		//Grab needed interface implementations
+		ExternalLogic extLogic = getExternalLogic();
+		ScormCloudLogic logic = getScormCloudLogic();
+		
 		//Find (or create) a registration for the current user and the given package
-		ScormCloudRegistration reg = pkgsBean.findOrCreateUserRegistrationFor(pkg);
+		String userId = extLogic.getCurrentUserId();
+		ScormCloudRegistration reg = logic.findRegistrationFor(pkg.getId(), userId, assignmentKey);
+        if(reg == null){
+            reg = logic.addNewRegistration(pkg, userId, assignmentKey);
+        }
 
-		//Here we check to see if the newly created reg was created outside of any
-		//tool context (and hence unavailable to the grade book). If so, get the context
-		//from the package
-		if(reg.getContext() == null){
-		    log.debug("New reg had a null context, setting context from package");
-		    reg.setContext(pkg.getContext());
-		    reg.setLocationId(pkg.getLocationId());
-		    pkgsBean.updateRegistration(reg);
-		}
-		
-		
-		String launchUrl = pkgsBean.getLaunchUrl(reg, 
-                                		        getAbsoluteUrlToSelf(request) + 
-                                		            "?action=postLaunchActions&regId=" + 
-                                		            reg.getId());
+        //Now get the launch url associated with the registration...
+		String launchUrl = logic.getLaunchUrl(reg, 
+		        getAbsoluteUrlToSelf(request) + "?action=postLaunchActions&regId=" + reg.getId());
 		
 		//Forward the user to the launch page, now that a registration exists for them
 		log.debug("launchUrl = " + launchUrl);
@@ -498,6 +499,16 @@ public class RequestController extends HttpServlet {
 		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		return (ScormCloudPackagesBean)context.getBean("packagesBean");
 	}
+	private ScormCloudLogic getScormCloudLogic()
+    {
+        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        return (ScormCloudLogic)context.getBean("org.sakaiproject.scormcloud.logic.ScormCloudLogic");
+    }
+	private ExternalLogic getExternalLogic()
+	{
+	    ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        return (ExternalLogic)context.getBean("org.sakaiproject.scormcloud.logic.ExternalLogic");
+	}
 	
 	private String getAbsoluteUrlToSelf(HttpServletRequest request) throws Exception {
 	    
@@ -508,4 +519,7 @@ public class RequestController extends HttpServlet {
 	    return controllerUrl.toString();
 	}
 	
+	private boolean isNullOrEmpty(String str){
+	    return (str == null || str.length() == 0);
+	}
 }

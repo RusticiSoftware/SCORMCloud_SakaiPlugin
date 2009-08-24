@@ -22,6 +22,8 @@
             ref="org.sakaiproject.user.api.UserDirectoryService" />
         <property name="gradebookExternalAssessmentService"
         	ref="org.sakaiproject.service.gradebook.GradebookExternalAssessmentService" />
+        <property name="assignmentService"
+        	ref="org.sakaiproject.assignment.api.AssignmentService" />
     </bean>
 
 	<!-- create bean to hold reference to scorm engine service -->

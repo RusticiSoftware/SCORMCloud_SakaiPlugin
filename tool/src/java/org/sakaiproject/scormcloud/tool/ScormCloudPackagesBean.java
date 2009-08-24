@@ -132,10 +132,10 @@ public class ScormCloudPackagesBean {
 	    return logic.getRegistrationsByPackageId(packageId);
 	}
 	
-	public ScormCloudRegistration findOrCreateUserRegistrationFor(ScormCloudPackage pkg){
-		ScormCloudRegistration reg = logic.findRegistrationFor(externalLogic.getCurrentUserId(), pkg.getId());
+	public ScormCloudRegistration findOrCreateUserRegistrationFor(ScormCloudPackage pkg, String assignmentKey){
+		ScormCloudRegistration reg = logic.findRegistrationFor(pkg.getId(), externalLogic.getCurrentUserId(), assignmentKey);
 		if(reg == null){
-			reg = logic.addNewRegistration(externalLogic.getCurrentUserId(), pkg);
+			reg = logic.addNewRegistration(pkg, externalLogic.getCurrentUserId(), assignmentKey);
 		}
 		return reg;
 	}
@@ -155,13 +155,13 @@ public class ScormCloudPackagesBean {
 	    logic.updateRegistrationResultsFromCloud(reg);
 	}
 	
-	public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
+	/*public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
 		return logic.addNewRegistration(userId, pkg);
-	}
+	}*/
 	
-	public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl){
+	/*public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl){
 		return logic.getLaunchUrl(reg, redirectOnExitUrl);
-	}
+	}*/
 	
 	/**
 	 * @param item a ScormCloudPackage to remove
@@ -188,11 +188,6 @@ public class ScormCloudPackagesBean {
         }
         return false;
     }
-	
-	
-	public boolean isGradebookAvailable(){
-	    return logic.isGradebookAvailable();
-	}
 	
 	public void setConfiguration(ScormCloudConfiguration config){
 	    logic.setScormCloudConfiguration(config);

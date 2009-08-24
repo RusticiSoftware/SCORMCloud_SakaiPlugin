@@ -86,6 +86,14 @@
       		  <version>${sakai.version}</version>
       		  <scope>provided</scope>
       		</dependency>
+
+      		<dependency>
+      		  <groupId>org.sakaiproject</groupId>
+      		  <artifactId>sakai-assignment-api</artifactId>
+      		  <!--<version>2.6.0RC1-SNAPSHOT</version>-->
+      		  <version>${sakai.version}</version>
+      		  <scope>provided</scope>
+      		</dependency>
 	
             <!-- needed until EB is in the Sakai master dependency management -->
             <dependency>
@@ -163,6 +171,10 @@
       		<dependency>
       		  <groupId>org.sakaiproject</groupId>
       		  <artifactId>sakai-gradebook-service-api</artifactId>
+            	</dependency>
+      		<dependency>
+      		  <groupId>org.sakaiproject</groupId>
+      		  <artifactId>sakai-assignment-api</artifactId>
             	</dependency>
             <dependency>
                 <groupId>commons-logging</groupId>

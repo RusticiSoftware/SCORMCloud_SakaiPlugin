@@ -157,4 +157,17 @@ public class ExternalLogicStub implements ExternalLogic {
         return "";
     }
 
+    public String getAssignmentIdFromAssignmentKey(String context,
+            String userId, String assignmentKey) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void updateAssignmentScore(String context, String userId,
+            String assignmentId, String score) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
 }

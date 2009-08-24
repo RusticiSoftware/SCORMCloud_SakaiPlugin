@@ -29,27 +29,31 @@ public class ScormCloudHttpAccess implements HttpAccess {
            
             String refId = ref.getId();
             
-            //Parse out a possible assignment context of this reference
+            //This isn't the id, just a unique key to provide a 
+            //sort of assignment "context" for the launch / registration
+            String assignmentKey = null;
+            
+            //Parse out a possible assignment key/context of this reference
             if(refId.contains("Assignments")){
-                //Typically, reference is like "Assignments/[assignment id/etc",
-                //here we parse out the [assignment id]
+                //Typically, reference is like "Assignments/[assignment key]/etc",
+                //here we parse out the [assignment key]
                 String assignmentString = refId.substring(refId.indexOf("Assignments"));
                 int beginAssignmentId = assignmentString.indexOf("/") + 1;
                 int endAssignmentId = assignmentString.indexOf("/", beginAssignmentId);
-                String assignmentId = assignmentString.substring(beginAssignmentId, endAssignmentId);
+                assignmentKey = assignmentString.substring(beginAssignmentId, endAssignmentId);
                 
-                log.debug("In handleAccess: assignmentId = " + assignmentId);
+                log.debug("In handleAccess: assignmentKey = " + assignmentKey);
             }
            
-            redirectToLaunchPage(req, res, packageId, "");
+            redirectToLaunchPage(req, res, packageId, assignmentKey);
            
         } catch (Exception e) {
            throw new RuntimeException(e);
         }
      }
 
-     private void redirectToLaunchPage(HttpServletRequest req, HttpServletResponse res, String packageId, String assignmentId) throws Exception {
-        res.sendRedirect("/scormcloud-tool/controller?action=launchPackage&id=" + packageId); 
+     private void redirectToLaunchPage(HttpServletRequest req, HttpServletResponse res, String packageId, String assignmentKey) throws Exception {
+        res.sendRedirect("/scormcloud-tool/controller?action=launchPackage&id=" + packageId + "&assignmentKey=" + assignmentKey); 
      }
 
 }

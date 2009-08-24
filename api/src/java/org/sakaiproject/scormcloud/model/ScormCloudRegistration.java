@@ -11,6 +11,8 @@ public class ScormCloudRegistration implements Serializable {
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context id
+	private String assignmentId; //assignment related to this reg
+	private String assignmentKey; //assignment "context" related to resource attachment
 	private Date dateCreated;
 	private String scormCloudId;
 	private String packageId;
@@ -76,7 +78,18 @@ public class ScormCloudRegistration implements Serializable {
     public void setContext(String context){
         this.context = context;
     }
-	
+	public String getAssignmentId(){
+	    return assignmentId;
+	}
+	public void setAssignmentId(String assignmentId){
+	    this.assignmentId = assignmentId;
+	}
+	public String getAssignmentKey(){
+	    return assignmentKey;
+	}
+	public void setAssignmentKey(String assignmentKey){
+	    this.assignmentKey = assignmentKey;
+	}
 	public String getScormCloudId() {
 		return scormCloudId;
 	}

@@ -76,4 +76,8 @@ public interface ExternalLogic {
     public String getCurrentContext();
 
     public String getUserDisplayId(String userId);
+
+    public String getAssignmentIdFromAssignmentKey(String context, String userId, String assignmentKey);
+    public void updateAssignmentScore(String context, String userId, String assignmentId, String score);
+    
 }

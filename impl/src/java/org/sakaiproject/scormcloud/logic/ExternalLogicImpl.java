@@ -12,19 +12,29 @@
 package org.sakaiproject.scormcloud.logic;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.sakaiproject.assignment.api.Assignment;
+import org.sakaiproject.assignment.api.AssignmentContent;
+import org.sakaiproject.assignment.api.AssignmentService;
+import org.sakaiproject.assignment.api.AssignmentSubmission;
+import org.sakaiproject.assignment.api.AssignmentSubmissionEdit;
 import org.sakaiproject.authz.api.FunctionManager;
 import org.sakaiproject.authz.api.SecurityService;
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentService;
+import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.exception.IdUnusedException;
+import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
+import org.sakaiproject.user.api.User;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
 
@@ -69,6 +79,11 @@ public class ExternalLogicImpl implements ExternalLogic {
 	private GradebookExternalAssessmentService gradeBookExternalAssessmentService;
 	public void setGradebookExternalAssessmentService(GradebookExternalAssessmentService service){
 	    this.gradeBookExternalAssessmentService = service;
+	}
+	
+	private AssignmentService assignmentService;
+	public void setAssignmentService(AssignmentService service){
+	    this.assignmentService = service;
 	}
 
 
@@ -209,6 +224,49 @@ public class ExternalLogicImpl implements ExternalLogic {
             return null;
         }
         return cur.getContext();
+    }
+    
+    public void updateAssignmentScore(String context, String userId, String assignmentId, String score){
+        try {
+            User user = userDirectoryService.getUser(userId);
+            AssignmentSubmission sub = assignmentService.getSubmission(assignmentId, user);
+            if(sub != null){
+                log.debug("Found assignment submission, updating...");
+                AssignmentSubmissionEdit edit = assignmentService.editSubmission(sub.getReference());
+                edit.setGrade(score);
+                edit.setGraded(true);
+                assignmentService.commitEdit(edit);
+                log.debug("Committed new score: " + score);
+            }       
+        } catch (Exception e){
+            log.debug("Exception thrown in debugAssignment", e);
+        }
+    }
+    
+    public String getAssignmentIdFromAssignmentKey(String context, String userId, String assignmentKey) {
+        try {
+            log.debug("Finding all assignments for context " + context + " userId " + userId);
+            Iterator it = assignmentService.getAssignmentsForContext(context, userId);
+            while(it.hasNext()){
+                Assignment asn = (Assignment)it.next();
+                log.debug("Assignment with id " + asn.getId());
+                AssignmentContent content = asn.getContent();
+                List atts = content.getAttachments();
+                for (Object att : atts){
+                    String refId = ((Reference)att).getId();
+                    log.debug("\tContent attachment reference: " + refId);
+                    if(refId.contains(assignmentKey)){
+                        log.debug("\tFound the assignment associated with this unique key!");
+                        return asn.getId();
+                    }
+                }
+            }
+            log.debug("Couldn't find an assignment with an attachment matching assignmentKey = " + assignmentKey);
+            return null;
+        } catch (Exception e) {
+            log.error("Exception thrown in getAssignmentIdFromAssignmentKey, returning null", e);
+            return null;
+        }
     }
 
 }

@@ -12,6 +12,7 @@
 package org.sakaiproject.scormcloud.logic;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -428,14 +429,17 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
     }
 
-    public ScormCloudRegistration addNewRegistration(String userId,
-            ScormCloudPackage pkg) {
+    public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg,
+            String userId, String assignmentKey) {
         // TODO: implement a does reg exist type functionality on the cloud
         String userDisplayName = externalLogic.getUserDisplayName(userId);
         String userDisplayId = externalLogic.getUserDisplayId(userId);
+        String assignmentId = externalLogic.getAssignmentIdFromAssignmentKey(
+                                            pkg.getContext(), userId, assignmentKey);
+        
         String firstName = "sakai";
         String lastName = "learner";
-
+        
         if (userDisplayName != null && userDisplayName.contains(" ")) {
             String[] nameParts = userDisplayName.split(" ");
             firstName = nameParts[0];
@@ -443,19 +447,21 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
 
         try {
-            String cloudRegId = "sakai-reg-" + userDisplayId + "-"
-                    + UUID.randomUUID().toString();
+            String cloudRegId = "sakai-reg-" + userDisplayId + "-" + assignmentId;
             scormEngineService.getRegistrationService().CreateRegistration(
-                    cloudRegId, pkg.getScormCloudId(), userId, firstName,
-                    lastName);
+                    cloudRegId, pkg.getScormCloudId(), userId, firstName, lastName);
+            
             ScormCloudRegistration reg = new ScormCloudRegistration();
             reg.setDateCreated(new Date());
-            reg.setLocationId(externalLogic.getCurrentLocationId());
-            reg.setOwnerId(externalLogic.getCurrentUserId());
-            reg.setContext(externalLogic.getCurrentContext());
+            reg.setOwnerId(userId);
+            reg.setLocationId(pkg.getLocationId());
+            reg.setContext(pkg.getContext());
+            reg.setAssignmentId(assignmentId);
+            reg.setAssignmentKey(assignmentKey);
             reg.setUserName(userDisplayId);
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
+            
             dao.save(reg);
             return reg;
         } catch (Exception e) {
@@ -482,19 +488,22 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         return dao.findBySearch(ScormCloudRegistration.class, s);
     }
 
-    public ScormCloudRegistration findRegistrationFor(String userId,
-            String pkgId) {
+    public ScormCloudRegistration findRegistrationFor(String pkgId,
+            String userId, String assignmentKey) {
         log.debug("Finding registration with userId = " + userId
                 + ", packageId = " + pkgId);
+        
         Search s = new Search();
         s.addRestriction(new Restriction("ownerId", userId));
         s.addRestriction(new Restriction("packageId", pkgId));
-        List<ScormCloudRegistration> regs = dao.findBySearch(
-                ScormCloudRegistration.class, s);
+        s.addRestriction(new Restriction("assignmentKey", assignmentKey));
+        List<ScormCloudRegistration> regs = dao.findBySearch(ScormCloudRegistration.class, s);
+        
         if (regs.size() >= 1) {
             if (regs.size() > 1) {
-                log.debug("Found more than one registration with userId = "
-                        + userId + " and packageId = " + pkgId);
+                log.warn("Found more than one registration with userId = "
+                        + userId + " and packageId = " + pkgId + 
+                        " and assignmentKey = " + assignmentKey);
             }
             return regs.get(0);
         }
@@ -608,7 +617,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setScore(sum.getScore());
             reg.setTotalTime(sum.getTotalTime());
             dao.save(reg);
-            addScoreToGradebook(reg);
+            updateAssignmentScore(reg);
+            
         } catch (Exception e) {
             log.debug("Exception getting registration results for " +
                       "reg with id = " + reg.getId() + 
@@ -616,18 +626,30 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
     }
     
-    public boolean isGradebookAvailable(){
-        return externalLogic.isGradebookAvailable();
+    public void updateAssignmentScore(ScormCloudRegistration reg){
+        log.debug("Updating assignment score for assignment " + reg.getAssignmentId() + " associated with reg " + reg.getId());
+        Double score = getCombinedScoreForAssignment(reg.getOwnerId(), reg.getAssignmentId());
+        String scoreStr = (score == null) ? null : score.toString();
+        externalLogic.updateAssignmentScore(reg.getContext(), reg.getOwnerId(), reg.getAssignmentId(), scoreStr);
     }
     
-    public void addScoreToGradebook(ScormCloudRegistration reg){
-        log.debug("Requesting to add to gradebook with " + 
-                  "reg id = " + reg.getId() + 
-                  ", context = " + reg.getContext() +
-                  ", owner id = " + reg.getOwnerId() +
-                  ", user name (display id) = " + reg.getUserName() + 
-                  ", score = " + reg.getScore());
+    public Double getCombinedScoreForAssignment(String ownerId, String assignmentId){
+        Search s = new Search();
+        s.addRestriction(new Restriction("ownerId", ownerId));
+        s.addRestriction(new Restriction("assignmentId", assignmentId));
+        List<ScormCloudRegistration> regs = dao.findBySearch(ScormCloudRegistration.class, s);
         
+        log.debug("In getCombinedScoreForAssignment, found " + regs.size() + 
+                  " regs (resources) associated with assignment = " + assignmentId);
+
+        Double scoreSum = 0.0;
+        for (ScormCloudRegistration reg : regs){
+            scoreSum += getScoreFromRegistration(reg);
+        }
+        return scoreSum / regs.size();
+    }
+    
+    public Double getScoreFromRegistration(ScormCloudRegistration reg){
         Double score = null;
         try { 
             score = new Double(reg.getScore()); 
@@ -638,15 +660,13 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             }
         }
         catch (NumberFormatException nfe) {}
-        String scoreStr = (score == null) ? null : score.toString();
-        
-        externalLogic.addScore(reg.getContext(), reg.getPackageId(), reg.getOwnerId(), scoreStr);
+        return (score == null) ? 0.0 : score; 
     }
+    
     public void addGradeToGradebook(ScormCloudPackage pkg){
         externalLogic.addGrade(pkg.getContext(), pkg.getId(), 
                 /*"http://www.google.com/#hl=en&q=package+detail+url",*/
-                null,
-                pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", false);
+                null, pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", false);
     }
 
 }
