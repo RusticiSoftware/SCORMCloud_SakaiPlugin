@@ -35,6 +35,7 @@
 <div class="navIntraTool">
     <a href="PackageList.jsp">List Packages</a>
     <a href="ImportPackage.jsp">Import Package</a>
+    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
 </div>
 
 <h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
@@ -51,7 +52,7 @@
 </c:if>
 
 
-<div class="instruction">Hello, ${bean.currentUserDisplayName}. Is gradebook available? <%= bean.isGradebookAvailable() %></div>
+<div class="instruction">Hello, ${bean.currentUserDisplayName}.</div>
 
 <form name="listItemsForm" action="controller?action=processPackageListAction" method="post">
     <table class="listHier">

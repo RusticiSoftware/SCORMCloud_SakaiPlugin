@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
+import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
@@ -191,5 +192,12 @@ public class ScormCloudPackagesBean {
 	
 	public boolean isGradebookAvailable(){
 	    return logic.isGradebookAvailable();
+	}
+	
+	public void setConfiguration(ScormCloudConfiguration config){
+	    logic.setScormCloudConfiguration(config);
+	}
+	public ScormCloudConfiguration getConfiguration(){
+	    return logic.getScormCloudConfiguration();
 	}
 }

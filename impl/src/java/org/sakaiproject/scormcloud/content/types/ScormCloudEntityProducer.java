@@ -21,18 +21,18 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class ScormCloudEntityProducer implements EntityProducer {
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Log log = LogFactory.getLog(getClass());
     private boolean m_shortRefs = true;
     private boolean m_siteAlias = true;
     private static final String SCORM_LABEL = "scormcloud";
     public final static String REFERENCE_ROOT = Entity.SEPARATOR + SCORM_LABEL;
     private HttpAccess httpAccess;
     public void init() {
-       logger.info("init()");
+       log.info("init()");
        try {
           EntityManager.registerEntityProducer(this, Entity.SEPARATOR + SCORM_LABEL);
        } catch (Exception e) {
-          logger.warn("Error registering Scorm Entity Producer", e);
+          log.warn("Error registering Scorm Entity Producer", e);
        }
     }
 
@@ -56,12 +56,16 @@ public class ScormCloudEntityProducer implements EntityProducer {
      {
          String id = null;
          String context = "";
+         
+         log.debug("In parseEntityReference: reference = " + reference);
 
          // for content hosting resources and collections
          if (reference.startsWith(REFERENCE_ROOT))
          {
              // parse out the local resource id
              id = reference.replaceFirst(REFERENCE_ROOT + Entity.SEPARATOR + "content", "");
+             
+             
          }
 
          // not mine

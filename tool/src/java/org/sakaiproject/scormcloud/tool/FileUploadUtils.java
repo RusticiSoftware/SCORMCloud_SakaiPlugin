@@ -3,28 +3,20 @@ package org.sakaiproject.scormcloud.tool;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.rusticisoftware.hostedengine.client.Configuration;
-import com.rusticisoftware.hostedengine.client.ScormCloud;
 
 public class FileUploadUtils {
     private static Log log = LogFactory.getLog(FileUploadUtils.class);
@@ -62,7 +54,7 @@ public class FileUploadUtils {
 		}
 		
 		
-		ServletFileUpload upload = new ServletFileUpload();
+		/*ServletFileUpload upload = new ServletFileUpload();
 		//upload.setSizeMax(Globals.MAX_UPLOAD_SIZE);
 		FileItemIterator iter = upload.getItemIterator(request);
 		while(iter.hasNext()){
@@ -92,6 +84,38 @@ public class FileUploadUtils {
 			else {
 				params.put(item.getFieldName(), Streams.asString(stream));
 			}
+		}
+		return true;*/
+		
+		// Create a factory for disk-based file items
+		FileItemFactory factory = new DiskFileItemFactory();
+
+		// Create a new file upload handler
+		ServletFileUpload upload = new ServletFileUpload(factory);
+
+		// Parse the request
+		List /* FileItem */ items = upload.parseRequest(request);
+		
+		// Process the uploaded items
+		Iterator iter = items.iterator();
+		while (iter.hasNext()) {
+		    FileItem item = (FileItem) iter.next();
+
+		    if (!item.isFormField()) {
+		        log.debug("Found non form field in upload request with field name = " + item.getFieldName());
+                
+                String name = item.getName();
+                if(name == null){
+                    throw new Exception("File upload did not have filename specified");
+                }
+                
+                // Some browsers, including IE, return the full path so trim off everything but the file name
+                name = getFileNameFromPath(name);
+                
+                item.write(outputFile);
+		    } else {
+		        params.put(item.getFieldName(), item.getString());
+		    }
 		}
 		return true;
 	}

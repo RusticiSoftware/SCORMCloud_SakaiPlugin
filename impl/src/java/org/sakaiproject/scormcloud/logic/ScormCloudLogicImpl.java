@@ -26,10 +26,12 @@ import org.sakaiproject.genericdao.api.search.Search;
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.dao.ScormCloudDao;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
+import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 
+import com.rusticisoftware.hostedengine.client.Configuration;
 import com.rusticisoftware.hostedengine.client.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
 
@@ -41,6 +43,8 @@ import com.rusticisoftware.hostedengine.client.ScormEngineService;
 public class ScormCloudLogicImpl implements ScormCloudLogic {
 
     private static Log log = LogFactory.getLog(ScormCloudLogicImpl.class);
+    
+    
 
     private ScormCloudDao dao;
 
@@ -54,11 +58,10 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         this.externalLogic = externalLogic;
     }
 
-    private ScormEngineService scormEngineService;
 
-    public void setScormEngineService(ScormEngineService service) {
-        this.scormEngineService = service;
-    }
+    private final String CLOUD_CONFIG_ID = "scorm-cloud-config";
+    private ScormCloudConfiguration scormCloudConfiguration;
+    private ScormEngineService scormEngineService;
 
     /**
      * Place any code that should run when this class is initialized by spring
@@ -66,6 +69,60 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
      */
     public void init() {
         log.debug("init");
+        initScormEngineService();
+    }
+    
+    public void initScormEngineService(){
+        scormCloudConfiguration = lookupScormCloudConfig();
+        if(scormCloudConfiguration != null){
+            log.debug("Found cloud config in database, initializing scorm engine service");
+            Configuration config = 
+                new Configuration(scormCloudConfiguration.getServiceUrl(), 
+                                  scormCloudConfiguration.getAppId(),
+                                  scormCloudConfiguration.getSecretKey());
+            scormEngineService = new ScormEngineService(config);
+        } else {
+            log.debug("Couldn't find existing config, not initializing scorm engine service");
+        }
+    }
+    
+    private ScormCloudConfiguration lookupScormCloudConfig(){
+        List<ScormCloudConfiguration> configs = dao.findAll(ScormCloudConfiguration.class);
+        if(configs.size() > 0){
+            return configs.get(0);
+        }
+        return null;
+    }
+    
+    public boolean isScormEngineServiceInitialized(){
+        return (scormEngineService != null);
+    }
+    
+    public void setScormCloudConfiguration(ScormCloudConfiguration config){
+        log.debug("setScormCloudConfiguration called w/ appId = " + config.getAppId());
+        ScormCloudConfiguration existingConfig = lookupScormCloudConfig();
+        if(existingConfig != null){
+            log.debug("Existing config found, updating it");
+            existingConfig.copyFrom(config);
+            dao.save(existingConfig);
+        } else {
+            log.debug("No existing config found, adding new one");
+            dao.save(config);
+        }
+        initScormEngineService();
+    }
+    
+    public ScormCloudConfiguration getScormCloudConfiguration(){
+        if(scormCloudConfiguration != null){
+            if(externalLogic.isUserAdmin(externalLogic.getCurrentUserId())){
+                return scormCloudConfiguration;
+            } else {
+                ScormCloudConfiguration copy = new ScormCloudConfiguration(scormCloudConfiguration);
+                copy.setSecretKey(null);
+                return copy;
+            }
+        }
+        return null;
     }
 
     /*
@@ -570,11 +627,25 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
                   ", owner id = " + reg.getOwnerId() +
                   ", user name (display id) = " + reg.getUserName() + 
                   ", score = " + reg.getScore());
-        externalLogic.addScore(reg.getContext(), reg.getPackageId(), reg.getOwnerId(), reg.getScore());
+        
+        Double score = null;
+        try { 
+            score = new Double(reg.getScore()); 
+            //The need for this multiplication may disappear in the future
+            //At which point the returned score will already be scaled to 100
+            if(score <= 1.0){
+                score *= 100.0;
+            }
+        }
+        catch (NumberFormatException nfe) {}
+        String scoreStr = (score == null) ? null : score.toString();
+        
+        externalLogic.addScore(reg.getContext(), reg.getPackageId(), reg.getOwnerId(), scoreStr);
     }
     public void addGradeToGradebook(ScormCloudPackage pkg){
         externalLogic.addGrade(pkg.getContext(), pkg.getId(), 
-                "http://www.google.com/#hl=en&q=package+detail+url", 
+                /*"http://www.google.com/#hl=en&q=package+detail+url",*/
+                null,
                 pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", false);
     }
 

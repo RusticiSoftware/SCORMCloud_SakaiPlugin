@@ -25,22 +25,39 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-
-<h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
-
-	<script>
-         window.open("${url}", "_blank", "");
-    </script>
-    
-<div class="instruction" style="padding-left:10px; padding-top:10px">
-	Your course has launched in a new window. When you have finished, please click 
-	<a href="#" onclick="javascript:history.back()">here</a> to go back, or close this window.
+<div class="navIntraTool">
+    <a href="PackageList.jsp">List Packages</a>
+    <a href="ImportPackage.jsp">Import Package</a>
+    <a href="controller?action=configureCloudPlugin">Configure Plugin</a>
 </div>
+
+<h3 class="insColor insBak insBorder">SCORM Cloud Configuration</h3>
+
+<div class="instruction">Enter your AppId and Secret Key below to activate the SCORM Cloud Plugin.</div>
+<form name="cloudConfigForm" id="cloudConfigForm" action="controller?action=configureCloudPlugin" method="post">
+	<table>
+		<tr>
+			<td>AppId</td>
+			<td><input id="appId" name="appId" type="text" value="${config.appId}" size="40" /></td>
+		</tr>
+		<tr>
+			<td>Secret Key</td>
+			<td><input id="secretKey" name="secretKey" type="text" value="${config.secretKey}" size="40" /></td>
+		</tr>
+		<tr>
+			<td>Service URL</td>
+			<td><input id="serviceUrl" name="serviceUrl" type="text" value="${config.serviceUrl}" size="40" /></td>
+		</tr>
+		<tr>
+			<td colspan="2">&nbsp;</td>
+		</tr>
+		<tr>
+			<td><input type="submit" name="submit" value="Submit" /></td>
+			<td><input type="submit" name="cancel" value="Cancel" /></td>
+		</tr>
+	</table>
+</form>
 
 </div>
 </body>
 </html>
-
-<!-- <script>
-   history.back()
-</script> -->

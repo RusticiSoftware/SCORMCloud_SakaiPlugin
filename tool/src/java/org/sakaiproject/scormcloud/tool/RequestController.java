@@ -25,6 +25,7 @@ import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
+import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 import org.sakaiproject.tool.api.Tool;
@@ -61,7 +62,12 @@ public class RequestController extends HttpServlet {
                 log.error("No action specified, returning!");
                 return;
             }
-			
+            if(action.equals("viewCloudConfiguration")){
+                proccessViewCloudConfigurationAction(request, response);
+            }
+			if(action.equals("configureCloudPlugin")){
+			    processConfigureCloudPluginAction(request, response);
+			}
 			if(action.equals("importPackage")){
 				processImportRequest(request, response);
 			}
@@ -108,7 +114,6 @@ public class RequestController extends HttpServlet {
 			    }
 			}
 			
-			
 			output.println("error: Action " + action + " not found");
 		}
 		catch (Exception e){
@@ -116,7 +121,37 @@ public class RequestController extends HttpServlet {
 		}
 	}
 	
-	private void processViewPackagePropertiesRequest(
+	private void proccessViewCloudConfigurationAction(HttpServletRequest request,
+	        HttpServletResponse response) throws Exception {
+	    ScormCloudConfiguration config = getScormCloudPackagesBean().getConfiguration();
+        if (config == null) {
+            config = new ScormCloudConfiguration();
+        }
+        request.setAttribute("config", config);
+        RequestDispatcher rd = request.getRequestDispatcher("ScormCloudConfiguration.jsp");
+        rd.forward(request, response);
+	}
+	
+	private void processConfigureCloudPluginAction(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+	    if(request.getParameter("submit") != null){
+            String appId = request.getParameter("appId");
+            String secretKey = request.getParameter("secretKey");
+            String serviceUrl = request.getParameter("serviceUrl");
+            
+            ScormCloudConfiguration config = new ScormCloudConfiguration();
+            config.setAppId(appId);
+            config.setSecretKey(secretKey);
+            config.setServiceUrl(serviceUrl);
+            getScormCloudPackagesBean().setConfiguration(config);
+            
+            getScormCloudPackagesBean().getMessages().add("SCORM Cloud Plugin Configuration Updated");
+	    }
+	    RequestDispatcher rd = request.getRequestDispatcher("PackageList.jsp");
+	    rd.forward(request, response);
+    }
+
+    private void processViewPackagePropertiesRequest(
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
         ScormCloudPackage pkg = getScormCloudPackagesBean().getPackageById(packageId);
@@ -330,7 +365,7 @@ public class RequestController extends HttpServlet {
         resource.setContent(new byte[]{0,0,0,0});  //Dummy content, we don't need it...
         resource.setContentType("application/zip");
         resource.setResourceType("scormcloud.type");
-        resource.setHidden();
+        //resource.setHidden();
         getContentHostingService().commitResource(resource);
 	}
 	
@@ -401,6 +436,18 @@ public class RequestController extends HttpServlet {
 		
 		//Find (or create) a registration for the current user and the given package
 		ScormCloudRegistration reg = pkgsBean.findOrCreateUserRegistrationFor(pkg);
+
+		//Here we check to see if the newly created reg was created outside of any
+		//tool context (and hence unavailable to the grade book). If so, get the context
+		//from the package
+		if(reg.getContext() == null){
+		    log.debug("New reg had a null context, setting context from package");
+		    reg.setContext(pkg.getContext());
+		    reg.setLocationId(pkg.getLocationId());
+		    pkgsBean.updateRegistration(reg);
+		}
+		
+		
 		String launchUrl = pkgsBean.getLaunchUrl(reg, 
                                 		        getAbsoluteUrlToSelf(request) + 
                                 		            "?action=postLaunchActions&regId=" + 

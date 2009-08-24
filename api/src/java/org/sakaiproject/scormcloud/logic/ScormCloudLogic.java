@@ -14,6 +14,7 @@ package org.sakaiproject.scormcloud.logic;
 import java.io.File;
 import java.util.List;
 
+import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
@@ -121,5 +122,8 @@ public interface ScormCloudLogic {
    public void resetRegistration(ScormCloudRegistration reg);
    
    public boolean isGradebookAvailable();
+   
+   public void setScormCloudConfiguration(ScormCloudConfiguration config);
+   public ScormCloudConfiguration getScormCloudConfiguration();
 
 }

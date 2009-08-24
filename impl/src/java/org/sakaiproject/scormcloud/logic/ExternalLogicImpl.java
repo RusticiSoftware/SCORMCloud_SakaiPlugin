@@ -22,6 +22,7 @@ import org.sakaiproject.service.gradebook.shared.GradebookExternalAssessmentServ
 import org.sakaiproject.exception.IdUnusedException;
 import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
+import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.SessionManager;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.UserDirectoryService;
@@ -94,11 +95,12 @@ public class ExternalLogicImpl implements ExternalLogic {
          location = s.getReference(); // get the entity reference to the site
       } catch (Exception e) {
          // sakai failed to get us a location so we can assume we are not inside the portal
-         return NO_LOCATION;
+         //return NO_LOCATION;
+          return null;
       }
-      if (location == null) {
+      /*if (location == null) {
          location = NO_LOCATION;
-      }
+      }*/
       return location;
    }
 
@@ -187,16 +189,26 @@ public class ExternalLogicImpl implements ExternalLogic {
     }
     
     public void addScore(String context, String gradeId, String userId, String score){
-        //if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
-        //    if(gradeBookExternalAssessmentService.isAssignmentDefined(context, gradeId)){
+        if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
+            if(gradeBookExternalAssessmentService.isExternalAssignmentDefined(context, gradeId)){
                 log.debug("external logic addScore: context = " + context + ", gradeId = " + gradeId + ", userId = " + userId + ", score = " + score);
                 gradeBookExternalAssessmentService.updateExternalAssessmentScore(context, gradeId, userId, score);
-        //    }
-        //}
+            } else {
+                log.debug("No external assignment found for context = " + 
+                     context + ", gradeId = " + gradeId + ". Not recording a grade");
+            }
+        } else {
+            log.error("Error in addScore, no grade book defined for context = " + context);
+        }
     }
     
     public String getCurrentContext(){
-        return toolManager.getCurrentPlacement().getContext();
+        Placement cur = toolManager.getCurrentPlacement();
+        if(cur == null){
+            log.warn("In getCurrentContext, no current placement found, returning null context");
+            return null;
+        }
+        return cur.getContext();
     }
 
 }

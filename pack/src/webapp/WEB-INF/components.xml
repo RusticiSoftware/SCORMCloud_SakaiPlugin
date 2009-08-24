@@ -25,12 +25,12 @@
     </bean>
 
 	<!-- create bean to hold reference to scorm engine service -->
-    <bean id="com.rusticisoftware.hostedengine.client.ScormEngineService"
+    <!--<bean id="com.rusticisoftware.hostedengine.client.ScormEngineService"
     	  class="com.rusticisoftware.hostedengine.client.ScormEngineService">
     	  <constructor-arg index="0" value="http://dev.cloud.scorm.com/EngineWebServices/" />
     	  <constructor-arg index="1" value="dave" />
     	  <constructor-arg index="2" value="y7bxwHapEWuOz3ODfZJ2je0DPJaFP8kHqDrQ4Bld" />
-   	</bean>
+   	</bean>-->
 
     <!-- create a logic bean, give it the dao from above -->
     <bean id="org.sakaiproject.scormcloud.logic.ScormCloudLogic"
@@ -40,8 +40,8 @@
             ref="org.sakaiproject.scormcloud.dao.ScormCloudDao" />
         <property name="externalLogic"
             ref="org.sakaiproject.scormcloud.logic.ExternalLogic" />
-        <property name="scormEngineService"
-        	ref="com.rusticisoftware.hostedengine.client.ScormEngineService" />
+        <!--<property name="scormEngineService"
+        	ref="com.rusticisoftware.hostedengine.client.ScormEngineService" />-->
     </bean>
     
     

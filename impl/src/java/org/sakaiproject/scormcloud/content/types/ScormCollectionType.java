@@ -40,7 +40,7 @@ import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 
 
-public class ScormCollectionType extends ZipCollectionType {
+public class ScormCollectionType extends BaseResourceType {
 	protected ResourceTypeRegistry resourceTypeRegistry;
     protected static Log log = LogFactory.getLog(ScormCollectionType.class);
     
@@ -49,21 +49,16 @@ public class ScormCollectionType extends ZipCollectionType {
 	public static final String SCORM_CONTENT_LABEL="SCORM Cloud Package";
 	public static final String SCORM_CONTENT_TYPE_ID="scormcloud.type";
 	
-	public static final String SCORM_UPLOAD_LABEL="Upload SCORM Cloud Package";
+	public static final String SCORM_UPLOAD_LABEL="Upload SCORM Package";
 	public static final String SCORM_LAUNCH_LABEL="Launch";
 	public static final String SCORM_REMOVE_LABEL="Remove";
 
 	public static final String SCORM_UPLOAD_HELPER_ID="sakai.scormcloud.upload.helper"; //="sakai.resource.type.helper";
-	//public static final String SCORM_UPLOAD_HELPER_ID="sakai.resource.type.helper";
 	public static final String SCORM_LAUNCH_TOOL_ID="sakai.scormcloud";
     public static final String SCORM_ACCESS_HELPER_ID="sakai.scormcloud";
     public static final String SCORM_REMOVE_HELPER_ID="sakai.scormcloud.remove.helper";
 	
-	/*public static final String SCORM_UPLOAD_HELPER_ID="sakai.scorm.helper"; //="sakai.resource.type.helper";
-	public static final String SCORM_LAUNCH_TOOL_ID="sakai.scorm.helper";
-	public static final String SCORM_ACCESS_HELPER_ID="sakai.scorm.access";
-	public static final String SCORM_REMOVE_HELPER_ID="sakai.scorm.remove.helper";*/
-	
+    
 	public ScormCollectionType() {	
 		List<String> requiredKeys = new ArrayList<String>();
 	    requiredKeys.add(ResourceProperties.PROP_STRUCTOBJ_TYPE);
@@ -97,18 +92,15 @@ public class ScormCollectionType extends ZipCollectionType {
 	    actionMap.put(create.getActionType(), makeList(create));
 	    //actionMap.put(launch.getActionType(), makeList(launch));
 	    actionMap.put(remove.getActionType(), makeList(remove));
-	    //actionMap.put(intercept.getActionType(), makeList(intercept));
 	    
 	    actions.put(create.getId(), create);
 	    //actions.put(launch.getId(), launch);
 	    actions.put(remove.getId(), remove);
-	    //actions.put(intercept.getId(), intercept);
 	    
 	    getResourceTypeRegistry().register(this);
 	}
 	
 	public ResourceTypeRegistry getResourceTypeRegistry() {
-        //return resourceTypeRegistry;
         if (resourceTypeRegistry == null) {
             resourceTypeRegistry = (ResourceTypeRegistry) 
                 ComponentManager.get("org.sakaiproject.content.api.ResourceTypeRegistry");
@@ -148,48 +140,12 @@ public class ScormCollectionType extends ZipCollectionType {
 
 	public String getIconLocation(ContentEntity entity, boolean expanded)
     {
-		String iconLocation = "sakai/dir_openroot.gif";
-		if(entity.isCollection())
-		{
-			ContentCollection collection = (ContentCollection) entity;
-			int memberCount = collection.getMemberCount();
-			if(memberCount == 0)
-			{
-				iconLocation = "sakai/dir_closed.gif";
-			}
-			else if(memberCount > ResourceType.EXPANDABLE_FOLDER_SIZE_LIMIT)
-			{
-				iconLocation = "sakai/dir_unexpand.gif";
-			}
-			else if(expanded) 
-			{
-				iconLocation = "sakai/dir_openminus.gif";
-			}
-			else 
-			{
-				iconLocation = "sakai/dir_closedplus.gif";
-			}
-		}
-		return iconLocation;
+	    return getIconLocation(entity);
     }
 	
 	public String getIconLocation(ContentEntity entity) 
 	{
-		String iconLocation = "sakai/dir_openroot.gif";
-		if(entity != null && entity.isCollection())
-		{
-			ContentCollection collection = (ContentCollection) entity;
-			int memberCount = collection.getMemberCount();
-			if(memberCount == 0)
-			{
-				iconLocation = "sakai/dir_closed.gif";
-			}
-			else if(memberCount > ResourceType.EXPANDABLE_FOLDER_SIZE_LIMIT)
-			{
-				iconLocation = "sakai/dir_unexpand.gif";
-			}
-		}
-		return iconLocation;
+	    return "../../scormcloud-tool/images/cloud_icon_sm.gif";
 	}
 
 	public String getId() {
@@ -373,6 +329,14 @@ public class ScormCollectionType extends ZipCollectionType {
 	public String getLocalizedHoverText(ContentEntity entity, boolean expanded) {
 		return "Scorm Cloud Content Package";
 	}
+
+    public String getLongSizeLabel(ContentEntity arg0) {
+        return "";
+    }
+
+    public String getSizeLabel(ContentEntity arg0) {
+        return "";
+    }
 
 	/*public boolean isExpandable() {
 		return true;

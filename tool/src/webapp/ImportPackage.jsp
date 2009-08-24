@@ -53,40 +53,70 @@
 
 <form name="importPackageForm" action="controller?action=importPackage" method="post" enctype="multipart/form-data">
 	<input name="helper" id="helper" type="hidden" value="${param.helper}" />
-	<table border="0" cellspacing="0" class="chefEditItem">
-		<tbody>
-			<tr>
-				<td>File</td>
-				<td>
-					<input id="filedata" name="filedata" type="file" size="40" />
-				</td>
-			</tr>
-			<tr>
-				<td>Title</td>
-				<td>
-					<input name="item-title" id="item-title" type="text" size="70" value="" />
-					<script type="text/javascript" language="JavaScript">
-					<!--
-						document.getElementById("item-title").focus();
-					// -->
-					</script>
-				</td>
-			</tr>
-			<tr>
-				<td>Hidden</td>
-				<td>
-					<%
-					String checkVal = "checked='true'";
-					if (item.getHidden() != null && !item.getHidden().booleanValue()) {
-						checkVal = "";
-					}
-					%>
-					<input name="item-hidden" title="Hide this from other users" 
-							type="checkbox" value="true" <%= checkVal %> />
-				</td>
-			</tr>
-		</tbody>
-	</table>
+	<p class="shorttext">
+			<span class="reqStar">*</span>
+			<span style="padding-right: 20px">	
+				File	
+			</span>
+			<input id="filedata" name="filedata" type="file" size="30" />
+	</p>
+	
+	<p class="shorttext">
+			<span class="reqStar">*</span>
+			<span style="padding-right: 20px">
+				Title
+			</span>	
+			<input name="item-title" id="item-title" type="text" size="28" value="" />
+	</p>
+	<br />
+	
+	<h4>Grading</h4>
+	<p class="checkbox  indnt2">
+		<input type="radio" 
+			name="create-gradebook-entry"
+			id="create-gradebook-entry-false"
+			value="false" 
+			checked="checked" />
+		<label for="create-gradebook-entry-false">Do not create gradebook entry associated with this content</label>
+		<br />
+		<input type="radio" 
+			name="create-gradebook-entry"
+			id="create-gradebook-entry-true"
+			value="true" />
+		<label for="create-gradebook-entry-true">Create gradebook entry associated with this content</label>
+		<br /><br />
+		<label for="point-scale" style="padding-left: 26px; padding-right:6px">
+				Point Scale
+		</label>
+		<input id="point-scale" name="point-scale" type="text" value="100" size="3" disabled="true" />
+	</p>
+	
+	<h4>Time Limits</h4>
+	<p class="checkbox  indnt2">
+		<input type="radio" 
+			name="impose-time-limits"
+			id="impose-time-limits-false"
+			value="false" 
+			checked="checked" />
+		<label for="impose-time-limits-false">Do not limit the time this content is accessible</label>
+		<br />
+		<input type="radio" 
+			name="impose-time-limits"
+			id="impose-time-limits-true"
+			value="true" />
+		<label for="impose-time-limits-true">Limit the time this content is accessible</label>
+		
+		<br /><br />
+		<label for="open-date" style="padding-left: 26px; padding-right:6px">
+				Open Date
+		</label>
+		<input name="open-date" type="text" value="100" size="3" />
+		<br />
+		<label for="due-date" style="padding-left: 26px; padding-right:6px">
+				Due Date
+		</label>
+		<input name="due-date" type="text" value="100" size="3" />
+	</p>
 
 	<p class="act">
 		<input name="import-package" type="submit" value="Import" />

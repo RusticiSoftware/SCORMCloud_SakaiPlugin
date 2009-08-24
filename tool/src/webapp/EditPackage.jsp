@@ -51,7 +51,7 @@
 </c:if>
 
 	<p>
-    	<a href="PackageList.jsp" onclick="history.back();">Return</a>
+    	<a href="PackageList.jsp">Return</a>
     </p>
 
 <!--<form name="listItemsForm" action="controller?action=processPackageListAction" method="post">-->
