@@ -15,54 +15,14 @@ import java.io.File;
 import java.util.List;
 
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
-import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
-
-import com.rusticisoftware.hostedengine.client.ScormEngineService;
 
 /**
  * This is the interface for the app Logic, 
  * @author Sakai App Builder -AZ
  */
 public interface ScormCloudLogic {
-	
-   /**
-    * This returns an item based on an id
-    * @param id the id of the item to fetch
-    * @return a ScormCloudItem or null if none found
-    */
-   public ScormCloudItem getItemById(Long id);
-
-   /**
-    * Check if a specified user can write this item in a specified site
-    * @param item to be modified or removed
-    * @param locationId a unique id which represents the current location of the user (entity reference)
-    * @param userId the internal user id (not username)
-    * @return true if item can be modified, false otherwise
-    */
-   public boolean canWriteItem(ScormCloudItem item, String locationId, String userId);
-
-   /**
-    * This returns a List of items for a specified site that are
-    * visible to the specified user
-    * @param locationId a unique id which represents the current location of the user (entity reference)
-    * @param userId the internal user id (not username)
-    * @return a List of ScormCloudItem objects
-    */
-   public List<ScormCloudItem> getAllVisibleItems(String locationId, String userId);
-
-   /**
-    * Save (Create or Update) an item (uses the current site)
-    * @param item the ScormCloudItem to create or update
-    */
-   public void saveItem(ScormCloudItem item);
-
-   /**
-    * Remove an item
-    * @param item the ScormCloudItem to remove
-    */
-   public void removeItem(ScormCloudItem item);
    
    /**
     * This returns a package based on an id

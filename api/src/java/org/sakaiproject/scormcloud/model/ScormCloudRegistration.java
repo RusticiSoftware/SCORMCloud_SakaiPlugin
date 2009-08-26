@@ -11,12 +11,16 @@ public class ScormCloudRegistration implements Serializable {
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context id
-	private String assignmentId; //assignment related to this reg
-	private String assignmentKey; //assignment "context" related to resource attachment
+	
 	private Date dateCreated;
 	private String scormCloudId;
 	private String packageId;
 	private String userName;
+	
+	private String assignmentId; //assignment related to this reg
+    private String assignmentKey; //assignment "context" related to resource attachment
+    private Boolean contributesToAssignmentGrade;
+	private Integer numberOfContributingResources = 0;
 	
 	private String complete;
 	private String success;
@@ -140,5 +144,17 @@ public class ScormCloudRegistration implements Serializable {
 
     public void setTotalTime(String totalTime) {
         this.totalTime = totalTime;
+    }
+    public Integer getNumberOfContributingResources(){
+        return numberOfContributingResources;
+    }
+    public void setNumberOfContributingResources(Integer contributingResources){
+        this.numberOfContributingResources = contributingResources;
+    }
+    public Boolean getContributesToAssignmentGrade() {
+        return contributesToAssignmentGrade;
+    }
+    public void setContributesToAssignmentGrade(Boolean contributes) {
+        this.contributesToAssignmentGrade = contributes;
     }
 }

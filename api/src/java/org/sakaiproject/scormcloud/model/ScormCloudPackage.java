@@ -12,6 +12,7 @@ private static final long serialVersionUID = 1L;
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context
 	private Boolean hidden; // only visible to owner if true
+	private Boolean contributesToAssignmentGrade;
 	private Date dateCreated;
 	
 	private String scormCloudId;
@@ -97,5 +98,11 @@ private static final long serialVersionUID = 1L;
 	public void setScormCloudId(String scormCloudId){
 		this.scormCloudId = scormCloudId;
 	}
+	public Boolean getContributesToAssignmentGrade() {
+        return contributesToAssignmentGrade;
+    }
+    public void setContributesToAssignmentGrade(Boolean contributes) {
+        this.contributesToAssignmentGrade = contributes;
+    }
 
 }

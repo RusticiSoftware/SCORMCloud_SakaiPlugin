@@ -12,6 +12,10 @@
 package org.sakaiproject.scormcloud.logic;
 
 import java.util.Date;
+import java.util.Observer;
+
+import org.sakaiproject.assignment.api.Assignment;
+import org.sakaiproject.assignment.api.AssignmentSubmission;
 
 
 /**
@@ -68,16 +72,15 @@ public interface ExternalLogic {
 	public boolean isUserAllowedInLocation(String userId, String permission, String locationId);
 	
 	
-	public boolean isGradebookAvailable();
-	public void addGrade(String context, String gradeId, String externalUrl,
-            String title, Double points, Date dueDate, String externalServiceDescription, Boolean ungraded);
-    public void deleteGrade(String context, String gradeId);
-    public void addScore(String context, String gradeId, String userId, String score);
     public String getCurrentContext();
 
     public String getUserDisplayId(String userId);
 
-    public String getAssignmentIdFromAssignmentKey(String context, String userId, String assignmentKey);
-    public void updateAssignmentScore(String context, String userId, String assignmentId, String score);
+    public Assignment getAssignmentFromAssignmentKey(String context, String userId, String assignmentKey);
+    public void updateAssignmentScore(String userId, String assignmentId, String score);
+    public void updateAssignmentSubmissionScore(AssignmentSubmission sub, String score);
+    
+    public void registerEventObserver(Observer obs);
+    public void updateAssignmentScore(Assignment asn, String userId, String score);
     
 }

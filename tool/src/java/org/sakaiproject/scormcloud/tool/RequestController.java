@@ -337,6 +337,10 @@ public class RequestController extends HttpServlet {
 		}
 		pkg.setHidden(itemHidden);
 		
+		//Does the package contribute to associated assignments?
+		String contributes = params.get("contribute-to-assigment-grade");
+		pkg.setContributesToAssignmentGrade(Boolean.parseBoolean(contributes));
+		
 		//Create new cloud id for package
 		String cloudId = UUID.randomUUID().toString();
 		pkg.setScormCloudId("sakai-" + cloudId);

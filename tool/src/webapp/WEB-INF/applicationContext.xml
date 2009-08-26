@@ -6,15 +6,6 @@
 <beans>
 
 	<!-- list the backing beans here -->
-	<bean id="itemsBean"
-			class="org.sakaiproject.scormcloud.tool.ScormCloudItemsBean"
-			init-method="init">
-		<property name="logic"
-			ref="org.sakaiproject.scormcloud.logic.ScormCloudLogic" />
-		<property name="externalLogic" 
-			ref="org.sakaiproject.scormcloud.logic.ExternalLogic" />
-	</bean>
-	
 	<bean id="packagesBean"
 			class="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean"
 			init-method="init">

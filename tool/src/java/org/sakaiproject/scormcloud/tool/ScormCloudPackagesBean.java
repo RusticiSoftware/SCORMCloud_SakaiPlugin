@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
-import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 

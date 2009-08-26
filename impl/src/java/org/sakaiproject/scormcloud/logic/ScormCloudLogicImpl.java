@@ -15,11 +15,19 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.sakaiproject.assignment.api.Assignment;
+import org.sakaiproject.assignment.api.AssignmentSubmission;
+import org.sakaiproject.assignment.api.AssignmentSubmissionEdit;
+import org.sakaiproject.assignment.cover.AssignmentService;
+import org.sakaiproject.entity.api.Reference;
+import org.sakaiproject.event.api.Event;
 import org.sakaiproject.genericdao.api.search.Restriction;
 import org.sakaiproject.genericdao.api.search.Search;
 
@@ -28,7 +36,6 @@ import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.dao.ScormCloudDao;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
-import org.sakaiproject.scormcloud.model.ScormCloudItem;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 
@@ -41,7 +48,7 @@ import com.rusticisoftware.hostedengine.client.ScormEngineService;
  * 
  * @author Sakai App Builder -AZ
  */
-public class ScormCloudLogicImpl implements ScormCloudLogic {
+public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
 
     private static Log log = LogFactory.getLog(ScormCloudLogicImpl.class);
     
@@ -71,6 +78,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
     public void init() {
         log.debug("init");
         initScormEngineService();
+        externalLogic.registerEventObserver(this);
     }
     
     public void initScormEngineService(){
@@ -126,136 +134,30 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.sakaiproject.scormcloud.logic.ScormCloudLogic#getItemById(java.lang
-     * .Long)
-     */
-    public ScormCloudItem getItemById(Long id) {
-        log.debug("Getting item by id: " + id);
-        return dao.findById(ScormCloudItem.class, id);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.sakaiproject.scormcloud.logic.ScormCloudLogic#canWriteItem(org.
-     * sakaiproject.scormcloud.model.ScormCloudItem, java.lang.String,
-     * java.lang.String)
-     */
-    public boolean canWriteItem(ScormCloudItem item, String locationId,
-            String userId) {
-        log.debug("checking if can write for: " + userId + ", " + locationId
-                + ": and item=" + item.getTitle());
-        if (item.getOwnerId().equals(userId)) {
-            // owner can always modify an item
-            return true;
-        } else if (externalLogic.isUserAdmin(userId)) {
-            // the system super user can modify any item
-            return true;
-        } else if (locationId.equals(item.getLocationId())
-                && externalLogic.isUserAllowedInLocation(userId,
-                        ExternalLogic.ITEM_WRITE_ANY, locationId)) {
-            // users with permission in the specified site can modify items from
-            // that site
-            return true;
-        }
-        return false;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.sakaiproject.scormcloud.logic.ScormCloudLogic#getAllVisibleItems(
-     * java.lang.String, java.lang.String)
-     */
-    public List<ScormCloudItem> getAllVisibleItems(String locationId,
-            String userId) {
-        log.debug("Fetching visible items for " + userId + " in site: "
-                + locationId);
-        List<ScormCloudItem> l = null;
-        if (locationId == null) {
-            // get all items
-            l = dao.findAll(ScormCloudItem.class);
-        } else {
-            l = dao.findBySearch(ScormCloudItem.class, new Search("locationId",
-                    locationId));
-        }
-        // check if the current user can see all items (or is super user)
-        if (externalLogic.isUserAdmin(userId)
-                || externalLogic.isUserAllowedInLocation(userId,
-                        ExternalLogic.ITEM_READ_HIDDEN, locationId)) {
-            log.debug("Security override: " + userId
-                    + " able to view all items");
-        } else {
-            // go backwards through the loop to avoid hitting the "end" early
-            for (int i = l.size() - 1; i >= 0; i--) {
-                ScormCloudItem item = (ScormCloudItem) l.get(i);
-                if (item.getHidden().booleanValue()
-                        && !item.getOwnerId().equals(userId)) {
-                    l.remove(item);
-                }
+    
+    public void update(Observable o, Object args){
+        Event evt = (Event)args;
+        log.debug("SCORM_CLOUD_LOGIC_EVENT_OBSERVATION: " + 
+                  " event = " + evt.getEvent() +
+        		  " context = " + evt.getContext() + 
+                  " userId = " + evt.getUserId() +
+                  " resource = " + evt.getResource());
+        
+        try {
+            if ("asn.submit.submission".equals(evt.getEvent())){
+                //This may not find any associated contributing registrations, 
+                //in which case, it won't update the score of the submission
+                AssignmentSubmission sub = AssignmentService.getSubmission(evt.getResource());
+                updateAssignmentScoreFromRegistrationScores(
+                        sub.getAssignment(), externalLogic.getCurrentUserId(), true);
             }
-        }
-        return l;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.sakaiproject.scormcloud.logic.ScormCloudLogic#removeItem(org.sakaiproject
-     * .scormcloud.model.ScormCloudItem)
-     */
-    public void removeItem(ScormCloudItem item) {
-        log.debug("In removeItem with item:" + item.getId() + ":"
-                + item.getTitle());
-        // check if current user can remove this item
-        if (canWriteItem(item, externalLogic.getCurrentLocationId(),
-                externalLogic.getCurrentUserId())) {
-            dao.delete(item);
-            log.info("Removing item: " + item.getId() + ":" + item.getTitle());
-        } else {
-            throw new SecurityException("Current user cannot remove item "
-                    + item.getId() + " because they do not have permission");
+        } catch (Exception e){
+            log.error("Exception thrown in update", e);
         }
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.sakaiproject.scormcloud.logic.ScormCloudLogic#saveItem(org.sakaiproject
-     * .scormcloud.model.ScormCloudItem)
-     */
-    public void saveItem(ScormCloudItem item) {
-        log.debug("In saveItem with item:" + item.getTitle());
-        // set the owner and site to current if they are not set
-        if (item.getOwnerId() == null) {
-            item.setOwnerId(externalLogic.getCurrentUserId());
-        }
-        if (item.getLocationId() == null) {
-            item.setLocationId(externalLogic.getCurrentLocationId());
-        }
-        if (item.getDateCreated() == null) {
-            item.setDateCreated(new Date());
-        }
-        // save item if new OR check if the current user can update the existing
-        // item
-        if ((item.getId() == null)
-                || canWriteItem(item, externalLogic.getCurrentLocationId(),
-                        externalLogic.getCurrentUserId())) {
-            dao.save(item);
-            log.info("Saving item: " + item.getId() + ":" + item.getTitle());
-        } else {
-            throw new SecurityException("Current user cannot update item "
-                    + item.getId() + " because they do not have permission");
-        }
-    }
-
+    
+    
+    
     public ScormCloudPackage getPackageById(String id) {
         log.debug("Getting package by id: " + id);
         return dao.findById(ScormCloudPackage.class, id);
@@ -352,15 +254,12 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         if (pkg.getDateCreated() == null) {
             pkg.setDateCreated(new Date());
         }
-        // save pkg if new OR check if the current user can update the existing
-        // pkg
+        // save pkg if new OR check if the current user can update the existing pkg
         if (pkg.getId() == null) {
             scormEngineService.getCourseService().ImportCourse(
                     pkg.getScormCloudId(), packageZip.getAbsolutePath());
-
             dao.save(pkg);
-            addGradeToGradebook(pkg);
-            log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
+            log.info("Saved package: " + pkg.getId() + ":" + pkg.getTitle());
         } else {
             throw new SecurityException("Current user cannot update package "
                     + pkg.getId() + " because they do not have permission");
@@ -429,13 +328,30 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
     }
 
+    private int getNumberOfContributingResourcesForAssignment(Assignment asn){
+        int count = 0;
+        List attachments = asn.getContent().getAttachments();
+        log.debug("\tIn getNumberOfActiveCloudPackageResourcesForAssignment, total attachments? = " + attachments.size());
+        for (Object att : attachments){
+            String pkgId = ((Reference)att).getEntity().getProperties().getProperty("packageId");
+            ScormCloudPackage pkg = getPackageById(pkgId);
+            if(pkg.getContributesToAssignmentGrade()){
+                count++;
+            }
+        }
+        log.debug("Total number of contributing resources for this assignment? " + count);
+        return count;
+    }
+    
     public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg,
             String userId, String assignmentKey) {
-        // TODO: implement a does reg exist type functionality on the cloud
         String userDisplayName = externalLogic.getUserDisplayName(userId);
         String userDisplayId = externalLogic.getUserDisplayId(userId);
-        String assignmentId = externalLogic.getAssignmentIdFromAssignmentKey(
+        Assignment assignment = externalLogic.getAssignmentFromAssignmentKey(
                                             pkg.getContext(), userId, assignmentKey);
+        
+        String assignmentId = assignment.getId();
+        int contributingResources = getNumberOfContributingResourcesForAssignment(assignment);
         
         String firstName = "sakai";
         String lastName = "learner";
@@ -447,7 +363,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
 
         try {
-            String cloudRegId = "sakai-reg-" + userDisplayId + "-" + assignmentId;
+            String cloudRegId = "sakai-reg-" + userDisplayId + "-" + UUID.randomUUID().toString();
             scormEngineService.getRegistrationService().CreateRegistration(
                     cloudRegId, pkg.getScormCloudId(), userId, firstName, lastName);
             
@@ -456,11 +372,15 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setOwnerId(userId);
             reg.setLocationId(pkg.getLocationId());
             reg.setContext(pkg.getContext());
-            reg.setAssignmentId(assignmentId);
-            reg.setAssignmentKey(assignmentKey);
+            
             reg.setUserName(userDisplayId);
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
+            
+            reg.setAssignmentId(assignmentId);
+            reg.setAssignmentKey(assignmentKey);
+            reg.setContributesToAssignmentGrade(pkg.getContributesToAssignmentGrade());
+            reg.setNumberOfContributingResources(contributingResources);
             
             dao.save(reg);
             return reg;
@@ -511,6 +431,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         return null;
     }
 
+    
+    
     public boolean canWriteRegistration(ScormCloudRegistration reg,
             String locationId, String userId) {
         log.debug("checking if can write for: " + userId + ", " + locationId);
@@ -589,8 +511,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         if (reg.getDateCreated() == null) {
             reg.setDateCreated(new Date());
         }
-        // save pkg if new OR check if the current user can update the existing
-        // pkg
+        // save pkg if new OR check if the current user can update the existing pkg
         if (canWriteRegistration(reg, externalLogic.getCurrentLocationId(),
                 externalLogic.getCurrentUserId())) {
             dao.save(reg);
@@ -608,6 +529,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             return;
         }
         try {
+            log.debug("Updating registration " + reg.getId() + " with results from SCORM Cloud...");
             RegistrationSummary sum = scormEngineService
                                         .getRegistrationService()
                                         .GetRegistrationSummary(
@@ -617,8 +539,6 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
             reg.setScore(sum.getScore());
             reg.setTotalTime(sum.getTotalTime());
             dao.save(reg);
-            updateAssignmentScore(reg);
-            
         } catch (Exception e) {
             log.debug("Exception getting registration results for " +
                       "reg with id = " + reg.getId() + 
@@ -626,27 +546,127 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         }
     }
     
-    public void updateAssignmentScore(ScormCloudRegistration reg){
-        log.debug("Updating assignment score for assignment " + reg.getAssignmentId() + " associated with reg " + reg.getId());
-        Double score = getCombinedScoreForAssignment(reg.getOwnerId(), reg.getAssignmentId());
-        String scoreStr = (score == null) ? null : score.toString();
-        externalLogic.updateAssignmentScore(reg.getContext(), reg.getOwnerId(), reg.getAssignmentId(), scoreStr);
+    private List<ScormCloudRegistration> findRegistrationsFor(String userId, String assignmentId){
+        Search s = new Search();
+        s.addRestriction(new Restriction("ownerId", userId));
+        s.addRestriction(new Restriction("assignmentId", assignmentId));
+        return dao.findBySearch(ScormCloudRegistration.class, s);
     }
     
-    public Double getCombinedScoreForAssignment(String ownerId, String assignmentId){
+    private List<ScormCloudRegistration> findContributingRegistrationsFor(String userId, String assignmentId){
         Search s = new Search();
-        s.addRestriction(new Restriction("ownerId", ownerId));
+        s.addRestriction(new Restriction("ownerId", userId));
         s.addRestriction(new Restriction("assignmentId", assignmentId));
-        List<ScormCloudRegistration> regs = dao.findBySearch(ScormCloudRegistration.class, s);
+        s.addRestriction(new Restriction("contributesToAssignmentGrade", Boolean.TRUE));
+        return dao.findBySearch(ScormCloudRegistration.class, s);
+    }
+    
+    public void updateAssignmentScoreFromRegistrationScores(String userId, String assignmentId, boolean updateRegsFromCloud){
+        log.debug("Updating assignment score for assignment " + assignmentId);
+        List<ScormCloudRegistration> regs = findContributingRegistrationsFor(userId, assignmentId);
+        if(regs.size() == 0){
+            log.debug("No contributing regisrations found for assignment = " + assignmentId +
+                      " therefore not updating it's score!");
+            return;
+        }
+        if(updateRegsFromCloud){
+            for(ScormCloudRegistration reg : regs){
+                updateRegistrationResultsFromCloud(reg);
+            }
+        }
+        Double score = getCombinedScore(regs);
+        String scoreStr = (score == null) ? null : score.toString();
+        externalLogic.updateAssignmentScore(userId, assignmentId, scoreStr);
+    }
+    
+    public void updateAssignmentScoreFromRegistrationScores(Assignment asn, String userId, boolean updateRegsFromCloud){
+        String assignmentId = asn.getId();
+        double maxPoints = ((double)asn.getContent().getMaxGradePoint()/10.0);
+        
+        log.debug("Updating assignment score for assignment " + assignmentId);
+        List<ScormCloudRegistration> regs = findContributingRegistrationsFor(userId, assignmentId);
+        if(regs.size() == 0){
+            log.debug("No contributing regisrations found for assignment = " + assignmentId +
+                      " therefore not updating it's score!");
+            return;
+        }
+        if(updateRegsFromCloud){
+            for(ScormCloudRegistration reg : regs){
+                updateRegistrationResultsFromCloud(reg);
+            }
+        }
+        Double score = (getCombinedScore(regs) * maxPoints) / 100.0;
+        String scoreStr = (score == null) ? null : score.toString();
+        externalLogic.updateAssignmentScore(asn, userId, scoreStr);
+    }
+    
+    
+    
+    public void updateAssignmentSubmissionScoreFromRegistrationScores(AssignmentSubmission sub, boolean updateRegsFromCloud){
+        log.debug("Updating assignment submission score for assignment submission " + sub.getReference());
+        String userId = sub.getSubmitterIdString();
+        String assignmentId = sub.getAssignmentId();
+        
+        List<ScormCloudRegistration> regs = findContributingRegistrationsFor(userId, assignmentId);
+        if(regs.size() == 0){
+            log.debug("No registrations found for assignment = " + assignmentId +
+                      " therefore not altering the submission score!");
+            return;
+        }
+        
+        if(updateRegsFromCloud){
+            for(ScormCloudRegistration reg : regs){
+                updateRegistrationResultsFromCloud(reg);
+            }
+        }
+        
+        Double score = getCombinedScore(regs);
+        String scoreStr = (score == null) ? null : score.toString();
+        
+        externalLogic.updateAssignmentSubmissionScore(sub, scoreStr);
+        //Runnable updater = new AssignmentSubmissionUpdater(sub, scoreStr);
+        //(new Thread(updater)).start();
+    }
+    
+    public class AssignmentSubmissionUpdater implements Runnable {
+        private AssignmentSubmission sub;
+        private String score;
+        public AssignmentSubmissionUpdater(AssignmentSubmission sub, String score){
+            this.sub = sub;
+            this.score = score;
+        }
+        public void run(){
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+                log.error("updater thread: ", e);
+            }
+            externalLogic.updateAssignmentSubmissionScore(sub, score);
+        }
+    }
+   
+    public Double getCombinedScore(List<ScormCloudRegistration> regs){
+        if (regs.size() == 0){
+            log.debug("getCombinedScore called with no regs, returning 0.0");
+            return 0.0;
+        }
+        
+        //Grab number of contributing regs / resources for the assignment
+        ScormCloudRegistration firstReg = regs.get(0);
+        String assignmentId = firstReg.getAssignmentId();
+        int numberOfContributingResources = firstReg.getNumberOfContributingResources();
         
         log.debug("In getCombinedScoreForAssignment, found " + regs.size() + 
-                  " regs (resources) associated with assignment = " + assignmentId);
+                  " regs and " + numberOfContributingResources + " contributing " +
+                  " resources associated with assignment = " + assignmentId);
 
         Double scoreSum = 0.0;
-        for (ScormCloudRegistration reg : regs){
-            scoreSum += getScoreFromRegistration(reg);
+        for (ScormCloudRegistration r : regs){
+            scoreSum += getScoreFromRegistration(r);
         }
-        return scoreSum / regs.size();
+        
+        //This assumes all contributing registrations / resources are weighted equally
+        return scoreSum / numberOfContributingResources;
     }
     
     public Double getScoreFromRegistration(ScormCloudRegistration reg){
@@ -663,10 +683,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic {
         return (score == null) ? 0.0 : score; 
     }
     
-    public void addGradeToGradebook(ScormCloudPackage pkg){
+    /*public void addGradeToGradebook(ScormCloudPackage pkg){
         externalLogic.addGrade(pkg.getContext(), pkg.getId(), 
-                /*"http://www.google.com/#hl=en&q=package+detail+url",*/
                 null, pkg.getTitle(), 100.0, new Date(), "SCORM Cloud", false);
-    }
+    }*/
 
 }

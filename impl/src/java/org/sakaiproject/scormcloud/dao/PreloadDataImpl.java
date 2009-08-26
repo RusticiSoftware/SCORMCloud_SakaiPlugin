@@ -17,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.scormcloud.dao.ScormCloudDao;
-import org.sakaiproject.scormcloud.model.ScormCloudItem;
+//import org.sakaiproject.scormcloud.model.ScormCloudItem;
 
 /**
  * This checks and preloads any data that is needed for this app
@@ -42,13 +42,13 @@ public class PreloadDataImpl {
 	public void preloadItems() {
 
 		// check if there are any items present, load some if not
-		if(dao.findAll(ScormCloudItem.class).isEmpty()){
+		/*if(dao.findAll(ScormCloudItem.class).isEmpty()){
 
 			// use the dao to preload some data here
 			dao.save( new ScormCloudItem("Preload Title", 
 					"Preload Owner", "Preload Site", Boolean.TRUE, new Date()) );
 
 			log.info("Preloaded " + dao.countAll(ScormCloudItem.class) + " items");
-		}
+		}*/
 	}
 }

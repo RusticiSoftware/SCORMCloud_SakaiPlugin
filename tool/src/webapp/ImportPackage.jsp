@@ -73,49 +73,17 @@
 	<h4>Grading</h4>
 	<p class="checkbox  indnt2">
 		<input type="radio" 
-			name="create-gradebook-entry"
-			id="create-gradebook-entry-false"
+			name="contribute-to-assigment-grade"
+			id="contribute-to-assigment-grade-false"
 			value="false" 
 			checked="checked" />
-		<label for="create-gradebook-entry-false">Do not create gradebook entry associated with this content</label>
+		<label for="contribute-to-assigment-grade-false">Do NOT allow this content to contribute to assignment grade</label>
 		<br />
 		<input type="radio" 
-			name="create-gradebook-entry"
-			id="create-gradebook-entry-true"
+			name="contribute-to-assigment-grade"
+			id="contribute-to-assigment-grade-true"
 			value="true" />
-		<label for="create-gradebook-entry-true">Create gradebook entry associated with this content</label>
-		<br /><br />
-		<label for="point-scale" style="padding-left: 26px; padding-right:6px">
-				Point Scale
-		</label>
-		<input id="point-scale" name="point-scale" type="text" value="100" size="3" disabled="true" />
-	</p>
-	
-	<h4>Time Limits</h4>
-	<p class="checkbox  indnt2">
-		<input type="radio" 
-			name="impose-time-limits"
-			id="impose-time-limits-false"
-			value="false" 
-			checked="checked" />
-		<label for="impose-time-limits-false">Do not limit the time this content is accessible</label>
-		<br />
-		<input type="radio" 
-			name="impose-time-limits"
-			id="impose-time-limits-true"
-			value="true" />
-		<label for="impose-time-limits-true">Limit the time this content is accessible</label>
-		
-		<br /><br />
-		<label for="open-date" style="padding-left: 26px; padding-right:6px">
-				Open Date
-		</label>
-		<input name="open-date" type="text" value="100" size="3" />
-		<br />
-		<label for="due-date" style="padding-left: 26px; padding-right:6px">
-				Due Date
-		</label>
-		<input name="due-date" type="text" value="100" size="3" />
+		<label for="contribute-to-assigment-grade-true">Allow this content to automatically contribute to assignment grade</label>
 	</p>
 
 	<p class="act">

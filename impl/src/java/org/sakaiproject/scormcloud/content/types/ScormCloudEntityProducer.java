@@ -60,17 +60,13 @@ public class ScormCloudEntityProducer implements EntityProducer {
          log.debug("In parseEntityReference: reference = " + reference);
 
          // for content hosting resources and collections
-         if (reference.startsWith(REFERENCE_ROOT))
-         {
+         if (reference.startsWith(REFERENCE_ROOT)) {
              // parse out the local resource id
              id = reference.replaceFirst(REFERENCE_ROOT + Entity.SEPARATOR + "content", "");
-             
-             
          }
 
          // not mine
-         else
-         {
+         else {
              return false;
          }
 

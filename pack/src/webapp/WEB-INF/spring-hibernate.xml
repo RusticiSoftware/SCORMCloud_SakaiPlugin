@@ -9,7 +9,6 @@
     <bean id="org.sakaiproject.scormcloud.HBMMappingList" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudItem.hbm.xml</value>
                 <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudPackage.hbm.xml</value>
                 <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudRegistration.hbm.xml</value>
                 <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudConfiguration.hbm.xml</value>
@@ -25,7 +24,6 @@
             ref="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
         <property name="persistentClasses">
             <list>
-                <value>org.sakaiproject.scormcloud.model.ScormCloudItem</value>
                 <value>org.sakaiproject.scormcloud.model.ScormCloudPackage</value>
                 <value>org.sakaiproject.scormcloud.model.ScormCloudRegistration</value>
                 <value>org.sakaiproject.scormcloud.model.ScormCloudConfiguration</value>
@@ -51,11 +49,11 @@
 	</bean>
 
 	<!-- create a data preloading bean that has transaction protection -->
-	<bean id="org.sakaiproject.scormcloud.dao.PreloadData"
+	<!--<bean id="org.sakaiproject.scormcloud.dao.PreloadData"
 			class="org.sakaiproject.scormcloud.dao.PreloadDataImpl"
 			init-method="init">
 		<property name="dao"
 			ref="org.sakaiproject.scormcloud.dao.ScormCloudDao" />
-	</bean>
+	</bean>-->
 
 </beans>
