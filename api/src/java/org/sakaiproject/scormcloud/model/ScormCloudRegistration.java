@@ -4,17 +4,16 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class ScormCloudRegistration implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
+    private static final long serialVersionUID = 1L;
+
 	private String id;
-	//private String title;
+	private String scormCloudId;
+    private String packageId;
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context id
 	
 	private Date dateCreated;
-	private String scormCloudId;
-	private String packageId;
 	private String userName;
 	
 	private String assignmentId; //assignment related to this reg
@@ -30,23 +29,6 @@ public class ScormCloudRegistration implements Serializable {
 	
 	public ScormCloudRegistration () {
 		
-	}
-
-	/**
-	 * Minimal constructor
-	 */
-	public ScormCloudRegistration(String ownerId, String locationId) {
-		this.ownerId = ownerId;
-		this.locationId = locationId;
-	}
-
-	/**
-	 * Full constructor
-	 */
-	public ScormCloudRegistration(String ownerId, String locationId, Date dateCreated) {
-		this.ownerId = ownerId;
-		this.locationId = locationId;
-		this.dateCreated = dateCreated;
 	}
 
 	/**
@@ -99,8 +81,7 @@ public class ScormCloudRegistration implements Serializable {
 	}
 	public void setScormCloudId(String scormCloudId){
 		this.scormCloudId = scormCloudId;
-	}
-	
+	}	
 	public String getPackageId() {
 		return packageId;
 	}
@@ -113,35 +94,27 @@ public class ScormCloudRegistration implements Serializable {
 	public void setUserName(String userName) {
 	    this.userName = userName;
 	}
-
     public String getComplete() {
         return complete;
     }
-
     public void setComplete(String complete) {
         this.complete = complete;
     }
-
     public String getSuccess() {
         return success;
     }
-
     public void setSuccess(String success) {
         this.success = success;
     }
-
     public String getScore() {
         return score;
     }
-
     public void setScore(String score) {
         this.score = score;
     }
-
     public String getTotalTime() {
         return totalTime;
     }
-
     public void setTotalTime(String totalTime) {
         this.totalTime = totalTime;
     }

@@ -68,7 +68,7 @@ public class ScormCloudPackagesBean {
 	 * @param id the unique id of the item
 	 * @return a ScormCloudPackage or null if not found
 	 */
-	public ScormCloudPackage getPackageById(String id) {
+	/*public ScormCloudPackage getPackageById(String id) {
 		return logic.getPackageById(id);
 	}
 
@@ -86,7 +86,7 @@ public class ScormCloudPackagesBean {
 	
 	public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl) throws Exception {
 	    return logic.getPackagePreviewUrl(pkg, redirectOnExitUrl);
-	}
+	}*/
 	
 	/**
 	 * @param item a ScormCloudPackage to remove
@@ -123,7 +123,7 @@ public class ScormCloudPackagesBean {
 	 * @param id the unique id of the item
 	 * @return a ScormCloudPackage or null if not found
 	 */
-	public ScormCloudRegistration getRegistrationById(String id) {
+	/*public ScormCloudRegistration getRegistrationById(String id) {
 		return logic.getRegistrationById(id);
 	}
 	
@@ -154,11 +154,11 @@ public class ScormCloudPackagesBean {
 	    logic.updateRegistrationResultsFromCloud(reg);
 	}
 	
-	/*public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
+	public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
 		return logic.addNewRegistration(userId, pkg);
-	}*/
+	}
 	
-	/*public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl){
+	public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl){
 		return logic.getLaunchUrl(reg, redirectOnExitUrl);
 	}*/
 	
@@ -188,10 +188,11 @@ public class ScormCloudPackagesBean {
         return false;
     }
 	
+	/*
 	public void setConfiguration(ScormCloudConfiguration config){
 	    logic.setScormCloudConfiguration(config);
 	}
 	public ScormCloudConfiguration getConfiguration(){
 	    return logic.getScormCloudConfiguration();
-	}
+	}*/
 }

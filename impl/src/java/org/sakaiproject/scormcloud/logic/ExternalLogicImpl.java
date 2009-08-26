@@ -108,6 +108,11 @@ public class ExternalLogicImpl implements ExternalLogic {
 		// register Sakai permissions for this tool
 		functionManager.registerFunction(ITEM_WRITE_ANY);
 		functionManager.registerFunction(ITEM_READ_HIDDEN);
+		
+		functionManager.registerFunction(SCORMCLOUD_CONFIGURE);
+		functionManager.registerFunction(SCORMCLOUD_IMPORT);
+		functionManager.registerFunction(SCORMCLOUD_TEST);
+		functionManager.registerFunction(SCORMCLOUD_VIEWTOOL);
 	}
 	
 	public void registerEventObserver(Observer obs){
@@ -207,20 +212,7 @@ public class ExternalLogicImpl implements ExternalLogic {
         return cur.getContext();
     }
     
-    public void updateAssignmentScore(String userId, String assignmentId, String score){
-        try {
-            User user = userDirectoryService.getUser(userId);
-            
-            AssignmentSubmission sub = assignmentService.getSubmission(assignmentId, user);
-            if(sub == null){
-                log.warn("In updateAssignmentScore, didn't find any submission for assignment with id = " + assignmentId); 
-                return;
-            }   
-            updateAssignmentSubmissionScore(sub, score);
-        } catch (Exception e){
-            log.debug("Exception thrown in updateAssignmentScore", e);
-        }
-    }
+    
     
     public void updateAssignmentScore(Assignment asn, String userId, String score){
 
@@ -262,20 +254,7 @@ public class ExternalLogicImpl implements ExternalLogic {
             }
         }
     }
-    
-    public void updateAssignmentSubmissionScore(AssignmentSubmission sub, String score){
-        try {
-            log.debug("Updating existing assignment submission " + sub.getReference());
-            AssignmentSubmissionEdit edit = assignmentService.editSubmission(sub.getReference());
-            edit.setGrade(score);
-            edit.setGraded(true);
-            assignmentService.commitEdit(edit);
-            log.debug("Committed new score: " + score);
-        } catch (Exception e){
-            log.debug("Exception thrown in updateAssignmentSubmissionScore", e);
-        }
-    }
-    
+     
     public Assignment getAssignmentFromAssignmentKey(String context, String userId, String assignmentKey) {
         try {
             log.debug("Finding all assignments for context " + context + " userId " + userId);
@@ -345,6 +324,34 @@ public class ExternalLogicImpl implements ExternalLogic {
             }
         } else {
             log.error("Error in addScore, no grade book defined for context = " + context);
+        }
+    }*/
+    
+    /*public void updateAssignmentScore(String userId, String assignmentId, String score){
+        try {
+            User user = userDirectoryService.getUser(userId);
+            
+            AssignmentSubmission sub = assignmentService.getSubmission(assignmentId, user);
+            if(sub == null){
+                log.warn("In updateAssignmentScore, didn't find any submission for assignment with id = " + assignmentId); 
+                return;
+            }   
+            updateAssignmentSubmissionScore(sub, score);
+        } catch (Exception e){
+            log.debug("Exception thrown in updateAssignmentScore", e);
+        }
+    }*/
+    
+    /*public void updateAssignmentSubmissionScore(AssignmentSubmission sub, String score){
+        try {
+            log.debug("Updating existing assignment submission " + sub.getReference());
+            AssignmentSubmissionEdit edit = assignmentService.editSubmission(sub.getReference());
+            edit.setGrade(score);
+            edit.setGraded(true);
+            assignmentService.commitEdit(edit);
+            log.debug("Committed new score: " + score);
+        } catch (Exception e){
+            log.debug("Exception thrown in updateAssignmentSubmissionScore", e);
         }
     }*/
     

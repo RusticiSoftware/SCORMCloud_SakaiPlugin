@@ -24,6 +24,9 @@ import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
  */
 public interface ScormCloudLogic {
    
+   public void setScormCloudConfiguration(ScormCloudConfiguration config);
+   public ScormCloudConfiguration getScormCloudConfiguration();
+    
    /**
     * This returns a package based on an id
     * @param id the id of the package to fetch
@@ -68,21 +71,13 @@ public interface ScormCloudLogic {
    
    
    
-   
    public ScormCloudRegistration getRegistrationById(String id);
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
-   public ScormCloudRegistration findRegistrationFor(String pkgId, String userId, String assignmentKey);
+   public ScormCloudRegistration findRegistrationFor(String userId, String assignmentKey);
    public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg, String userId, String assignmentKey);
-   
-   public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
-   
    public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId);
-   public void updateRegistration(ScormCloudRegistration reg);
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
    public void resetRegistration(ScormCloudRegistration reg);
-   
-   public void setScormCloudConfiguration(ScormCloudConfiguration config);
-   public ScormCloudConfiguration getScormCloudConfiguration();
-
+   public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
 }

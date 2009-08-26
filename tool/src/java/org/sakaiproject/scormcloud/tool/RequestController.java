@@ -43,9 +43,34 @@ public class RequestController extends HttpServlet {
     private static final String PROP_SCORMCLOUD_PACKAGE_ID = "packageId";
     private static Log log = LogFactory.getLog(RequestController.class);
 	private static final long serialVersionUID = 1L;
+	
+	private ApplicationContext appContext;
+	private ScormCloudLogic logic;
+	private ExternalLogic extLogic;
+	private ScormCloudPackagesBean pkgsBean;
+	
+	private void initInterfaces(){
+	    if(appContext == null){
+	        appContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+	    }
+	    if(logic == null){
+	        logic = (ScormCloudLogic)appContext
+	            .getBean("org.sakaiproject.scormcloud.logic.ScormCloudLogic");
+	    }
+	    if (extLogic == null){
+	        extLogic = (ExternalLogic)appContext
+	            .getBean("org.sakaiproject.scormcloud.logic.ExternalLogic");
+	    }
+	    if (pkgsBean == null){
+	        pkgsBean = (ScormCloudPackagesBean)appContext
+	            .getBean("packagesBean");
+	    }
+	}
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try{
+		    initInterfaces();
+		    
 		    log.debug("paramaterMap size = " + request.getParameterMap().size());
 			PrintWriter output = response.getWriter();
 			String action = request.getParameter("action");
@@ -126,7 +151,7 @@ public class RequestController extends HttpServlet {
 	
 	private void proccessViewCloudConfigurationAction(HttpServletRequest request,
 	        HttpServletResponse response) throws Exception {
-	    ScormCloudConfiguration config = getScormCloudPackagesBean().getConfiguration();
+	    ScormCloudConfiguration config = logic.getScormCloudConfiguration();
         if (config == null) {
             config = new ScormCloudConfiguration();
         }
@@ -146,9 +171,9 @@ public class RequestController extends HttpServlet {
             config.setAppId(appId);
             config.setSecretKey(secretKey);
             config.setServiceUrl(serviceUrl);
-            getScormCloudPackagesBean().setConfiguration(config);
+            logic.setScormCloudConfiguration(config);
             
-            getScormCloudPackagesBean().getMessages().add("SCORM Cloud Plugin Configuration Updated");
+            pkgsBean.getMessages().add("SCORM Cloud Plugin Configuration Updated");
 	    }
 	    RequestDispatcher rd = request.getRequestDispatcher("PackageList.jsp");
 	    rd.forward(request, response);
@@ -157,8 +182,8 @@ public class RequestController extends HttpServlet {
     private void processViewPackagePropertiesRequest(
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
-        ScormCloudPackage pkg = getScormCloudPackagesBean().getPackageById(packageId);
-        String packagePropertiesUrl = getScormCloudPackagesBean().getPackagePropertiesUrl(pkg);
+        ScormCloudPackage pkg = logic.getPackageById(packageId);
+        String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg);
         request.setAttribute("pkg", pkg);
         request.setAttribute("packagePropertiesUrl", packagePropertiesUrl);
         RequestDispatcher rd = request.getRequestDispatcher("EditPackage.jsp");
@@ -169,10 +194,9 @@ public class RequestController extends HttpServlet {
             HttpServletResponse response) throws Exception {
         String regId = request.getParameter("regId");
         log.debug("processPostLaunchActions called with regId = " + regId);
-        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
-        ScormCloudRegistration reg = bean.getRegistrationById(regId);
+        ScormCloudRegistration reg = logic.getRegistrationById(regId);
         if (reg != null){
-            bean.updateRegistrationResultsFromCloud(reg);  
+            logic.updateRegistrationResultsFromCloud(reg);  
         } else {
             log.debug("Error! Registration with id " + regId + "not found!");
         }
@@ -185,7 +209,7 @@ public class RequestController extends HttpServlet {
         String packageId = request.getParameter("packageId");
         
         request.setAttribute("pkg", 
-                getScormCloudPackagesBean()
+                logic
                     .getPackageById(packageId));
         
         //Delete or update, based on button pressed
@@ -201,7 +225,7 @@ public class RequestController extends HttpServlet {
         
         //Now grab the altered registration list
         request.setAttribute("regList",
-                getScormCloudPackagesBean()
+                logic
                     .getRegistrationsByPackageId(packageId));
         
         RequestDispatcher rd = request.getRequestDispatcher("RegistrationList.jsp");
@@ -210,21 +234,20 @@ public class RequestController extends HttpServlet {
 
     private void processUpdateRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
         String[] selectedItems = request.getParameterValues("select-item");
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsUpdated = 0;
             for (String id : selectedItems){
-                ScormCloudRegistration reg = bean.getRegistrationById(id);
-                bean.updateRegistrationResultsFromCloud(reg);
+                ScormCloudRegistration reg = logic.getRegistrationById(id);
+                logic.updateRegistrationResultsFromCloud(reg);
             }
-            bean.messages.add("Updated " + itemsUpdated + " items");
+            pkgsBean.getMessages().add("Updated " + itemsUpdated + " items");
         }
     }
 
     private void processDeleteRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+        ScormCloudPackagesBean bean = pkgsBean;
         String[] selectedItems = request.getParameterValues("select-item");
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsRemoved = 0;
@@ -241,7 +264,7 @@ public class RequestController extends HttpServlet {
     
     private void processResetRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+        ScormCloudPackagesBean bean = pkgsBean;
         String[] selectedItems = request.getParameterValues("select-item");
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsReset = 0;
@@ -259,14 +282,14 @@ public class RequestController extends HttpServlet {
     private void processViewRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
-        ScormCloudPackagesBean bean = getScormCloudPackagesBean();
-        ScormCloudPackage pkg = (ScormCloudPackage)bean.getPackageById(packageId);
+        ScormCloudPackagesBean bean = pkgsBean;
+        ScormCloudPackage pkg = (ScormCloudPackage)logic.getPackageById(packageId);
         if(pkg == null){
             log.debug("Error processing view registration request, " +
                       "package with id = " + packageId + " not found!");
             response.sendRedirect("PackageList.jsp");
         }
-        List<ScormCloudRegistration> regList = bean.getRegistrationsByPackageId(pkg.getId());
+        List<ScormCloudRegistration> regList = logic.getRegistrationsByPackageId(pkg.getId());
         
         request.setAttribute("pkg", pkg);
         request.setAttribute("regList", regList);
@@ -279,7 +302,7 @@ public class RequestController extends HttpServlet {
     }
 
 	public void processDeletePackagesRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	    ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+	    ScormCloudPackagesBean bean = pkgsBean;
         String[] selectedItems = request.getParameterValues("select-item");
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsRemoved = 0;
@@ -302,12 +325,12 @@ public class RequestController extends HttpServlet {
 	       ContentEntity contentEntity = pipe.getContentEntity();
 
 	       try {
-	           ScormCloudPackagesBean bean = getScormCloudPackagesBean();
+	           ScormCloudPackagesBean bean = pkgsBean;
 	           String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
-	           ScormCloudPackage pkg = bean.getPackageById(packageId);
+	           ScormCloudPackage pkg = logic.getPackageById(packageId);
 	           if(bean.canDelete(pkg)){
     	           getContentHostingService().removeResource(contentEntity.getId());
-    	           getScormCloudPackagesBean().checkRemovePackageById(packageId);
+    	           pkgsBean.checkRemovePackageById(packageId);
 	           }
 	       }
 	       catch (Exception e) {
@@ -346,7 +369,7 @@ public class RequestController extends HttpServlet {
 		pkg.setScormCloudId("sakai-" + cloudId);
 		
 		//Add package through packages bean
-        getScormCloudPackagesBean().addNewPackage(pkg, tempFile);     
+        logic.addNewPackage(pkg, tempFile);     
         
         //Clean up the temp file now that we're done
         tempFile.delete();
@@ -430,12 +453,9 @@ public class RequestController extends HttpServlet {
 		String assignmentKey = request.getParameter("assignmentKey");
 		log.debug("action launchPackage requested with packageId = " + packageId +
 		          " assignmentKey = " + assignmentKey);
-		
-		//Grab the packages bean
-		ScormCloudPackagesBean pkgsBean = getScormCloudPackagesBean();
-		
+
 		//Go get the package specified by the id in the request
-		ScormCloudPackage pkg = pkgsBean.getPackageById(packageId);
+		ScormCloudPackage pkg = logic.getPackageById(packageId);
 		if(pkg == null){
 			log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
 			request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
@@ -443,13 +463,9 @@ public class RequestController extends HttpServlet {
 			rd.forward(request, response);
 		}
 		
-		//Grab needed interface implementations
-		ExternalLogic extLogic = getExternalLogic();
-		ScormCloudLogic logic = getScormCloudLogic();
-		
 		//Find (or create) a registration for the current user and the given package
 		String userId = extLogic.getCurrentUserId();
-		ScormCloudRegistration reg = logic.findRegistrationFor(pkg.getId(), userId, assignmentKey);
+		ScormCloudRegistration reg = logic.findRegistrationFor(userId, assignmentKey);
         if(reg == null){
             reg = logic.addNewRegistration(pkg, userId, assignmentKey);
         }
@@ -473,11 +489,8 @@ public class RequestController extends HttpServlet {
         String packageId = request.getParameter("id");
         log.debug("action prewiewPackage requested with packageId = " + packageId);
         
-        //Grab the packages bean
-        ScormCloudPackagesBean pkgsBean = getScormCloudPackagesBean();
-        
         //Go get the package specified by the id in the request
-        ScormCloudPackage pkg = pkgsBean.getPackageById(packageId);
+        ScormCloudPackage pkg = logic.getPackageById(packageId);
         if(pkg == null){
             log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
             request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
@@ -485,7 +498,7 @@ public class RequestController extends HttpServlet {
             rd.forward(request, response);
         }
         
-        String previewUrl = pkgsBean.getPackagePreviewUrl(pkg, 
+        String previewUrl = logic.getPackagePreviewUrl(pkg, 
                                 getAbsoluteUrlToSelf(request) + "?action=closeWindow");
         
         //Forward the user to the launch page
@@ -498,21 +511,7 @@ public class RequestController extends HttpServlet {
 	/**
 	 * Get the scorm cloud packages bean
 	 */
-	private ScormCloudPackagesBean getScormCloudPackagesBean()
-	{
-		ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-		return (ScormCloudPackagesBean)context.getBean("packagesBean");
-	}
-	private ScormCloudLogic getScormCloudLogic()
-    {
-        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        return (ScormCloudLogic)context.getBean("org.sakaiproject.scormcloud.logic.ScormCloudLogic");
-    }
-	private ExternalLogic getExternalLogic()
-	{
-	    ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        return (ExternalLogic)context.getBean("org.sakaiproject.scormcloud.logic.ExternalLogic");
-	}
+	
 	
 	private String getAbsoluteUrlToSelf(HttpServletRequest request) throws Exception {
 	    

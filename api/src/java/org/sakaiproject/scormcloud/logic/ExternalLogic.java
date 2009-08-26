@@ -29,6 +29,11 @@ public interface ExternalLogic {
 	// permissions
 	public final static String ITEM_WRITE_ANY = "scormcloud.write.any";
 	public final static String ITEM_READ_HIDDEN = "scormcloud.read.hidden";
+	
+	public final static String SCORMCLOUD_CONFIGURE = "scormcloud.configure";
+	public final static String SCORMCLOUD_IMPORT = "scormcloud.import";
+	public final static String SCORMCLOUD_VIEWTOOL = "scormcloud.viewtool";
+	public final static String SCORMCLOUD_TEST = "scormcloud.launchtest";
 
 	/**
 	 * @return the current sakai user id (not username)
@@ -76,11 +81,9 @@ public interface ExternalLogic {
 
     public String getUserDisplayId(String userId);
 
-    public Assignment getAssignmentFromAssignmentKey(String context, String userId, String assignmentKey);
-    public void updateAssignmentScore(String userId, String assignmentId, String score);
-    public void updateAssignmentSubmissionScore(AssignmentSubmission sub, String score);
-    
     public void registerEventObserver(Observer obs);
+    
+    public Assignment getAssignmentFromAssignmentKey(String context, String userId, String assignmentKey);
     public void updateAssignmentScore(Assignment asn, String userId, String score);
     
 }

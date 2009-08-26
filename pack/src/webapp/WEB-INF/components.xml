@@ -41,7 +41,6 @@
     
     <bean id="org.sakaiproject.content.api.ResourceType.scormcloud"
       class="org.sakaiproject.scormcloud.content.types.ScormCollectionType"
-      
       singleton="true">
       <!--<property name="resourceTypeRegistry">
          <ref bean="org.sakaiproject.content.api.ResourceTypeRegistry" />
