@@ -36,16 +36,16 @@
 <div class="portletBody">
 
 <div class="navIntraTool">
-    <a href="PackageList.jsp">List Packages</a>
-    <a href="ImportPackage.jsp">Import Package</a>
-    <a href="controller?action=configureCloudPlugin">Configure Plugin</a>
+    <a href="controller?action=viewPackages">List Resources</a>
+    <a href="controller?action=viewRegistrations">List Registrations</a>
+	<a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
 </div>
 
 <h3 class="insColor insBak insBorder">SCORM Cloud Configuration</h3>
 
 <div class="instruction">Enter your AppId and Secret Key below to activate the SCORM Cloud Plugin.</div>
 <form name="cloudConfigForm" id="cloudConfigForm" action="controller?action=configureCloudPlugin" method="post">
-	<table cellspacing="4">
+	<table cellspacing="8">
 		<tr>
 			<td>AppId</td>
 			<td><input id="appId" name="appId" type="text" value="${config.appId}" size="40" /></td>
@@ -62,8 +62,11 @@
 			<td colspan="2">&nbsp;</td>
 		</tr>
 		<tr>
-			<td><input type="submit" name="submit" value="Submit" /></td>
-			<td><input type="submit" name="cancel" value="Cancel" /></td>
+			<td colspan="2">
+			    <input type="submit" name="submit" value="Submit" />
+			    &nbsp;
+			    <input type="submit" name="cancel" value="Cancel" />
+			</td>
 		</tr>
 	</table>
 </form>

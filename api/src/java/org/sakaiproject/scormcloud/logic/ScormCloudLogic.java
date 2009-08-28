@@ -13,6 +13,7 @@ package org.sakaiproject.scormcloud.logic;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
@@ -57,6 +58,7 @@ public interface ScormCloudLogic {
    
    public ScormCloudRegistration getRegistrationById(String id);
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
+   public List<ScormCloudRegistration> getRegistrationsByPropertyMap(Map<String, Object> propertyMap);
    public ScormCloudRegistration findRegistrationFor(String userId, String assignmentKey);
    public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg, String userId, String assignmentKey);
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);

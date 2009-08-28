@@ -21,6 +21,7 @@
     bean.doPageChecks(request, response);
     
     pageContext.setAttribute("bean", bean);
+    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -36,11 +37,19 @@
 <div class="portletBody">
 
 <div class="navIntraTool">
-    <a href="PackageList.jsp">List Packages</a>
-    <a href="ImportPackage.jsp">Import Package</a>
+    <a href="controller?action=viewPackages">List Resources</a>
+    <a href="controller?action=viewRegistrations">List Registrations</a>
+    <c:if test="${canConfigure}">
+	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
+    </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">SCORM Cloud Registrations for Package ${pkg.title}</h3>
+<h3 class="insColor insBak insBorder">
+	SCORM Cloud Registrations
+	<c:if test="${not empty pkg}">
+		for Resource ${pkg.title}
+	</c:if>
+</h3>
 
 <c:if test="${fn:length(bean.messages) > 0}">
     <div class="alertMessage">
@@ -56,76 +65,93 @@
 
 <div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
 
-<form name="listItemsForm" action="controller?action=processRegistrationListAction" method="post">
-	<input type="hidden" name="packageId" value="${pkg.id}" />
-    <table class="listHier">
-        <thead>
-            <tr>
-                <th class="firstHeader"></th>
-                <th class="secondHeader">Username</th>
-                <th class="assignmentId">Assignment Name</th>
-                <!-- <th class="thirdHeader">SCORM Cloud ID</th> -->
-                <th class="fourthColumn">Complete</th>
-                <th class="fifthColumn">Success</th>
-                <th class="sixthColumn">Score</th>
-                <th class="seventhColumn">Time Spent</th>
-                <th class="eighthColumn">Creation Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="reg" items="${regList}">
-                <% ScormCloudRegistration reg = (ScormCloudRegistration)pageContext.getAttribute("reg"); %>
-                <tr>
-                    <td class="firstColumn">
-                            <input name="select-item" value="${reg.id}" type="checkbox" />
-                    </td>
-                    <td class="secondColumn">
-                        <a href="controller?action=viewDetailedRegistrationReport&id=${reg.id}">
-                            ${reg.userName}
-                        </a>                 
-                    </td>
-                    <td>
-                    	<span>${reg.assignmentName}</span>
-                    </td>
-                    <!-- <td class="thirdColumn">
-                        <span>${reg.scormCloudId}</span>
-                    </td> -->
-                    <%-- <td class="fourthColumn">
-                        <c:choose>
-                            <c:when test="${reg.hidden}">
-                                <input name="item-hidden" type="checkbox" disabled="true" checked="true" />
-                            </c:when><c:otherwise>
-                                <input name="item-hidden" type="checkbox" disabled="true" />
-                            </c:otherwise>
-                        </c:choose>
-                    </td> --%>
-                    <td class="fourthColumn">
-                    	<span>${reg.complete}</span>
-                    </td>
-                    <td class="fifthColumn">
-                    	<span>${reg.success}</span>
-                    </td>
-                    <td class="sixthColumn">
-                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score}</span>
-                    </td>
-                    <td class="seventhColumn">
-                    	<span>${reg.totalTime}</span>
-                    </td>
-                    <td class="eighthColumn">
-                        <fmt:formatDate value="${reg.dateCreated}" type="both" 
-                            dateStyle="medium" timeStyle="medium" />
-                    </td>
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-
-    <p class="act">
-    	<input name="update-items" type="submit" value="Update Results" />
-    	<input name="reset-items" type="submit" value="Reset" />
-        <input name="delete-items" type="submit" value="Delete" />
-    </p>
+<form name=searchRegistrationsForm" actions="controller?action=searchRegistrations" method="post">
+	<c:if test="${not empty pkg}">
+		<input type="hidden" id="packageId" name="packageId" value="${pkg.id}" />
+	</c:if>
+	<table>
+		<tr>
+			<td>
+				<label for="userSearch">${not empty pkg ? "Filter" : "Search"} By User</label>
+				<input type="text" id="userSearch" name="userSearch" value="${regListUserSearch}" size="40" />
+			</td>
+			<td>
+				<label for="assignmentSearch">${not empty pkg ? "Filter" : "Search"} By Assignment</label>
+				<input type="text" id="assignmentSearch" name="assignmentSearch" value="${regListAssignmentSearch}" size="40" />
+			</td>
+			<td>
+				<input type="submit" id="searchSubmit" name="searchSubmit" value="Search" />
+			</td>
+		</tr>
+	</table>
 </form>
+
+
+<c:if test="${not empty regList}">
+	<form name="listItemsForm" action="controller?action=processRegistrationListAction" method="post">
+	    <table class="listHier">
+	        <thead>
+	            <tr>
+	                <th></th>
+	                <th>Username</th>
+	                <th>Assignment Name</th>
+	                <th>Complete</th>
+	                <th>Success</th>
+	                <th>Score</th>
+	                <th>Time Spent</th>
+	                <th>SCORM Data</th>
+	                <th>Launch History</th>
+	                <th>Creation Date</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <c:forEach var="reg" items="${regList}">
+	                <% ScormCloudRegistration reg = (ScormCloudRegistration)pageContext.getAttribute("reg"); %>
+	                <tr>
+	                    <td>
+	                        <input name="select-item" value="${reg.id}" type="checkbox" />
+	                    </td>
+	                    <td>
+	                        <span>${reg.userName}</span>                 
+	                    </td>
+	                    <td>
+	                    	<span>${reg.assignmentName}</span>
+	                    </td>
+	                    <td>
+	                    	<span>${reg.complete}</span>
+	                    </td>
+	                    <td>
+	                    	<span>${reg.success}</span>
+	                    </td>
+	                    <td>
+	                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score}</span>
+	                    </td>
+	                    <td>
+	                    	<span>${reg.totalTime}</span>
+	                    </td>
+	                    <td>
+	                    	<a href="controller?action=viewScormData&registrationId=${reg.id}">SCORM Data</a>
+	                    </td>
+	                    <td>
+	                    	<a href="controller?action=viewLaunchHistory&registrationId=${reg.id}">Launch History</a>
+	                    </td>
+	                    <td>
+	                        <fmt:formatDate value="${reg.dateCreated}" type="both" 
+	                            dateStyle="medium" timeStyle="medium" />
+	                    </td>
+	                </tr>
+	            </c:forEach>
+	        </tbody>
+	    </table>
+	
+	    <p class="act">
+	    	<input name="update-items" type="submit" value="Update Results" />
+	    	<input name="reset-items" type="submit" value="Reset" />
+	        <input name="delete-items" type="submit" value="Delete" />
+	    </p>
+    
+	</form>
+</c:if>
 
 </div>
 </body>

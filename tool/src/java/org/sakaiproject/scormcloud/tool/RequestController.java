@@ -149,11 +149,6 @@ public class RequestController extends HttpServlet {
 			if(action.equals("launchPackage")){
 				processLaunchRequest(request, response);
 			}
-			if(action.equals("processPackageListAction")){
-			    if (request.getParameterValues("delete-items") != null) {
-			        processDeletePackagesRequest(request, response);
-			    }
-			}
 			if(action.equals("processRegistrationListAction")){
 			    processRegistrationListRequest(request, response);
 			}
@@ -350,42 +345,34 @@ public class RequestController extends HttpServlet {
 
     private void processViewRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        String packageId = request.getParameter("id");
-        String assignmentView = request.getParameter("assignmentView");
-        ScormCloudPackage pkg = (ScormCloudPackage)logic.getPackageById(packageId);
-        if(pkg == null){
-            log.debug("Error processing view registration request, " +
-                      "package with id = " + packageId + " not found!");
-            response.sendRedirect("PackageList.jsp");
-        }
-        List<ScormCloudRegistration> regList = logic.getRegistrationsByPackageId(pkg.getId());
         
-        request.setAttribute("pkg", pkg);
-        request.setAttribute("regList", regList);
+        String packageId = request.getParameter("packageId");
+        String userSearch = request.getParameter("userSearch");
+        String assignmentSearch = request.getParameter("assignmentSearch");
+        
+        if(!isNullOrEmpty(packageId)){
+            request.setAttribute("pkg", logic.getPackageById(packageId));
+        }
+        
+        HashMap<String, Object> propertyMap = new HashMap<String, Object>();
+        if (!isNullOrEmpty(packageId)) 
+            propertyMap.put("packageId", packageId);
+        if (!isNullOrEmpty(userSearch)) 
+            propertyMap.put("userName", userSearch);
+        if (!isNullOrEmpty(assignmentSearch)) 
+            propertyMap.put("assignmentName", assignmentSearch);
+        
+        List<ScormCloudRegistration> regList = logic.getRegistrationsByPropertyMap(propertyMap);
+        
+        if(regList != null){
+            request.setAttribute("regList", regList);
+        }
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LIST);
         rd.forward(request, response);
     }
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws ServletException {
         doGet(request, response);
-    }
-
-	public void processDeletePackagesRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-	    ScormCloudPackagesBean bean = pkgsBean;
-        String[] selectedItems = request.getParameterValues("select-item");
-        if (selectedItems != null && selectedItems.length > 0) {
-            int itemsRemoved = 0;
-            for (int i=0; i<selectedItems.length; i++) {
-                String id = selectedItems[i];
-                ScormCloudPackage pkg = logic.getPackageById(id);
-                if(pkg != null){
-                    logic.removePackage(pkg);
-                    itemsRemoved++;
-                }
-            }
-            bean.messages.add("Removed " + itemsRemoved + " items");
-        }
-	    response.sendRedirect("PackageList.jsp");
     }
 
 	private void processDeletePackageResourceRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -512,6 +499,7 @@ public class RequestController extends HttpServlet {
 	public void processLaunchRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String packageId = request.getParameter("id");
 		String assignmentKey = request.getParameter("assignmentKey");
+		String resourceLink = request.getParameter("resourceLink");
 		log.debug("action launchPackage requested with packageId = " + packageId +
 		          " assignmentKey = " + assignmentKey);
 
@@ -532,6 +520,12 @@ public class RequestController extends HttpServlet {
 		//Forward the user to the launch page, now that a registration exists for them
 		log.debug("launchUrl = " + launchUrl);
 		request.setAttribute("url", launchUrl);
+		
+		//If via resource link, include that in page request
+		if(!isNullOrEmpty(resourceLink)){
+		    request.setAttribute("resourceLink", true);
+		}
+		
 		RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LAUNCH);
 		rd.forward(request, response);
 	}

@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.UUID;
@@ -316,6 +317,23 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         return dao.findBySearch(ScormCloudRegistration.class, s);
     }
 
+    public List<ScormCloudRegistration> getRegistrationsByPropertyMap(Map<String, Object> propertyMap){
+        log.debug("Getting registrations by property map");
+        boolean emptySearch = true;
+        Search s = new Search();
+        for (String propertyName : propertyMap.keySet()){
+            Object propertyValue = propertyMap.get(propertyName);
+            if(propertyValue != null){
+                emptySearch = false;
+                log.debug("Adding property " + propertyName + " = " + propertyValue.toString());
+                s.addRestriction(new Restriction(propertyName, propertyValue));
+            }
+        }
+        if(emptySearch){
+            return null;
+        }
+        return dao.findBySearch(ScormCloudRegistration.class, s);
+    }
     
     
     public ScormCloudRegistration findRegistrationFor(String userId, String assignmentKey) {

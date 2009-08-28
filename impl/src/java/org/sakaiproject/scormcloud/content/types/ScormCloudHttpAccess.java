@@ -53,7 +53,7 @@ public class ScormCloudHttpAccess implements HttpAccess {
      }
 
      private void redirectToLaunchPage(HttpServletRequest req, HttpServletResponse res, String packageId, String assignmentKey) throws Exception {
-        res.sendRedirect("/scormcloud-tool/controller?action=launchPackage&id=" + packageId + "&assignmentKey=" + assignmentKey); 
+        res.sendRedirect("/scormcloud-tool/controller?action=launchPackage&resourceLink=true&id=" + packageId + "&assignmentKey=" + assignmentKey); 
      }
 
 }

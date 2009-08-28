@@ -84,7 +84,7 @@
                     	<a href="controller?action=previewPackage&id=${pkg.id}">Preview</a>
                     </td>
                     <td>
-                        <a href="controller?action=viewRegistrations&id=${pkg.id}">Results</a>
+                        <a href="controller?action=viewRegistrations&packageId=${pkg.id}">Results</a>
                     </td>
                     <td>
                         <fmt:formatDate value="${pkg.dateCreated}" type="both" 

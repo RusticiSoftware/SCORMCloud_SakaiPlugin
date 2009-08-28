@@ -20,6 +20,7 @@
     bean.doPageChecks(request, response);
     
     pageContext.setAttribute("bean", bean);
+    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -43,9 +44,9 @@
     </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">Edit SCORM Cloud Package Properties for ${pkg.title}</h3>
+<h3 class="insColor insBak insBorder">Editing SCORM Cloud Package Properties for ${pkg.title}</h3>
 
-<div class="instruction">Please click <a href="#" onclick="javascript:history.back()">here</a> to go back.</div>
+<div class="instruction">When you are finished, please click <a href="#" onclick="javascript:history.back()">here</a> to go back.</div>
 
 
 <c:if test="${fn:length(bean.messages) > 0}">

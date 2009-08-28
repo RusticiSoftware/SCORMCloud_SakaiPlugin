@@ -22,17 +22,25 @@
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
 <title>SCORM Cloud Launch Pad</title>
 </head>
-<body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
+<body onload="<%= request.getAttribute("sakai.html.body.onload") %>" style="padding-left:10px; padding-top:10px">
 <div class="portletBody">
 
 
-<h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
+<h3 class="insColor insBak insBorder">Launching SCORM Cloud Registration</h3>
 
-	<script>
-         window.open("${url}", "_blank", "");
+	<script type="text/javascript">
+         window.open("${url}", "launchWindow", "");
     </script>
     
-<div class="instruction" style="padding-left:10px; padding-top:10px">
+    <c:if test="${resourceLink}">
+    	<script type="text/javascript">
+    		if(launchWindow){
+    			window.location = "Closer.html";
+    		}
+    	</script>
+    </c:if>
+    
+<div class="instruction" style="padding-top:10px">
 	Your course has launched in a new window. When you have finished, please click 
 	<a href="#" onclick="javascript:history.back()">here</a> to go back, or close this window.
 </div>
