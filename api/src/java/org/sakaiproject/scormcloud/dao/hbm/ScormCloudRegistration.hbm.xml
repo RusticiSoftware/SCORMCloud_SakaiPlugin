@@ -20,6 +20,7 @@
 		<property name="context" type="string" length="255" />
 		<property name="assignmentId" type="string" length="255" />
 		<property name="assignmentKey" type="string" length="255" />
+		<property name="assignmentName" type="string" length="255" />
 		<property name="contributesToAssignmentGrade" type="java.lang.Boolean" not-null="true" />
 		<property name="numberOfContributingResources" type="java.lang.Integer" not-null="true" />
 		<property name="dateCreated" type="java.util.Date" />

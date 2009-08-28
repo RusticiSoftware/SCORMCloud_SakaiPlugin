@@ -18,6 +18,7 @@ public class ScormCloudRegistration implements Serializable {
 	
 	private String assignmentId; //assignment related to this reg
     private String assignmentKey; //assignment "context" related to resource attachment
+    private String assignmentName;
     private Boolean contributesToAssignmentGrade;
 	private Integer numberOfContributingResources = 0;
 	
@@ -75,6 +76,12 @@ public class ScormCloudRegistration implements Serializable {
 	}
 	public void setAssignmentKey(String assignmentKey){
 	    this.assignmentKey = assignmentKey;
+	}
+	public String getAssignmentName(){
+	    return assignmentName;
+	}
+	public void setAssignmentName(String assignmentName){
+	    this.assignmentName = assignmentName;
 	}
 	public String getScormCloudId() {
 		return scormCloudId;

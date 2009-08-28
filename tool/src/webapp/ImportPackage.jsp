@@ -15,8 +15,8 @@
 	WebApplicationContext context = 
 		WebApplicationContextUtils.getWebApplicationContext(application);
 	ScormCloudPackagesBean bean = (ScormCloudPackagesBean) context.getBean("packagesBean");
-	
-	ScormCloudPackage item = new ScormCloudPackage();
+
+    bean.doPageChecks(request, response);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -26,16 +26,10 @@
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>ScormCloud Add/Update Item</title>
+<title>SCORM Cloud Import Package</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
-
-<c:if test="${empty param.helper}">
-	<div class="navIntraTool">
-		<a href="PackageList.jsp">List Packages</a>
-	</div>
-</c:if>
 
 <h3 class="insColor insBak insBorder">Import Package</h3>
 
@@ -66,7 +60,7 @@
 			<span style="padding-right: 20px">
 				Title
 			</span>	
-			<input name="item-title" id="item-title" type="text" size="28" value="" />
+			<input name="package-title" id="package-title" type="text" size="28" value="" />
 	</p>
 	<br />
 	
@@ -84,6 +78,22 @@
 			id="contribute-to-assigment-grade-true"
 			value="true" />
 		<label for="contribute-to-assigment-grade-true">Allow this content to automatically contribute to assignment grade</label>
+	</p>
+	
+	<h4>Launch Behavior</h4>
+	<p class="checkbox  indnt2">
+		<input type="radio" 
+			name="allow-non-assignment-launch"
+			id="allow-non-assignment-launch-false"
+			value="false" 
+			checked="checked" />
+		<label for="allow-non-assignment-launch-false">Do NOT allow this content to be launched outside of the context of an assignment</label>
+		<br />
+		<input type="radio" 
+			name="allow-non-assignment-launch"
+			id="allow-non-assignment-launch-true"
+			value="true" />
+		<label for="allow-non-assignment-launch-true">Allow this content to to be launched in any context</label>
 	</p>
 
 	<p class="act">

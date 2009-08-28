@@ -106,13 +106,9 @@ public class ExternalLogicImpl implements ExternalLogic {
 	public void init() {
 		log.debug("init");
 		// register Sakai permissions for this tool
-		functionManager.registerFunction(ITEM_WRITE_ANY);
-		functionManager.registerFunction(ITEM_READ_HIDDEN);
-		
 		functionManager.registerFunction(SCORMCLOUD_CONFIGURE);
-		functionManager.registerFunction(SCORMCLOUD_IMPORT);
-		functionManager.registerFunction(SCORMCLOUD_TEST);
-		functionManager.registerFunction(SCORMCLOUD_VIEWTOOL);
+		functionManager.registerFunction(SCORMCLOUD_ADMIN);
+		
 	}
 	
 	public void registerEventObserver(Observer obs){
@@ -221,7 +217,7 @@ public class ExternalLogicImpl implements ExternalLogic {
 
         if(!shouldBeInGradebook){
             log.debug("Assignment with id " + asn.getId() + 
-                      "shouldn't even be in the gradebook, returning...");
+                      " shouldn't even be in the gradebook, returning...");
             return;
         }
         
@@ -277,6 +273,15 @@ public class ExternalLogicImpl implements ExternalLogic {
             return null;
         } catch (Exception e) {
             log.error("Exception thrown in getAssignmentIdFromAssignmentKey, returning null", e);
+            return null;
+        }
+    }
+
+    public String getAssignmentNameFromId(String id) {
+        try {
+        Assignment asn = assignmentService.getAssignment(id);
+        return asn.getTitle();
+        } catch (Exception e){
             return null;
         }
     }

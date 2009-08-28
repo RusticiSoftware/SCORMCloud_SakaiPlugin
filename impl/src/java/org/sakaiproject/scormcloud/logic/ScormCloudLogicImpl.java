@@ -150,79 +150,22 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         return dao.findById(ScormCloudPackage.class, id);
     }
 
-    public boolean canWritePackage(ScormCloudPackage pkg, String locationId,
-            String userId) {
-        log.debug("checking if can write for: " + userId + ", " + locationId
-                + ": and pkg title=" + pkg.getTitle());
-        if (pkg.getOwnerId().equals(userId)) {
-            // owner can always modify an item
-            return true;
-        } else if (externalLogic.isUserAdmin(userId)) {
-            // the system super user can modify any item
-            return true;
-        } else if (locationId.equals(pkg.getLocationId())
-                && externalLogic.isUserAllowedInLocation(userId,
-                        ExternalLogic.ITEM_WRITE_ANY, locationId)) {
-            // users with permission in the specified site can modify items from
-            // that site
-            return true;
-        }
-        return false;
-    }
-
-    public List<ScormCloudPackage> getAllVisiblePackages(String locationId,
-            String userId) {
-        log.debug("Fetching visible items for " + userId + " in site: "
-                + locationId);
-        List<ScormCloudPackage> l = null;
-        if (locationId == null) {
-            // get all items
-            l = dao.findAll(ScormCloudPackage.class);
-        } else {
-            l = dao.findBySearch(ScormCloudPackage.class, new Search(
-                    "locationId", locationId));
-        }
-        // check if the current user can see all items (or is super user)
-        if (externalLogic.isUserAdmin(userId)
-                || externalLogic.isUserAllowedInLocation(userId,
-                        ExternalLogic.ITEM_READ_HIDDEN, locationId)) {
-            log.debug("Security override: " + userId
-                    + " able to view all items");
-        } else {
-            // go backwards through the loop to avoid hitting the "end" early
-            for (int i = l.size() - 1; i >= 0; i--) {
-                ScormCloudPackage pkg = (ScormCloudPackage) l.get(i);
-                if (pkg.getHidden().booleanValue() 
-                        && !pkg.getOwnerId().equals(userId)) {
-                    l.remove(pkg);
-                }
-            }
-        }
-        return l;
-    }
-
     public void removePackage(ScormCloudPackage pkg) {
         log.debug("In removePackage with item:" + 
                   pkg.getId() + ":" + pkg.getTitle());
         // check if current user can remove this item
-        if (canWritePackage(pkg, externalLogic.getCurrentLocationId(),
-                externalLogic.getCurrentUserId())) {
-            try {
-                scormEngineService
-                    .getCourseService()
-                    .DeleteCourse(pkg.getScormCloudId());
-            } catch (Exception e) {
-                log.debug(
-                        "Exception occurred trying to delete package with id = "
-                                + pkg.getId() + ", cloud id = "
-                                + pkg.getScormCloudId(), e);
-            }
-            dao.delete(pkg);
-            log.info("Removing package: " + pkg.getId() + ":" + pkg.getTitle());
-        } else {
-            throw new SecurityException("Current user cannot remove item "
-                    + pkg.getId() + " because they do not have permission");
+        try {
+            scormEngineService
+                .getCourseService()
+                .DeleteCourse(pkg.getScormCloudId());
+        } catch (Exception e) {
+            log.debug(
+                    "Exception occurred trying to delete package with id = "
+                            + pkg.getId() + ", cloud id = "
+                            + pkg.getScormCloudId(), e);
         }
+        dao.delete(pkg);
+        log.info("Removing package: " + pkg.getId() + ":" + pkg.getTitle());
     }
 
     public void addNewPackage(ScormCloudPackage pkg, File packageZip)
@@ -270,14 +213,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
         // save pkg if new OR check if the current user can update the existing
         // pkg
-        if (canWritePackage(pkg, externalLogic.getCurrentLocationId(),
-                externalLogic.getCurrentUserId())) {
-            dao.save(pkg);
-            log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
-        } else {
-            throw new SecurityException("Current user cannot update package "
-                    + pkg.getId() + " because they do not have permission");
-        }
+        dao.save(pkg);
+        log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
     }
     
     public String getPackagePropertiesUrl(ScormCloudPackage pkg){
@@ -319,7 +256,6 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         Assignment assignment = externalLogic.getAssignmentFromAssignmentKey(
                                             pkg.getContext(), userId, assignmentKey);
         
-        String assignmentId = assignment.getId();
         int contributingResources = getNumberOfContributingResourcesForAssignment(assignment);
         
         String firstName = "sakai";
@@ -346,8 +282,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
             
-            reg.setAssignmentId(assignmentId);
             reg.setAssignmentKey(assignmentKey);
+            reg.setAssignmentId(assignment.getId());
+            reg.setAssignmentName(assignment.getTitle());
             reg.setContributesToAssignmentGrade(pkg.getContributesToAssignmentGrade());
             reg.setNumberOfContributingResources(contributingResources);
             
@@ -408,69 +345,37 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         s.addRestriction(new Restriction("contributesToAssignmentGrade", Boolean.TRUE));
         return dao.findBySearch(ScormCloudRegistration.class, s);
     }
-    
-    
-    
-    public boolean canWriteRegistration(ScormCloudRegistration reg,
-            String locationId, String userId) {
-        log.debug("checking if can write for: " + userId + ", " + locationId);
-        if (reg.getOwnerId().equals(userId)) {
-            // owner can always modify an item
-            return true;
-        } else if (externalLogic.isUserAdmin(userId)) {
-            // the system super user can modify any item
-            return true;
-        } else if (locationId.equals(reg.getLocationId())
-                && externalLogic.isUserAllowedInLocation(userId,
-                        ExternalLogic.ITEM_WRITE_ANY, locationId)) {
-            // users with permission in the specified site can modify items from
-            // that site
-            return true;
-        }
-        return false;
-    }
+
 
     public void removeRegistration(ScormCloudRegistration reg) {
         log.debug("In removeRegistration with regId:" + reg.getId());
         // check if current user can remove this item
-        if (canWriteRegistration(reg, externalLogic.getCurrentLocationId(),
-                externalLogic.getCurrentUserId())) {
-            try {
-                scormEngineService.getRegistrationService().DeleteRegistration(reg.getScormCloudId());
-            }
-            catch (Exception e){
-                log.debug("Exception thrown trying to delete registration with id = " +
-                          reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
-            }
-            dao.delete(reg);
-            log.info("Removing reg with id: " + reg.getId());
-        } else {
-            throw new SecurityException("Current user cannot remove item "
-                    + reg.getId() + " because they do not have permission");
+        try {
+            scormEngineService.getRegistrationService().DeleteRegistration(reg.getScormCloudId());
         }
+        catch (Exception e){
+            log.debug("Exception thrown trying to delete registration with id = " +
+                      reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
+        }
+        dao.delete(reg);
+        log.info("Removing reg with id: " + reg.getId());
     }
     
     public void resetRegistration(ScormCloudRegistration reg) {
         log.debug("In resetRegistration with regId:" + reg.getId());
         // check if current user can remove this item
-        if (canWriteRegistration(reg, externalLogic.getCurrentLocationId(),
-                externalLogic.getCurrentUserId())) {
-            try {
-                log.info("Resetting reg with id: " + reg.getId());
-                scormEngineService.getRegistrationService().ResetRegistration(reg.getScormCloudId());
-                reg.setComplete("unknown");
-                reg.setSuccess("unknown");
-                reg.setScore("unknown");
-                reg.setTotalTime("0");
-                dao.save(reg);
-            }
-            catch (Exception e){
-                log.debug("Exception thrown trying to reset registration with id = " +
-                          reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
-            }
-        } else {
-            throw new SecurityException("Current user cannot reset registration "
-                    + reg.getId() + " because they do not have permission");
+        try {
+            log.info("Resetting reg with id: " + reg.getId());
+            scormEngineService.getRegistrationService().ResetRegistration(reg.getScormCloudId());
+            reg.setComplete("unknown");
+            reg.setSuccess("unknown");
+            reg.setScore("unknown");
+            reg.setTotalTime("0");
+            dao.save(reg);
+        }
+        catch (Exception e){
+            log.debug("Exception thrown trying to reset registration with id = " +
+                      reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
         }
     }
 
@@ -642,5 +547,46 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         Double score = (getCombinedScore(regs) * maxPoints) / 100.0;
         String scoreStr = (score == null) ? null : score.toString();
         externalLogic.updateAssignmentScore(asn, userId, scoreStr);
+    }
+
+
+
+    public String getAssignmentNameFromId(String id) {
+        return externalLogic.getAssignmentNameFromId(id);
+    }
+
+
+    public boolean isCurrentUserSakaiAdmin(){
+        String currentUserId = externalLogic.getCurrentUserId();
+        return externalLogic.isUserAdmin(currentUserId);
+    }
+
+    public boolean isCurrentUserPluginAdmin() {
+        String currentUserId = externalLogic.getCurrentUserId();
+        String currentLocation = externalLogic.getCurrentLocationId();
+        return externalLogic.isUserAllowedInLocation(
+                    currentUserId, ExternalLogic.SCORMCLOUD_ADMIN, currentLocation);
+    }
+
+    public boolean isPluginConfigured() {
+        ScormCloudConfiguration configuration = getScormCloudConfiguration();
+        return (configuration != null);
+    }
+
+    public boolean canConfigurePlugin() {
+        //Sakai admins can do whatever they please...
+        if(isCurrentUserSakaiAdmin()){
+            return true;
+        }
+        String currentUserId = externalLogic.getCurrentUserId();
+        String currentLocation = externalLogic.getCurrentLocationId();
+        return externalLogic.isUserAllowedInLocation(
+                currentUserId, ExternalLogic.SCORMCLOUD_CONFIGURE, currentLocation);
+    }
+
+    public List<ScormCloudPackage> getAllSitePackages(){
+        Search s = new Search();
+        s.addRestriction(new Restriction("locationId", externalLogic.getCurrentLocationId()));
+        return dao.findBySearch(ScormCloudPackage.class, s);
     }
 }

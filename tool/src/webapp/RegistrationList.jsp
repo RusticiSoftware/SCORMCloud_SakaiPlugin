@@ -17,6 +17,9 @@
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
     ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    
+    bean.doPageChecks(request, response);
+    
     pageContext.setAttribute("bean", bean);
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -60,6 +63,7 @@
             <tr>
                 <th class="firstHeader"></th>
                 <th class="secondHeader">Username</th>
+                <th class="assignmentId">Assignment Name</th>
                 <!-- <th class="thirdHeader">SCORM Cloud ID</th> -->
                 <th class="fourthColumn">Complete</th>
                 <th class="fifthColumn">Success</th>
@@ -70,24 +74,18 @@
         </thead>
         <tbody>
             <c:forEach var="reg" items="${regList}">
-            <% ScormCloudRegistration reg = (ScormCloudRegistration)pageContext.getAttribute("reg"); %>
-                <c:set var="deletable"><%= bean.canDelete(reg) %></c:set>
+                <% ScormCloudRegistration reg = (ScormCloudRegistration)pageContext.getAttribute("reg"); %>
                 <tr>
                     <td class="firstColumn">
-                        <c:if test="${deletable}">
                             <input name="select-item" value="${reg.id}" type="checkbox" />
-                        </c:if>
                     </td>
                     <td class="secondColumn">
-                        <c:choose>
-                            <c:when test="${deletable}">
-                                <a href="controller?action=viewDetailedRegistrationReport&id=${reg.id}">
-                                    ${reg.userName}
-                                </a>
-                            </c:when><c:otherwise>
-                                ${reg.userName}
-                            </c:otherwise>      
-                        </c:choose>             
+                        <a href="controller?action=viewDetailedRegistrationReport&id=${reg.id}">
+                            ${reg.userName}
+                        </a>                 
+                    </td>
+                    <td>
+                    	<span>${reg.assignmentName}</span>
                     </td>
                     <!-- <td class="thirdColumn">
                         <span>${reg.scormCloudId}</span>
@@ -108,7 +106,7 @@
                     	<span>${reg.success}</span>
                     </td>
                     <td class="sixthColumn">
-                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score * 100.0}</span>
+                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score}</span>
                     </td>
                     <td class="seventhColumn">
                     	<span>${reg.totalTime}</span>

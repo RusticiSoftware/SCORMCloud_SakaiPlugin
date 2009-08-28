@@ -11,6 +11,16 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml" %>
+<%
+    // Get the backing bean from the spring context
+    WebApplicationContext context = 
+        WebApplicationContextUtils.getWebApplicationContext(application);
+    ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    
+    bean.allowOnlyAdmin(request, response);
+    
+    pageContext.setAttribute("bean", bean);
+%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -20,7 +30,7 @@
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Packages</title>
+<title>SCORM Cloud Plugin Configuration</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
@@ -35,7 +45,7 @@
 
 <div class="instruction">Enter your AppId and Secret Key below to activate the SCORM Cloud Plugin.</div>
 <form name="cloudConfigForm" id="cloudConfigForm" action="controller?action=configureCloudPlugin" method="post">
-	<table>
+	<table cellspacing="4">
 		<tr>
 			<td>AppId</td>
 			<td><input id="appId" name="appId" type="text" value="${config.appId}" size="40" /></td>

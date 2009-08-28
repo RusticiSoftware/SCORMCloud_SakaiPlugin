@@ -11,7 +11,6 @@ private static final long serialVersionUID = 1L;
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context
-	private Boolean hidden; // only visible to owner if true
 	private Boolean contributesToAssignmentGrade;
 	private Date dateCreated;
 	
@@ -38,23 +37,16 @@ private static final long serialVersionUID = 1L;
 	 */
 	public ScormCloudPackage(String title,
 			String ownerId, String locationId,
-			Boolean hidden, Date dateCreated) {
+			Date dateCreated) {
 		this.title = title;
 		this.ownerId = ownerId;
 		this.locationId = locationId;
-		this.hidden = hidden;
 		this.dateCreated = dateCreated;
 	}
 
 	/**
 	 * Getters and Setters
 	 */
-	public Boolean getHidden() {
-		return hidden;
-	}
-	public void setHidden(Boolean hidden) {
-		this.hidden = hidden;
-	}
 	public String getId() {
 		return id;
 	}

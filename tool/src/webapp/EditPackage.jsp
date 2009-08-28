@@ -16,6 +16,9 @@
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
     ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+
+    bean.doPageChecks(request, response);
+    
     pageContext.setAttribute("bean", bean);
 %>
 
@@ -27,17 +30,23 @@
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Packages</title>
+<title>SCORM Cloud Package Properties Editor</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
 <div class="navIntraTool">
-    <a href="PackageList.jsp">List Packages</a>
-    <a href="ImportPackage.jsp">Import Package</a>
+    <a href="controller?action=viewPackages">List Resources</a>
+    <a href="controller?action=viewRegistrations">Search Registrations</a>
+    <c:if test="${canConfigure}">
+	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
+    </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">Edit Information for Package ${pkg.title}</h3>
+<h3 class="insColor insBak insBorder">Edit SCORM Cloud Package Properties for ${pkg.title}</h3>
+
+<div class="instruction">Please click <a href="#" onclick="javascript:history.back()">here</a> to go back.</div>
+
 
 <c:if test="${fn:length(bean.messages) > 0}">
     <div class="alertMessage">
@@ -50,17 +59,8 @@
     <% bean.messages.clear(); %>
 </c:if>
 
-	<p>
-    	<a href="PackageList.jsp">Return</a>
-    </p>
+<iframe frameborder="no" width="98%" height="800px" src="${packagePropertiesUrl}" />
 
-<!--<form name="listItemsForm" action="controller?action=processPackageListAction" method="post">-->
-    <iframe frameborder="no" width="98%" height="800px" src="${packagePropertiesUrl}" />
-
-
-	
-
-<!--</form>-->
 
 </div>
 </body>

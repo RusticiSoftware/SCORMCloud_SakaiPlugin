@@ -16,7 +16,11 @@
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
     ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    
+    bean.doPageChecks(request, response);
+    
     pageContext.setAttribute("bean", bean);
+    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -33,12 +37,14 @@
 <div class="portletBody">
 
 <div class="navIntraTool">
-    <a href="PackageList.jsp">List Packages</a>
-    <a href="ImportPackage.jsp">Import Package</a>
-    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
+    <a href="controller?action=viewPackages">List Resources</a>
+    <a href="controller?action=viewRegistrations">List Registrations</a>
+    <c:if test="${canConfigure}">
+	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
+    </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
+<h3 class="insColor insBak insBorder">SCORM Cloud Resources</h3>
 
 <c:if test="${fn:length(bean.messages) > 0}">
     <div class="alertMessage">
@@ -58,50 +64,18 @@
     <table class="listHier">
         <thead>
             <tr>
-                <th class="firstHeader"></th>
-                <th class="secondHeader">Title</th>
-                <!-- <th class="thirdHeader">SCORM Cloud ID</th> -->
-                <th class="fourthHeader">Hidden</th>
-                <th class="fifthHeader">Configure Package</th>
-                <th class="fifthHeader">Preview Package</th>
-                <th class="fifthHeader">Registration Results</th>
-                <th class="sixthHeader">Creation Date</th>
+                <th>Title</th>
+                <th>Configure Package</th>
+                <th>Preview Package</th>
+                <th>Registration Results</th>
+                <th>Creation Date</th>
             </tr>
         </thead>
         <tbody>
-            <c:forEach var="pkg" items="${bean.allVisiblePackages}">
-                <% ScormCloudPackage pkg = (ScormCloudPackage)pageContext.getAttribute("pkg"); %>
-                <c:set var="deletable"><%= bean.canDelete(pkg) %></c:set>
-                <%-- <c:set var="launchable"><%= bean.canLaunch(pkg) %></c:set> --%>
+            <c:forEach var="pkg" items="${pkgList}">
                 <tr>
-                    <td class="firstColumn">
-                        <c:if test="${deletable}">
-                            <input name="select-item" value="${pkg.id}" type="checkbox" />
-                        </c:if>
-                    </td>
-                    <td class="secondColumn">
-                        <c:choose>
-                            <%--<c:when test="${launchable}">--%>
-                            <c:when test="<%= true %>">
-                                <a href="controller?action=launchPackage&id=${pkg.id}">
-                                    ${pkg.title}
-                                </a>
-                            </c:when><c:otherwise>
-                                ${pkg.title}
-                            </c:otherwise>    
-                        </c:choose>             
-                    </td>
-                    <!-- <td class="thirdColumn">
-                        <span>${pkg.scormCloudId}</span>
-                    </td> -->
-                    <td class="fourthColumn">
-                        <c:choose>
-                            <c:when test="${pkg.hidden}">
-                                <input name="item-hidden" type="checkbox" disabled="true" checked="true" />
-                            </c:when><c:otherwise>
-                                <input name="item-hidden" type="checkbox" disabled="true" />
-                            </c:otherwise>
-                        </c:choose>
+                    <td>
+                        ${pkg.title}           
                     </td>
                     <td>
                     	<a href="controller?action=viewPackageProperties&id=${pkg.id}">Configure</a>
@@ -109,10 +83,10 @@
                     <td>
                     	<a href="controller?action=previewPackage&id=${pkg.id}">Preview</a>
                     </td>
-                    <td class="fifthColumn">
+                    <td>
                         <a href="controller?action=viewRegistrations&id=${pkg.id}">Results</a>
                     </td>
-                    <td class="sixthColumn">
+                    <td>
                         <fmt:formatDate value="${pkg.dateCreated}" type="both" 
                             dateStyle="medium" timeStyle="medium" />
                     </td>
@@ -120,10 +94,6 @@
             </c:forEach>
         </tbody>
     </table>
-
-    <p class="act">
-        <input name="delete-items" type="submit" value="Delete" />
-    </p>
 </form>
 
 </div>

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,23 @@ public class RequestController extends HttpServlet {
     private static Log log = LogFactory.getLog(RequestController.class);
 	private static final long serialVersionUID = 1L;
 	
+	public static final String PAGE_PLUGIN_CONFIGURE = "ScormCloudConfiguration.jsp";
+	public static final String PAGE_PACKAGE_IMPORT = "ImportPackage.jsp";
+	public static final String PAGE_PACKAGE_LIST = "PackageList.jsp";
+	public static final String PAGE_PACKAGE_EDIT = "EditPackage.jsp";
+	public static final String PAGE_REGISTRATION_LIST = "RegistrationList.jsp";
+	public static final String PAGE_REGISTRATION_LAUNCH = "Launch.jsp";
+	public static final String PAGE_SHOW_MESSAGE = "ShowMessage.jsp";
+	public static final String PAGE_WELCOME = "Welcome.jsp";
+	public static final String PAGE_CLOSER = "Closer.html";
+	
+	private static final List<String> pagesAllowedByNonAdmin = 
+	    Arrays.asList(new String[]{PAGE_WELCOME, PAGE_REGISTRATION_LAUNCH, PAGE_CLOSER});
+	
+	private static final List<String> actionsAllowedByNonAdmin =
+	    Arrays.asList(new String[]{"launchPackage", "postLaunchActions", "closeWindow"});
+	
+	
 	private ApplicationContext appContext;
 	private ScormCloudLogic logic;
 	private ExternalLogic extLogic;
@@ -67,6 +85,23 @@ public class RequestController extends HttpServlet {
 	    }
 	}
 
+	private void doSecurityFilterOnAction(HttpServletRequest request, 
+	        HttpServletResponse response, String action) throws Exception {
+	    boolean admin = logic.isCurrentUserPluginAdmin() || logic.isCurrentUserSakaiAdmin();
+	    boolean actionAllowed = actionsAllowedByNonAdmin.contains(action);
+	    if (!admin && !actionAllowed) {
+            log.warn("Warning: security filter had to deny user " + 
+                    extLogic.getUserDisplayId(extLogic.getCurrentUserId()) +
+                    " from performing action: " + action);
+            sendToMessagePage(request, response, 
+                    "Action not allowed", 
+                    "We're sorry, but the current settings for the " +
+                    "SCORM Cloud plugin disallow you from performing " +
+                    "this action. Please contact your local Sakai or SCORM Plugin " +
+                    "administrator if you feel you've recieved this message in error.");
+        }
+	}
+	
 	public void doGet (HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		try{
 		    initInterfaces();
@@ -89,6 +124,12 @@ public class RequestController extends HttpServlet {
             if(action == null || action.length() < 1){
                 log.error("No action specified, returning!");
                 return;
+            }
+            
+            doSecurityFilterOnAction(request, response, action);
+            
+            if(action.equals("viewPackages")){
+                processViewPackagesRequest(request, response);
             }
             if(action.equals("viewCloudConfiguration")){
                 proccessViewCloudConfigurationAction(request, response);
@@ -134,6 +175,9 @@ public class RequestController extends HttpServlet {
 			if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
 			}
+			if(action.equals("showMessage")){
+			    sendToMessagePage(request, response, "Test Title", "Test Message");
+			}
 			if(action.equals("debugParams")){
 			    log.debug("Debugging params sent");
 			    Map params = request.getParameterMap();
@@ -148,15 +192,39 @@ public class RequestController extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
+
+    private void processViewPackagesRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        List<ScormCloudPackage> pkgList = logic.getAllSitePackages();
+        request.setAttribute("pkgList", pkgList);
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_LIST);
+        rd.forward(request, response);
+    }
+
+    private void sendToMessagePage(HttpServletRequest request, HttpServletResponse response, 
+            String messageTitle, String message) throws Exception {
+	    sendToMessagePage(request, response, messageTitle, message, false);
+	}
 	
-	private void proccessViewCloudConfigurationAction(HttpServletRequest request,
+	private void sendToMessagePage(HttpServletRequest request, HttpServletResponse response, 
+	        String messageTitle, String message, boolean hideBackLink) throws Exception {
+        request.setAttribute("messageTitle", messageTitle);
+        request.setAttribute("message", message);
+        if(hideBackLink){
+            request.setAttribute("hideBackLink", true);
+        }
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_SHOW_MESSAGE);
+        rd.forward(request, response);
+    }
+
+    private void proccessViewCloudConfigurationAction(HttpServletRequest request,
 	        HttpServletResponse response) throws Exception {
 	    ScormCloudConfiguration config = logic.getScormCloudConfiguration();
         if (config == null) {
             config = new ScormCloudConfiguration();
         }
         request.setAttribute("config", config);
-        RequestDispatcher rd = request.getRequestDispatcher("ScormCloudConfiguration.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_PLUGIN_CONFIGURE);
         rd.forward(request, response);
 	}
 	
@@ -173,9 +241,11 @@ public class RequestController extends HttpServlet {
             config.setServiceUrl(serviceUrl);
             logic.setScormCloudConfiguration(config);
             
-            pkgsBean.getMessages().add("SCORM Cloud Plugin Configuration Updated");
+            sendToMessagePage(request, response, 
+                    "SCORM Cloud Plugin Configured", 
+                    "Thank you for configuring the SCORM Cloud Plugin.");
 	    }
-	    RequestDispatcher rd = request.getRequestDispatcher("PackageList.jsp");
+	    RequestDispatcher rd = request.getRequestDispatcher(PAGE_WELCOME);
 	    rd.forward(request, response);
     }
 
@@ -186,7 +256,7 @@ public class RequestController extends HttpServlet {
         String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg);
         request.setAttribute("pkg", pkg);
         request.setAttribute("packagePropertiesUrl", packagePropertiesUrl);
-        RequestDispatcher rd = request.getRequestDispatcher("EditPackage.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_EDIT);
         rd.forward(request, response);
     }
 
@@ -209,8 +279,7 @@ public class RequestController extends HttpServlet {
         String packageId = request.getParameter("packageId");
         
         request.setAttribute("pkg", 
-                logic
-                    .getPackageById(packageId));
+                logic.getPackageById(packageId));
         
         //Delete or update, based on button pressed
         if(request.getParameter("delete-items") != null){
@@ -228,7 +297,7 @@ public class RequestController extends HttpServlet {
                 logic
                     .getRegistrationsByPackageId(packageId));
         
-        RequestDispatcher rd = request.getRequestDispatcher("RegistrationList.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LIST);
         rd.forward(request, response);
 	}
 
@@ -252,10 +321,10 @@ public class RequestController extends HttpServlet {
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsRemoved = 0;
             for (String id : selectedItems){
-                if (bean.checkRemoveRegistrationById(id)) {
+                ScormCloudRegistration reg = logic.getRegistrationById(id);
+                if(reg != null){
+                    logic.removeRegistration(reg);
                     itemsRemoved++;
-                } else {
-                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
                 }
             }
             bean.messages.add("Removed " + itemsRemoved + " items");
@@ -269,10 +338,10 @@ public class RequestController extends HttpServlet {
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsReset = 0;
             for (String id : selectedItems){
-                if (bean.checkResetRegistrationById(id)) {
+                ScormCloudRegistration reg = logic.getRegistrationById(id);
+                if(reg != null){
+                    logic.resetRegistration(reg);
                     itemsReset++;
-                } else {
-                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
                 }
             }
             bean.messages.add("Reset " + itemsReset + " registrations");
@@ -282,7 +351,7 @@ public class RequestController extends HttpServlet {
     private void processViewRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
-        ScormCloudPackagesBean bean = pkgsBean;
+        String assignmentView = request.getParameter("assignmentView");
         ScormCloudPackage pkg = (ScormCloudPackage)logic.getPackageById(packageId);
         if(pkg == null){
             log.debug("Error processing view registration request, " +
@@ -293,7 +362,7 @@ public class RequestController extends HttpServlet {
         
         request.setAttribute("pkg", pkg);
         request.setAttribute("regList", regList);
-        RequestDispatcher rd = request.getRequestDispatcher("RegistrationList.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LIST);
         rd.forward(request, response);
     }
 
@@ -308,10 +377,10 @@ public class RequestController extends HttpServlet {
             int itemsRemoved = 0;
             for (int i=0; i<selectedItems.length; i++) {
                 String id = selectedItems[i];
-                if (bean.checkRemovePackageById(id)) {
+                ScormCloudPackage pkg = logic.getPackageById(id);
+                if(pkg != null){
+                    logic.removePackage(pkg);
                     itemsRemoved++;
-                } else {
-                    bean.messages.add("Removal error: Cannot remove item with id: " + id);
                 }
             }
             bean.messages.add("Removed " + itemsRemoved + " items");
@@ -325,13 +394,10 @@ public class RequestController extends HttpServlet {
 	       ContentEntity contentEntity = pipe.getContentEntity();
 
 	       try {
-	           ScormCloudPackagesBean bean = pkgsBean;
 	           String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
 	           ScormCloudPackage pkg = logic.getPackageById(packageId);
-	           if(bean.canDelete(pkg)){
-    	           getContentHostingService().removeResource(contentEntity.getId());
-    	           pkgsBean.checkRemovePackageById(packageId);
-	           }
+	           getContentHostingService().removeResource(contentEntity.getId());
+	           logic.removePackage(pkg);
 	       }
 	       catch (Exception e) {
 	           throw new RuntimeException(e);
@@ -353,12 +419,7 @@ public class RequestController extends HttpServlet {
 		
 		//Create new package object
         ScormCloudPackage pkg = new ScormCloudPackage();
-        pkg.setTitle(params.get("item-title"));
-        Boolean itemHidden = Boolean.FALSE;
-		if ( (params.get("item-hidden") != null) ) {
-			itemHidden = Boolean.TRUE;
-		}
-		pkg.setHidden(itemHidden);
+        pkg.setTitle(params.get("package-title"));
 		
 		//Does the package contribute to associated assignments?
 		String contributes = params.get("contribute-to-assigment-grade");
@@ -381,7 +442,7 @@ public class RequestController extends HttpServlet {
             processImportHelperActions(pkg, request, response);
         }
         //Send the user back to the package list page
-		response.sendRedirect("PackageList.jsp");
+		response.sendRedirect(PAGE_PACKAGE_LIST);
 	}
 	
 	
@@ -456,12 +517,6 @@ public class RequestController extends HttpServlet {
 
 		//Go get the package specified by the id in the request
 		ScormCloudPackage pkg = logic.getPackageById(packageId);
-		if(pkg == null){
-			log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
-			request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
-			RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-			rd.forward(request, response);
-		}
 		
 		//Find (or create) a registration for the current user and the given package
 		String userId = extLogic.getCurrentUserId();
@@ -477,7 +532,7 @@ public class RequestController extends HttpServlet {
 		//Forward the user to the launch page, now that a registration exists for them
 		log.debug("launchUrl = " + launchUrl);
 		request.setAttribute("url", launchUrl);
-		RequestDispatcher rd = request.getRequestDispatcher("Launch.jsp");
+		RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LAUNCH);
 		rd.forward(request, response);
 	}
 	
@@ -504,7 +559,7 @@ public class RequestController extends HttpServlet {
         //Forward the user to the launch page
         log.debug("previewUrl = " + previewUrl);
         request.setAttribute("url", previewUrl);
-        RequestDispatcher rd = request.getRequestDispatcher("Launch.jsp");
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LAUNCH);
         rd.forward(request, response);
     }
 

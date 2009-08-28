@@ -107,7 +107,7 @@
 
 	<!-- define the starting page for this app -->
 	<welcome-file-list>
-		<welcome-file>PackageList.jsp</welcome-file>
+		<welcome-file>Welcome.jsp</welcome-file>
 	</welcome-file-list>
 
 </web-app>

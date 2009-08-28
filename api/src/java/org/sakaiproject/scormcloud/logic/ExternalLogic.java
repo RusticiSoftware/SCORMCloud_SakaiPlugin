@@ -27,13 +27,8 @@ public interface ExternalLogic {
 	public final static String NO_LOCATION = "noLocationAvailable";
 
 	// permissions
-	public final static String ITEM_WRITE_ANY = "scormcloud.write.any";
-	public final static String ITEM_READ_HIDDEN = "scormcloud.read.hidden";
-	
+	public final static String SCORMCLOUD_ADMIN = "scormcloud.admin";
 	public final static String SCORMCLOUD_CONFIGURE = "scormcloud.configure";
-	public final static String SCORMCLOUD_IMPORT = "scormcloud.import";
-	public final static String SCORMCLOUD_VIEWTOOL = "scormcloud.viewtool";
-	public final static String SCORMCLOUD_TEST = "scormcloud.launchtest";
 
 	/**
 	 * @return the current sakai user id (not username)
@@ -85,5 +80,7 @@ public interface ExternalLogic {
     
     public Assignment getAssignmentFromAssignmentKey(String context, String userId, String assignmentKey);
     public void updateAssignmentScore(Assignment asn, String userId, String score);
+    
+    public String getAssignmentNameFromId(String id);
     
 }

@@ -34,23 +34,7 @@ public interface ScormCloudLogic {
     */
    public ScormCloudPackage getPackageById(String id);
 
-   /**
-    * Check if a specified user can write this item in a specified site
-    * @param item to be modified or removed
-    * @param locationId a unique id which represents the current location of the user (entity reference)
-    * @param userId the internal user id (not username)
-    * @return true if item can be modified, false otherwise
-    */
-   public boolean canWritePackage(ScormCloudPackage pkg, String locationId, String userId);
-
-   /**
-    * This returns a List of items for a specified site that are
-    * visible to the specified user
-    * @param locationId a unique id which represents the current location of the user (entity reference)
-    * @param userId the internal user id (not username)
-    * @return a List of ScormCloudItem objects
-    */
-   public List<ScormCloudPackage> getAllVisiblePackages(String locationId, String userId);
+   public List<ScormCloudPackage> getAllSitePackages();
 
    public void addNewPackage(ScormCloudPackage pkg, File packageZip) throws Exception;
    
@@ -75,9 +59,15 @@ public interface ScormCloudLogic {
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
    public ScormCloudRegistration findRegistrationFor(String userId, String assignmentKey);
    public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg, String userId, String assignmentKey);
-   public boolean canWriteRegistration(ScormCloudRegistration reg, String locationId, String userId);
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
    public void resetRegistration(ScormCloudRegistration reg);
    public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
+   
+   public String getAssignmentNameFromId(String id);
+   
+   public boolean isCurrentUserSakaiAdmin();
+   public boolean isCurrentUserPluginAdmin();
+   public boolean canConfigurePlugin();
+   public boolean isPluginConfigured();
 }

@@ -6,6 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -48,151 +51,41 @@ public class ScormCloudPackagesBean {
 		return externalLogic.getUserDisplayName(externalLogic.getCurrentUserId());
 	}
 
-	/**
-	 * @param item a ScormCloudPackage to check
-	 * @return true if the current user can remove or update the item
-	 */
-	public boolean canDelete(ScormCloudPackage pkg) {
-		log.debug("check Delete for: " + pkg.getId());
-		return logic.canWritePackage(pkg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId());
-	}
-
-	/**
-	 * @return a List of ScormCloudPackage objects visible to the current user in the current site
-	 */
-	public List getAllVisiblePackages() {
-		return logic.getAllVisiblePackages(externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId());
-	}
-
-	/**
-	 * @param id the unique id of the item
-	 * @return a ScormCloudPackage or null if not found
-	 */
-	/*public ScormCloudPackage getPackageById(String id) {
-		return logic.getPackageById(id);
-	}
-
-	public void updatePackage(ScormCloudPackage pkg) {
-		logic.updatePackage(pkg);
+	public boolean isCurrentUserSakaiAdmin(){
+	    return logic.isCurrentUserSakaiAdmin();
 	}
 	
-	public void addNewPackage(ScormCloudPackage pkg, File zipFile) throws Exception {
-		logic.addNewPackage(pkg, zipFile);
+	public boolean isCurrentUserPluginAdmin(){
+	    return logic.isCurrentUserPluginAdmin();
 	}
 	
-	public String getPackagePropertiesUrl(ScormCloudPackage pkg) throws Exception {
-	    return logic.getPackagePropertiesUrl(pkg);
+	public boolean canConfigurePlugin(){
+	    return logic.canConfigurePlugin();
 	}
 	
-	public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl) throws Exception {
-	    return logic.getPackagePreviewUrl(pkg, redirectOnExitUrl);
-	}*/
-	
-	/**
-	 * @param item a ScormCloudPackage to remove
-	 * @return true if the item can be removed by the current user, false otherwise
-	 */
-	public boolean checkRemovePackageById(String id) {
-		log.debug("check and Remove for: " + id);
-		ScormCloudPackage item = logic.getPackageById(id);
-		if ( item != null && 
-				logic.canWritePackage(item, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
-			logic.removePackage(item);
-			return true;
-		}
-		return false;
+	public boolean isPluginConfigured(){
+	    return logic.isPluginConfigured();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	//--------------Registrations-------------------
-
-	/**
-	 * @return a List of ScormCloudPackage objects visible to the current user in the current site
-	 */
-	/*public List getAllVisibleRegistrations() {
-		return logic.getAllVisibleRegistrations(externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId());
-	}*/
-
-	/**
-	 * @param id the unique id of the item
-	 * @return a ScormCloudPackage or null if not found
-	 */
-	/*public ScormCloudRegistration getRegistrationById(String id) {
-		return logic.getRegistrationById(id);
-	}
-	
-	public List<ScormCloudRegistration> getRegistrationsByPackageId(String packageId) {
-	    return logic.getRegistrationsByPackageId(packageId);
-	}
-	
-	public ScormCloudRegistration findOrCreateUserRegistrationFor(ScormCloudPackage pkg, String assignmentKey){
-		ScormCloudRegistration reg = logic.findRegistrationFor(pkg.getId(), externalLogic.getCurrentUserId(), assignmentKey);
-		if(reg == null){
-			reg = logic.addNewRegistration(pkg, externalLogic.getCurrentUserId(), assignmentKey);
-		}
-		return reg;
-	}
-	
-	public boolean canDelete(ScormCloudRegistration reg) {
-        log.debug("check Delete for: " + reg.getId());
-        return logic.canWriteRegistration(reg, 
-                    externalLogic.getCurrentLocationId(), 
-                    externalLogic.getCurrentUserId());
-    }
-
-	public void updateRegistration(ScormCloudRegistration reg) {
-		logic.updateRegistration(reg);
-	}
-	
-	public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg) {
-	    logic.updateRegistrationResultsFromCloud(reg);
-	}
-	
-	public ScormCloudRegistration addNewRegistration(String userId, ScormCloudPackage pkg){
-		return logic.addNewRegistration(userId, pkg);
-	}
-	
-	public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl){
-		return logic.getLaunchUrl(reg, redirectOnExitUrl);
-	}*/
-	
-	/**
-	 * @param item a ScormCloudPackage to remove
-	 * @return true if the item can be removed by the current user, false otherwise
-	 */
-	public boolean checkRemoveRegistrationById(String id) {
-		log.debug("check and Remove for: " + id);
-		ScormCloudRegistration reg = logic.getRegistrationById(id);
-		if ( reg != null && 
-				logic.canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
-			logic.removeRegistration(reg);
-			return true;
-		}
-		return false;
-	}
-	
-	public boolean checkResetRegistrationById(String id) {
-        log.debug("check and Remove for: " + id);
-        ScormCloudRegistration reg = logic.getRegistrationById(id);
-        if ( reg != null && 
-                logic.canWriteRegistration(reg, externalLogic.getCurrentLocationId(), externalLogic.getCurrentUserId()) ) {
-            logic.resetRegistration(reg);
-            return true;
+	public void ensureConfigured(HttpServletRequest request, 
+            HttpServletResponse response) throws Exception {
+	    boolean configured = logic.isPluginConfigured();
+        if(!configured){
+            response.sendRedirect(RequestController.PAGE_WELCOME);
         }
-        return false;
-    }
-	
-	/*
-	public void setConfiguration(ScormCloudConfiguration config){
-	    logic.setScormCloudConfiguration(config);
 	}
-	public ScormCloudConfiguration getConfiguration(){
-	    return logic.getScormCloudConfiguration();
-	}*/
+	
+	public void allowOnlyAdmin(HttpServletRequest request, 
+	        HttpServletResponse response) throws Exception { 
+	    boolean admin = logic.isCurrentUserPluginAdmin() || logic.isCurrentUserSakaiAdmin();
+	    if(!admin){
+	        response.sendRedirect("controller?action=actionNotAllowed");
+	    }
+	}
+	
+	public void doPageChecks(HttpServletRequest request, 
+            HttpServletResponse response) throws Exception { 
+        ensureConfigured(request, response);
+        allowOnlyAdmin(request, response);
+    }
 }

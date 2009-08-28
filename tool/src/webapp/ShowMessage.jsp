@@ -20,22 +20,32 @@
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Launch Pad</title>
+<title>SCORM Cloud Plugin Message</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
-<div class="portletBody">
-
-
-<h3 class="insColor insBak insBorder">SCORM Cloud Packages</h3>
-
-	<script>
-         window.open("${url}", "_blank", "");
-    </script>
-    
-<div class="instruction" style="padding-left:10px; padding-top:10px">
-	Your course has launched in a new window. When you have finished, please click 
-	<a href="#" onclick="javascript:history.back()">here</a> to go back, or close this window.
-</div>
+<div class="portletBody">	
+	
+	<h2 class="insColor insBak insBorder">SCORM Cloud Plugin by Rustici Software</h2>
+	
+	<table>
+		<tr>
+			<td>
+				<img class="messageIcon" src="images/icon_cloud.jpg" />
+			</td>
+			<td style="vertical-align:top">
+				<div style="padding-left:20px">
+					<h3 class="messageTitle">${messageTitle}</h3>
+					<div class="instruction">
+						${message}
+						<c:if test="${empty hideBackLink}">
+							<br /><br />
+							You can click <a href="#" onclick="javascript:history.back()">here</a> to go back.
+						</c:if> 
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
 
 </div>
 </body>
