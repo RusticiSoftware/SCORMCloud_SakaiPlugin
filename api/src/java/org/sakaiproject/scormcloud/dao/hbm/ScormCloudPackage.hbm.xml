@@ -18,6 +18,7 @@
 		<property name="locationId" type="string" length="255" not-null="true" />
 		<property name="context" type="string" length="255" not-null="true" />
 		<property name="contributesToAssignmentGrade" type="java.lang.Boolean" not-null="true" />
+		<property name="allowLaunchOutsideAssignment" type="java.lang.Boolean" not-null="true" />
 		<property name="dateCreated" type="java.util.Date" />
 		<property name="scormCloudId" type="string" length="255" not-null="true" />
 	</class>

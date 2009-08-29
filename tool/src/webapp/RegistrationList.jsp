@@ -79,7 +79,7 @@
 				<label for="assignmentSearch">${not empty pkg ? "Filter" : "Search"} By Assignment</label>
 				<input type="text" id="assignmentSearch" name="assignmentSearch" value="${regListAssignmentSearch}" size="40" />
 			</td>
-			<td>
+			<td style="vertical-align:bottom">
 				<input type="submit" id="searchSubmit" name="searchSubmit" value="Search" />
 			</td>
 		</tr>

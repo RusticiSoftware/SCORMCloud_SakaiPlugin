@@ -31,7 +31,7 @@ public class ScormCloudHttpAccess implements HttpAccess {
             
             //This isn't the id, just a unique key to provide a 
             //sort of assignment "context" for the launch / registration
-            String assignmentKey = null;
+            String assignmentKey = "";
             
             //Parse out a possible assignment key/context of this reference
             if(refId.contains("Assignments")){

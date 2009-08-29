@@ -32,13 +32,13 @@
          window.open("${url}", "launchWindow", "");
     </script>
     
-    <c:if test="${resourceLink}">
+    <%--<c:if test="${resourceLink}">
     	<script type="text/javascript">
     		if(launchWindow){
     			window.location = "Closer.html";
     		}
     	</script>
-    </c:if>
+    </c:if>--%>
     
 <div class="instruction" style="padding-top:10px">
 	Your course has launched in a new window. When you have finished, please click 

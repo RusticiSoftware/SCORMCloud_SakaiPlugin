@@ -254,11 +254,13 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             String userId, String assignmentKey) {
         String userDisplayName = externalLogic.getUserDisplayName(userId);
         String userDisplayId = externalLogic.getUserDisplayId(userId);
-        Assignment assignment = externalLogic.getAssignmentFromAssignmentKey(
-                                            pkg.getContext(), userId, assignmentKey);
         
-        int contributingResources = getNumberOfContributingResourcesForAssignment(assignment);
-        
+        Assignment assignment = null;
+        if (assignmentKey != null && assignmentKey != ""){
+            externalLogic.getAssignmentFromAssignmentKey(
+                    pkg.getContext(), userId, assignmentKey);
+        }
+
         String firstName = "sakai";
         String lastName = "learner";
         
@@ -283,11 +285,16 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
             
-            reg.setAssignmentKey(assignmentKey);
-            reg.setAssignmentId(assignment.getId());
-            reg.setAssignmentName(assignment.getTitle());
-            reg.setContributesToAssignmentGrade(pkg.getContributesToAssignmentGrade());
-            reg.setNumberOfContributingResources(contributingResources);
+            if(assignment != null){
+                reg.setAssignmentKey(assignmentKey);
+                reg.setAssignmentId(assignment.getId());
+                reg.setAssignmentName(assignment.getTitle());
+                reg.setContributesToAssignmentGrade(pkg.getContributesToAssignmentGrade());
+                int contributingResources = getNumberOfContributingResourcesForAssignment(assignment);
+                reg.setNumberOfContributingResources(contributingResources);
+            } else {
+                reg.setAssignmentName("None");
+            }
             
             dao.save(reg);
             return reg;
@@ -336,13 +343,19 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     }
     
     
-    public ScormCloudRegistration findRegistrationFor(String userId, String assignmentKey) {
-        log.debug("Finding registration with userId = " + userId
-                + ", assignmentKey = " + assignmentKey);
+    public ScormCloudRegistration findRegistrationFor(ScormCloudPackage pkg, String userId, String assignmentKey) {
+        log.debug("Finding registration with userId = " + userId + 
+                  ", assignmentKey = " + assignmentKey);
+                
         
         Search s = new Search();
         s.addRestriction(new Restriction("ownerId", userId));
-        s.addRestriction(new Restriction("assignmentKey", assignmentKey));
+        if(pkg != null){
+            s.addRestriction(new Restriction("packageId", pkg.getId()));
+        }
+        if(assignmentKey != null){
+            s.addRestriction(new Restriction("assignmentKey", assignmentKey));
+        }
         List<ScormCloudRegistration> regs = dao.findBySearch(ScormCloudRegistration.class, s);
         
         if (regs.size() >= 1) {

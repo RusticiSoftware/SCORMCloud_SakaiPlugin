@@ -73,8 +73,8 @@
 											</c:otherwise>
 										</c:choose>
 										Once the plugin is configured, you can use the links above to view detailed 
-										reporting of your learner's interaction with the SCORM resources that have 
-										been attached to assignments.
+										reporting of your learner's interaction with the SCORM resources that you 
+										have imported.
 									</c:otherwise>
 								</c:choose>
 								Documentation on the usage of the SCORM Cloud plugin can be found <a href="Documentation.html">here.</a>

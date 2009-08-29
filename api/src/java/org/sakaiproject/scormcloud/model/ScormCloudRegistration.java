@@ -19,7 +19,7 @@ public class ScormCloudRegistration implements Serializable {
 	private String assignmentId; //assignment related to this reg
     private String assignmentKey; //assignment "context" related to resource attachment
     private String assignmentName;
-    private Boolean contributesToAssignmentGrade;
+    private Boolean contributesToAssignmentGrade = Boolean.FALSE;
 	private Integer numberOfContributingResources = 0;
 	
 	private String complete;

@@ -99,6 +99,7 @@ public class RequestController extends HttpServlet {
                     "SCORM Cloud plugin disallow you from performing " +
                     "this action. Please contact your local Sakai or SCORM Plugin " +
                     "administrator if you feel you've recieved this message in error.");
+            return;
         }
 	}
 	
@@ -170,9 +171,6 @@ public class RequestController extends HttpServlet {
 			if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
 			}
-			if(action.equals("showMessage")){
-			    sendToMessagePage(request, response, "Test Title", "Test Message");
-			}
 			if(action.equals("debugParams")){
 			    log.debug("Debugging params sent");
 			    Map params = request.getParameterMap();
@@ -235,10 +233,6 @@ public class RequestController extends HttpServlet {
             config.setSecretKey(secretKey);
             config.setServiceUrl(serviceUrl);
             logic.setScormCloudConfiguration(config);
-            
-            sendToMessagePage(request, response, 
-                    "SCORM Cloud Plugin Configured", 
-                    "Thank you for configuring the SCORM Cloud Plugin.");
 	    }
 	    RequestDispatcher rd = request.getRequestDispatcher(PAGE_WELCOME);
 	    rd.forward(request, response);
@@ -412,6 +406,10 @@ public class RequestController extends HttpServlet {
 		String contributes = params.get("contribute-to-assigment-grade");
 		pkg.setContributesToAssignmentGrade(Boolean.parseBoolean(contributes));
 		
+		//Allow the package to be launched outside of an assignment?
+		String allowNonAssignmentLaunch = params.get("allow-non-assignment-launch");
+		pkg.setAllowLaunchOutsideAssignment(Boolean.parseBoolean(allowNonAssignmentLaunch));
+		
 		//Create new cloud id for package
 		String cloudId = UUID.randomUUID().toString();
 		pkg.setScormCloudId("sakai-" + cloudId);
@@ -500,15 +498,32 @@ public class RequestController extends HttpServlet {
 		String packageId = request.getParameter("id");
 		String assignmentKey = request.getParameter("assignmentKey");
 		String resourceLink = request.getParameter("resourceLink");
+		
 		log.debug("action launchPackage requested with packageId = " + packageId +
 		          " assignmentKey = " + assignmentKey);
 
 		//Go get the package specified by the id in the request
 		ScormCloudPackage pkg = logic.getPackageById(packageId);
 		
+		log.debug("isNullOrEmpty(assignmentKey)? " + isNullOrEmpty(assignmentKey));
+		log.debug("assignmentKey == null? " + (assignmentKey == null));
+		log.debug("assignmentKey.length()? " + assignmentKey.length());
+		log.debug("getAllowLaunchOutsideAssignment? " + pkg.getAllowLaunchOutsideAssignment());
+		log.debug("!getAllowLaunchOutsideAssignment? " + !pkg.getAllowLaunchOutsideAssignment());
+		
+		//If no assignment context, make sure we can still launch...
+        if(isNullOrEmpty(assignmentKey) && !pkg.getAllowLaunchOutsideAssignment()){
+            sendToMessagePage(request, response, 
+                "Launch Not Allowed", 
+                "We're sorry, but current settings for this SCORM Cloud " +
+                "resource disallow you from launching it outside of " +
+                "the context of an assignment.");
+            return;
+        }
+		
 		//Find (or create) a registration for the current user and the given package
 		String userId = extLogic.getCurrentUserId();
-		ScormCloudRegistration reg = logic.findRegistrationFor(userId, assignmentKey);
+		ScormCloudRegistration reg = logic.findRegistrationFor(pkg, userId, assignmentKey);
         if(reg == null){
             reg = logic.addNewRegistration(pkg, userId, assignmentKey);
         }

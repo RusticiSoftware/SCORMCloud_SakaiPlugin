@@ -12,6 +12,7 @@ private static final long serialVersionUID = 1L;
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context
 	private Boolean contributesToAssignmentGrade;
+	private Boolean allowLaunchOutsideAssignment;
 	private Date dateCreated;
 	
 	private String scormCloudId;
@@ -83,7 +84,6 @@ private static final long serialVersionUID = 1L;
 	public void setContext(String context){
 	    this.context = context;
 	}
-	
 	public String getScormCloudId() {
 		return scormCloudId;
 	}
@@ -95,6 +95,12 @@ private static final long serialVersionUID = 1L;
     }
     public void setContributesToAssignmentGrade(Boolean contributes) {
         this.contributesToAssignmentGrade = contributes;
+    }
+    public boolean getAllowLaunchOutsideAssignment() {
+        return allowLaunchOutsideAssignment;
+    }
+    public void setAllowLaunchOutsideAssignment(Boolean allow){
+        this.allowLaunchOutsideAssignment = allow;
     }
 
 }

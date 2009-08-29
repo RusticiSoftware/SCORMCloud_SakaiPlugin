@@ -59,7 +59,7 @@ public interface ScormCloudLogic {
    public ScormCloudRegistration getRegistrationById(String id);
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
    public List<ScormCloudRegistration> getRegistrationsByPropertyMap(Map<String, Object> propertyMap);
-   public ScormCloudRegistration findRegistrationFor(String userId, String assignmentKey);
+   public ScormCloudRegistration findRegistrationFor(ScormCloudPackage pkg, String userId, String assignmentKey);
    public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg, String userId, String assignmentKey);
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
