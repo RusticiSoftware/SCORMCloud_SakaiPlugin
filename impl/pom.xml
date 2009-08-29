@@ -58,6 +58,11 @@
             <groupId>org.sakaiproject.entitybroker</groupId>
             <artifactId>entitybroker-utils</artifactId>
         </dependency>
+
+      	<!--<dependency>
+        	<groupId>xerces</groupId>
+        	<artifactId>xmlParserAPIs</artifactId>
+	</dependency>-->
        <!-- Sakai dependencies -->
     	<dependency>
             <groupId>org.sakaiproject.kernel</groupId>

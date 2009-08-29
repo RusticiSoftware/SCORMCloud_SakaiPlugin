@@ -28,11 +28,6 @@
          <artifactId>scormcloud-api</artifactId>
       </dependency>
 
-      <dependency>
-          <groupId>com.rusticisoftware.hostedengine</groupId>
-          <artifactId>scorm-cloud-client</artifactId>
-      </dependency>
-
       <!-- we are running a webapp in tomcat so we need the servlet api -->
       <dependency>
          <groupId>javax.servlet</groupId>

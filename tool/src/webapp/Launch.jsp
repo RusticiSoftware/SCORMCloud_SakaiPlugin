@@ -42,7 +42,7 @@
     
 <div class="instruction" style="padding-top:10px">
 	Your course has launched in a new window. When you have finished, please click 
-	<a href="#" onclick="javascript:history.back()">here</a> to go back, or close this window.
+	<a href="javascript:history.back()">here</a> to go back, or close this window.
 </div>
 
 </div>

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page errorPage="error.jsp" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ActivityReporter" %>
+<%@ page import="org.w3c.dom.Document" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -21,6 +22,10 @@
     
     pageContext.setAttribute("bean", bean);
     pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
+    
+    Document reportXml = (Document)request.getAttribute("reportXml");
+    pageContext.setAttribute("activityReport",
+            (new ActivityReporter()).createReport(reportXml));
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -28,6 +33,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <script src="/library/js/headscripts.js" language="JavaScript" type="text/javascript"></script>
+<script type="text/javascript" src="javascript/jquery-1.3.2.min.js"></script>
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
@@ -44,9 +50,10 @@
     </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">Editing SCORM Cloud Package Properties for ${pkg.title}</h3>
+<h3 class="insColor insBak insBorder">SCORM Cloud Registration Activity Report</h3>
 
-<div class="instruction">When you are finished, please click <a href="javascript:history.back()">here</a> to go back.</div>
+<div class="instruction">Displayed below is a report of ${reg.userName}'s activity with resource ${pkg.title}. 
+	When finished viewing, you can click <a href="javascript:history.back()">here</a> to go back.</div>
 
 
 <c:if test="${fn:length(bean.messages) > 0}">
@@ -60,7 +67,12 @@
     <% bean.messages.clear(); %>
 </c:if>
 
-<iframe frameborder="no" width="98%" height="800px" src="${packagePropertiesUrl}" />
+<div id="reportTitle">
+	
+</div>
+<div id="reportContainer">
+	${activityReport}
+</div>
 
 
 </div>

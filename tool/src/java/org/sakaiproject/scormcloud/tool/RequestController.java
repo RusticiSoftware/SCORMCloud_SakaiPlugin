@@ -37,6 +37,7 @@ import org.sakaiproject.tool.cover.SessionManager;
 import org.sakaiproject.tool.cover.ToolManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.w3c.dom.Document;
 
 
 
@@ -54,12 +55,14 @@ public class RequestController extends HttpServlet {
 	public static final String PAGE_SHOW_MESSAGE = "ShowMessage.jsp";
 	public static final String PAGE_WELCOME = "Welcome.jsp";
 	public static final String PAGE_CLOSER = "Closer.html";
+	private static final String PAGE_ACTIVITY_REPORT = "ActivityReport.jsp";
 	
 	private static final List<String> pagesAllowedByNonAdmin = 
 	    Arrays.asList(new String[]{PAGE_WELCOME, PAGE_REGISTRATION_LAUNCH, PAGE_CLOSER});
 	
 	private static final List<String> actionsAllowedByNonAdmin =
 	    Arrays.asList(new String[]{"launchPackage", "postLaunchActions", "closeWindow"});
+    
 	
 	
 	private ApplicationContext appContext;
@@ -156,6 +159,12 @@ public class RequestController extends HttpServlet {
 			if(action.equals("viewRegistrations")){
 			    processViewRegistrationsRequest(request, response);
 			}
+			if(action.equals("viewActivityReport")){
+			    processViewActivityReportRequest(request, response);
+			}
+			if(action.equals("viewLaunchHistoryReport")){
+			    processViewLaunchHistoryReport(request, response);
+			}
 			if(action.equals("postLaunchActions")){
 			    processPostLaunchActions(request, response);
 			}
@@ -185,6 +194,24 @@ public class RequestController extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
+
+    private void processViewLaunchHistoryReport(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        
+    }
+
+    private void processViewActivityReportRequest(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        String registrationId = request.getParameter("registrationId");
+        ScormCloudRegistration reg = logic.getRegistrationById(registrationId);
+        ScormCloudPackage pkg = logic.getPackageById(reg.getPackageId());
+        Document reportXml = logic.getRegistrationReport(reg);
+        request.setAttribute("reg", reg);
+        request.setAttribute("pkg", pkg);
+        request.setAttribute("reportXml", reportXml);
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_ACTIVITY_REPORT);
+        rd.forward(request, response);
+    }
 
     private void processViewPackagesRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
@@ -264,12 +291,6 @@ public class RequestController extends HttpServlet {
 
     private void processRegistrationListRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-	  //Make sure to recreate the "state" of the reg list page
-        String packageId = request.getParameter("packageId");
-        
-        request.setAttribute("pkg", 
-                logic.getPackageById(packageId));
-        
         //Delete or update, based on button pressed
         if(request.getParameter("delete-items") != null){
             processDeleteRegistrationsRequest(request, response);
@@ -280,14 +301,7 @@ public class RequestController extends HttpServlet {
         else if (request.getParameter("update-items") != null){
             processUpdateRegistrationsRequest(request, response);
         }
-        
-        //Now grab the altered registration list
-        request.setAttribute("regList",
-                logic
-                    .getRegistrationsByPackageId(packageId));
-        
-        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REGISTRATION_LIST);
-        rd.forward(request, response);
+        processViewRegistrationsRequest(request, response);
 	}
 
     private void processUpdateRegistrationsRequest(HttpServletRequest request,
@@ -356,7 +370,7 @@ public class RequestController extends HttpServlet {
         if (!isNullOrEmpty(assignmentSearch)) 
             propertyMap.put("assignmentName", assignmentSearch);
         
-        List<ScormCloudRegistration> regList = logic.getRegistrationsByPropertyMap(propertyMap);
+        List<ScormCloudRegistration> regList = logic.getRegistrationsWherePropertiesLike(propertyMap);
         
         if(regList != null){
             request.setAttribute("regList", regList);
@@ -555,13 +569,6 @@ public class RequestController extends HttpServlet {
         
         //Go get the package specified by the id in the request
         ScormCloudPackage pkg = logic.getPackageById(packageId);
-        if(pkg == null){
-            log.debug("Error in launchPackage action, no package with id = " + packageId + " found!");
-            request.setAttribute("errorMessage", "Package with id " + packageId + " not found!");
-            RequestDispatcher rd = request.getRequestDispatcher("error.jsp");
-            rd.forward(request, response);
-        }
-        
         String previewUrl = logic.getPackagePreviewUrl(pkg, 
                                 getAbsoluteUrlToSelf(request) + "?action=closeWindow");
         

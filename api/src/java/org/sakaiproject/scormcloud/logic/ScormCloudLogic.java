@@ -18,6 +18,8 @@ import java.util.Map;
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This is the interface for the app Logic, 
@@ -54,17 +56,17 @@ public interface ScormCloudLogic {
    public String getPackagePropertiesUrl(ScormCloudPackage pkg);
    public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl);
    
-   
-   
    public ScormCloudRegistration getRegistrationById(String id);
    public List<ScormCloudRegistration> getRegistrationsByPackageId(String pkgId);
-   public List<ScormCloudRegistration> getRegistrationsByPropertyMap(Map<String, Object> propertyMap);
+   public List<ScormCloudRegistration> getRegistrationsWherePropertiesEqual(Map<String, Object> propertyMap);
+   public List<ScormCloudRegistration> getRegistrationsWherePropertiesLike(Map<String, Object> propertyMap);
    public ScormCloudRegistration findRegistrationFor(ScormCloudPackage pkg, String userId, String assignmentKey);
    public ScormCloudRegistration addNewRegistration(ScormCloudPackage pkg, String userId, String assignmentKey);
    public void updateRegistrationResultsFromCloud(ScormCloudRegistration reg);
    public void removeRegistration(ScormCloudRegistration reg);
    public void resetRegistration(ScormCloudRegistration reg);
    public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
+   public Document getRegistrationReport(ScormCloudRegistration reg);
    
    public String getAssignmentNameFromId(String id);
    

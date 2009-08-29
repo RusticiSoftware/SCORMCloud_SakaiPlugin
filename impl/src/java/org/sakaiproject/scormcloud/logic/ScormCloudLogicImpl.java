@@ -11,7 +11,9 @@
 
 package org.sakaiproject.scormcloud.logic;
 
+import java.io.CharArrayReader;
 import java.io.File;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,9 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.UUID;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,10 +44,14 @@ import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import com.rusticisoftware.hostedengine.client.Configuration;
 import com.rusticisoftware.hostedengine.client.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
+import com.rusticisoftware.hostedengine.client.Utils;
+import com.rusticisoftware.hostedengine.client.Enums.RegistrationResultsFormat;
 
 /**
  * This is the implementation of the business logic interface
@@ -52,9 +61,7 @@ import com.rusticisoftware.hostedengine.client.ScormEngineService;
 public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
 
     private static Log log = LogFactory.getLog(ScormCloudLogicImpl.class);
-    
-    
-
+ 
     private ScormCloudDao dao;
 
     public void setDao(ScormCloudDao dao) {
@@ -324,7 +331,15 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         return dao.findBySearch(ScormCloudRegistration.class, s);
     }
 
-    public List<ScormCloudRegistration> getRegistrationsByPropertyMap(Map<String, Object> propertyMap){
+    public List<ScormCloudRegistration> getRegistrationsWherePropertiesEqual(Map<String, Object> propertyMap){
+        return searchRegistrationsByPropertyMap(propertyMap, Restriction.EQUALS);
+    }
+    
+    public List<ScormCloudRegistration> getRegistrationsWherePropertiesLike(Map<String, Object> propertyMap){
+        return searchRegistrationsByPropertyMap(propertyMap, Restriction.LIKE);
+    }
+    
+    public List<ScormCloudRegistration> searchRegistrationsByPropertyMap(Map<String, Object> propertyMap, int restrictionType){
         log.debug("Getting registrations by property map");
         boolean emptySearch = true;
         Search s = new Search();
@@ -333,7 +348,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             if(propertyValue != null){
                 emptySearch = false;
                 log.debug("Adding property " + propertyName + " = " + propertyValue.toString());
-                s.addRestriction(new Restriction(propertyName, propertyValue));
+                s.addRestriction(new Restriction(propertyName, propertyValue, restrictionType));
             }
         }
         if(emptySearch){
@@ -341,6 +356,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
         return dao.findBySearch(ScormCloudRegistration.class, s);
     }
+    
+    
     
     
     public ScormCloudRegistration findRegistrationFor(ScormCloudPackage pkg, String userId, String assignmentKey) {
@@ -353,7 +370,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         if(pkg != null){
             s.addRestriction(new Restriction("packageId", pkg.getId()));
         }
-        if(assignmentKey != null){
+        if(assignmentKey != null && assignmentKey != ""){
             s.addRestriction(new Restriction("assignmentKey", assignmentKey));
         }
         List<ScormCloudRegistration> regs = dao.findBySearch(ScormCloudRegistration.class, s);
@@ -471,6 +488,20 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             log.error("Encountered an exception while trying to get " +
                       "launch url from SCORM Cloud, returning null", e);
             return null;
+        }
+    }
+    
+    public Document getRegistrationReport(ScormCloudRegistration reg){
+        try {
+            String resultsXml = scormEngineService.getRegistrationService()
+                .GetRegistrationResult(
+                        reg.getScormCloudId(),
+                        RegistrationResultsFormat.FULL_DETAIL);
+            return Utils.parseXmlString(resultsXml);
+        } catch (Exception e) {
+            log.error("Encountered an exception while trying to get " +
+                      "report xml from SCORM Cloud, returning null", e);
+          return null;
         }
     }
     

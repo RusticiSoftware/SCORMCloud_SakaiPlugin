@@ -63,7 +63,7 @@
 </c:if>
 
 
-<div class="instruction">Hello, ${bean.currentUserDisplayName}</div>
+<div class="instruction">Use the inputs below to ${empty pkg ? "search for" : "filter the"} results.</div>
 
 <form name=searchRegistrationsForm" actions="controller?action=searchRegistrations" method="post">
 	<c:if test="${not empty pkg}">
@@ -72,11 +72,11 @@
 	<table>
 		<tr>
 			<td>
-				<label for="userSearch">${not empty pkg ? "Filter" : "Search"} By User</label>
+				<label for="userSearch">${empty pkg ? "Search" : "Filter"} By User</label>
 				<input type="text" id="userSearch" name="userSearch" value="${regListUserSearch}" size="40" />
 			</td>
 			<td>
-				<label for="assignmentSearch">${not empty pkg ? "Filter" : "Search"} By Assignment</label>
+				<label for="assignmentSearch">${empty pkg ? "Search" : "Filter"} By Assignment</label>
 				<input type="text" id="assignmentSearch" name="assignmentSearch" value="${regListAssignmentSearch}" size="40" />
 			</td>
 			<td style="vertical-align:bottom">
@@ -89,6 +89,9 @@
 
 <c:if test="${not empty regList}">
 	<form name="listItemsForm" action="controller?action=processRegistrationListAction" method="post">
+		<c:if test="${not empty pkg}">
+			<input type="hidden" id="packageId" name="packageId" value="${pkg.id}" />
+		</c:if>
 	    <table class="listHier">
 	        <thead>
 	            <tr>
@@ -99,7 +102,7 @@
 	                <th>Success</th>
 	                <th>Score</th>
 	                <th>Time Spent</th>
-	                <th>SCORM Data</th>
+	                <th>Activity Report</th>
 	                <th>Launch History</th>
 	                <th>Creation Date</th>
 	            </tr>
@@ -130,10 +133,10 @@
 	                    	<span>${reg.totalTime}</span>
 	                    </td>
 	                    <td>
-	                    	<a href="controller?action=viewScormData&registrationId=${reg.id}">SCORM Data</a>
+	                    	<a href="controller?action=viewActivityReport&registrationId=${reg.id}">Activity Report</a>
 	                    </td>
 	                    <td>
-	                    	<a href="controller?action=viewLaunchHistory&registrationId=${reg.id}">Launch History</a>
+	                    	<a href="controller?action=viewLaunchHistoryReport&registrationId=${reg.id}">Launch History</a>
 	                    </td>
 	                    <td>
 	                        <fmt:formatDate value="${reg.dateCreated}" type="both" 

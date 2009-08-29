@@ -73,12 +73,6 @@
                 <version>0.1</version><!--ScormCloud.version-->
             </dependency>
 
-            <dependency>
-                <groupId>com.rusticisoftware.hostedengine</groupId>
-                <artifactId>scorm-cloud-client</artifactId>
-                <version>0.1</version><!--ScormCloud.version-->
-            </dependency>
-
       		<dependency>
       		  <groupId>org.sakaiproject</groupId>
       		  <artifactId>sakai-gradebook-service-api</artifactId>
@@ -141,10 +135,6 @@
             <dependency>
                 <groupId>org.sakaiproject.scormcloud</groupId>
                 <artifactId>scormcloud-impl</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>com.rusticisoftware.hostedengine</groupId>
-                <artifactId>scorm-cloud-client</artifactId>
             </dependency>-->
             <!-- needed until EB is in the Sakai master dependency management -->
        <!-- Sakai dependencies -->
@@ -196,10 +186,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-mock</artifactId>
         </dependency>
-      <dependency>
-          <groupId>com.rusticisoftware.hostedengine</groupId>
-          <artifactId>scorm-cloud-client</artifactId>
-      </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
