@@ -185,7 +185,7 @@ public class ActivityReporter {
         List<Element> interactions = getChildrenByTagName(interactionsRoot, "interaction");
         if (interactions.size() > 0){
             xml.append("<div class='detailsTopLabel'>Interactions<div id='interactionArrowDiv' class='sub_detail_arrows' ");
-            xml.append("onclick=\'$(\"#interactionsTable'" + actNum + "'\").toggle(); $(\"img\",this).css(\"right\",$(\"#interactionsTable'" + actNum + "'\").is(\":hidden\") ? \"images/down-arrow.gif\" : \"images/up-arrow.gif\"); \' >");
+            xml.append("onclick=\'$(\"#interactionsTable" + actNum + "\").toggle(); $(\"img\",this).css(\"right\",$(\"#interactionsTable" + actNum + "\").is(\":hidden\") ? \"images/down-arrow.gif\" : \"images/up-arrow.gif\"); \' >");
             xml.append("<img id='interaction_arrows' class='img_detail_arrows' src='images/down-arrow.gif' />");
             xml.append("</div></div>");
             xml.append("<table id='interactionsTable" + actNum + "' class='interactionsTable table_details'>");

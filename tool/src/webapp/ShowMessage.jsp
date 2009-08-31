@@ -39,7 +39,7 @@
 						${message}
 						<c:if test="${empty hideBackLink}">
 							<br /><br />
-							You can click <a href="#" onclick="javascript:history.back()">here</a> to go back.
+							You can click <a href="javascript:history.back()">here</a> to go back.
 						</c:if> 
 					</div>
 				</div>

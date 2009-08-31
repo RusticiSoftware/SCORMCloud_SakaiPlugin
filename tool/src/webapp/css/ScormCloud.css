@@ -8,11 +8,25 @@ tr.odd {
 	background-color: #ffffff;
 }
 
-#reportContainer {
+
+#packagePropertiesEditor {
+	height: 800px;
+	width: 90%;
+	padding-left: 10px;
+	color: #555555;
+	font-size: %95;
+}
+
+#activityReportContainer, #launchHistoryReportContainer {
 	height:400px; 
+	width: 95%;
 	padding-left:10px; 
-	font-size:95%;
 	color:#555555;
+	font-size:90%;
+}
+
+#launchHistoryReportContainer {
+	font-size: 100%;
 }
 
 #column_headers {position:relative; font-weight:bold; border-bottom:1px solid #4171B5; padding: 3px 0px; margin-top:10px;}
@@ -54,7 +68,7 @@ td.intLblWidth {width:110px;}
 .actRuntimeData {position:relative;}
 
 .interactionsTable {display:none;}
-.sub_detail_arrows {margin-left:5px; width:16px; height:16px; overflow:hidden; position:absolute; left:90px; top:1px; cursor:pointer;}
+.sub_detail_arrows {margin-left:15px; width:16px; height:16px; overflow:hidden; position:absolute; left:90px; top:1px; cursor:pointer;}
 .comment_arrow {left:190px;}
 .learnerComments {display:none;}
 

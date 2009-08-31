@@ -34,10 +34,10 @@ public class ScormCloudHttpAccess implements HttpAccess {
             String assignmentKey = "";
             
             //Parse out a possible assignment key/context of this reference
-            if(refId.contains("Assignments")){
+            if(refId.contains("Assignments/")){
                 //Typically, reference is like "Assignments/[assignment key]/etc",
                 //here we parse out the [assignment key]
-                String assignmentString = refId.substring(refId.indexOf("Assignments"));
+                String assignmentString = refId.substring(refId.indexOf("Assignments/"));
                 int beginAssignmentId = assignmentString.indexOf("/") + 1;
                 int endAssignmentId = assignmentString.indexOf("/", beginAssignmentId);
                 assignmentKey = assignmentString.substring(beginAssignmentId, endAssignmentId);

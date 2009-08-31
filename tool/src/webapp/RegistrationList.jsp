@@ -38,7 +38,7 @@
 
 <div class="navIntraTool">
     <a href="controller?action=viewPackages">List Resources</a>
-    <a href="controller?action=viewRegistrations">List Registrations</a>
+    <a href="controller?action=viewRegistrations">Search Registrations</a>
     <c:if test="${canConfigure}">
 	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
     </c:if>
@@ -73,11 +73,11 @@
 		<tr>
 			<td>
 				<label for="userSearch">${empty pkg ? "Search" : "Filter"} By User</label>
-				<input type="text" id="userSearch" name="userSearch" value="${regListUserSearch}" size="40" />
+				<input type="text" id="userSearch" name="userSearch" value="${userSearch}" size="40" />
 			</td>
 			<td>
 				<label for="assignmentSearch">${empty pkg ? "Search" : "Filter"} By Assignment</label>
-				<input type="text" id="assignmentSearch" name="assignmentSearch" value="${regListAssignmentSearch}" size="40" />
+				<input type="text" id="assignmentSearch" name="assignmentSearch" value="${assignmentSearch}" size="40" />
 			</td>
 			<td style="vertical-align:bottom">
 				<input type="submit" id="searchSubmit" name="searchSubmit" value="Search" />

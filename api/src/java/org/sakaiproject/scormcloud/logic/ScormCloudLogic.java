@@ -27,8 +27,8 @@ import org.w3c.dom.Element;
  */
 public interface ScormCloudLogic {
    
-   public void setScormCloudConfiguration(ScormCloudConfiguration config);
-   public ScormCloudConfiguration getScormCloudConfiguration();
+   public void saveScormCloudConfiguration(ScormCloudConfiguration config) throws Exception;
+   public ScormCloudConfiguration getScormCloudConfiguration() throws Exception;
     
    /**
     * This returns a package based on an id
@@ -53,7 +53,7 @@ public interface ScormCloudLogic {
     */
    public void removePackage(ScormCloudPackage pkg);
    
-   public String getPackagePropertiesUrl(ScormCloudPackage pkg);
+   public String getPackagePropertiesUrl(ScormCloudPackage pkg, String styleSheetUrl);
    public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl);
    
    public ScormCloudRegistration getRegistrationById(String id);
@@ -66,9 +66,9 @@ public interface ScormCloudLogic {
    public void removeRegistration(ScormCloudRegistration reg);
    public void resetRegistration(ScormCloudRegistration reg);
    public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl);
+   public String getLaunchHistoryReport(ScormCloudRegistration reg);
+   public String getLaunchInfoXml(ScormCloudRegistration reg, String launchId);
    public Document getRegistrationReport(ScormCloudRegistration reg);
-   
-   public String getAssignmentNameFromId(String id);
    
    public boolean isCurrentUserSakaiAdmin();
    public boolean isCurrentUserPluginAdmin();

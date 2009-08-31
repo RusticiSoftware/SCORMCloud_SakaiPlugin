@@ -30,10 +30,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <script src="/library/js/headscripts.js" language="JavaScript" type="text/javascript"></script>
 <script type="text/javascript" src="javascript/jquery-1.3.2.min.js"></script>
+<script type="text/javascript">
+        var extConfigurationString = '';
+        var reportsHelperUrl = 'controller';
+</script>
+<script type="text/javascript" src="javascript/LaunchHistoryReport.js"></script>
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Registration Activity Report</title>
+<link rel="Stylesheet" href="css/LaunchHistoryReport.css" />
+<title>SCORM Cloud Registration Launch History Report</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
@@ -46,10 +52,12 @@
     </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">SCORM Cloud Registration Activity Report</h3>
+<h3 class="insColor insBak insBorder">SCORM Cloud Registration Launch History Report</h3>
 
-<div class="instruction">Displayed below is a report of ${reg.userName}'s activity with resource ${pkg.title}. 
-	When finished viewing, you can click <a href="javascript:history.back()">here</a> to go back.</div>
+<div class="instruction">Displayed below is a list showing each of ${reg.userName}'s 
+    launches of the resource ${pkg.title}. To view details about a specific launch, you can 
+    expand using the plus symbol to the left of the launch time. When finished viewing, 
+    you can click <a href="javascript:history.back()">here</a> to go back.</div>
 
 
 <c:if test="${fn:length(bean.messages) > 0}">
@@ -63,9 +71,13 @@
     <% bean.messages.clear(); %>
 </c:if>
 
-
-<div id="activityReportContainer">
-	${activityReport}
+<div id="launchHistoryReportContainer">
+	<div id="historyInfo">
+       <div class="info_title">Launches</div>
+       <div id="historyDetails" class="history_details">
+       		${launchHistoryReport}
+       </div>
+    </div>
 </div>
 
 

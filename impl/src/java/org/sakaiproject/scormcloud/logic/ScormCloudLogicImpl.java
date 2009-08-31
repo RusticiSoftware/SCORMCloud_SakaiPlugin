@@ -34,6 +34,7 @@ import org.sakaiproject.assignment.api.AssignmentSubmissionEdit;
 import org.sakaiproject.assignment.cover.AssignmentService;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.event.api.Event;
+import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.genericdao.api.search.Restriction;
 import org.sakaiproject.genericdao.api.search.Search;
 
@@ -41,6 +42,7 @@ import org.sakaiproject.genericdao.api.search.Search;
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.scormcloud.dao.ScormCloudDao;
 import org.sakaiproject.scormcloud.logic.ScormCloudLogic;
+import org.sakaiproject.scormcloud.logic.helpers.LaunchHistoryReportHelper;
 import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
@@ -48,6 +50,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.rusticisoftware.hostedengine.client.Configuration;
+import com.rusticisoftware.hostedengine.client.LaunchInfo;
 import com.rusticisoftware.hostedengine.client.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
 import com.rusticisoftware.hostedengine.client.Utils;
@@ -74,17 +77,12 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         this.externalLogic = externalLogic;
     }
 
-
-    private ScormCloudConfiguration scormCloudConfiguration;
-    private ScormEngineService scormEngineService;
-
     /**
      * Place any code that should run when this class is initialized by spring
      * here
      */
     public void init() {
         log.debug("init");
-        initScormEngineService();
         externalLogic.registerEventObserver(this);
     }
     
@@ -92,60 +90,67 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     
     //----------------- SCORM Cloud Configuration --------------------
     
-    public void initScormEngineService(){
-        scormCloudConfiguration = lookupScormCloudConfig();
-        if(scormCloudConfiguration != null){
-            log.debug("Found cloud config in database, initializing scorm engine service");
-            Configuration config = 
-                new Configuration(scormCloudConfiguration.getServiceUrl(), 
-                                  scormCloudConfiguration.getAppId(),
-                                  scormCloudConfiguration.getSecretKey());
-            scormEngineService = new ScormEngineService(config);
-        } else {
-            log.debug("Couldn't find existing config, not initializing scorm engine service");
-        }
-    }
-    
-    private ScormCloudConfiguration lookupScormCloudConfig(){
-        List<ScormCloudConfiguration> configs = dao.findAll(ScormCloudConfiguration.class);
-        if(configs.size() > 0){
-            return configs.get(0);
-        }
-        return null;
-    }
-    
-    public boolean isScormEngineServiceInitialized(){
-        return (scormEngineService != null);
-    }
-    
-    public void setScormCloudConfiguration(ScormCloudConfiguration config){
-        log.debug("setScormCloudConfiguration called w/ appId = " + config.getAppId());
-        ScormCloudConfiguration existingConfig = lookupScormCloudConfig();
-        if(existingConfig != null){
-            log.debug("Existing config found, updating it");
-            existingConfig.copyFrom(config);
-            dao.save(existingConfig);
-        } else {
-            log.debug("No existing config found, adding new one");
-            dao.save(config);
-        }
-        initScormEngineService();
-    }
-    
-    public ScormCloudConfiguration getScormCloudConfiguration(){
-        if(scormCloudConfiguration != null){
-            if(externalLogic.isUserAdmin(externalLogic.getCurrentUserId())){
-                return scormCloudConfiguration;
-            } else {
-                ScormCloudConfiguration copy = new ScormCloudConfiguration(scormCloudConfiguration);
-                copy.setSecretKey(null);
-                return copy;
-            }
-        }
-        return null;
+    public boolean isPluginConfigured() {
+        ScormCloudConfiguration configuration = 
+            getScormCloudConfigurationInternal(externalLogic.getCurrentContext());
+        return (configuration != null);
     }
 
     
+    private ScormEngineService getScormEngineService(String context){
+        ScormCloudConfiguration cloudConfig = getScormCloudConfigurationInternal(context);
+        if(cloudConfig != null){
+            log.debug("Found cloud config in database, returning scorm engine service");
+            return new ScormEngineService(
+                    new Configuration(cloudConfig.getServiceUrl(), 
+                            cloudConfig.getAppId(),
+                            cloudConfig.getSecretKey()));
+        } else {
+            log.debug("Couldn't find existing config, returning null");
+            return null;
+        }
+    }
+
+    
+    public void saveScormCloudConfiguration(ScormCloudConfiguration config) throws Exception {
+        if(!canConfigurePlugin()){
+            log.error("saveScormCloudConfiguration called without canConfigurePlugin permission!");
+            throw new Exception("saveScormCloudConfiguration called without canConfigurePlugin permission!");
+        }
+        log.debug("saveScormCloudConfiguration called w/ context = " + config.getContext());
+        dao.save(config);
+    }
+    
+    public ScormCloudConfiguration getScormCloudConfiguration() throws Exception {
+        return getScormCloudConfiguration(externalLogic.getCurrentContext(), true);
+    }
+    
+    private ScormCloudConfiguration getScormCloudConfigurationInternal(String context){
+        try { return getScormCloudConfiguration(context, false); }
+        catch (Exception e) {
+            log.debug("Exception thrown in getScormCloudConfigurationInternal", e);
+            return null;
+        }
+    }
+    
+    private ScormCloudConfiguration getScormCloudConfiguration(String context, boolean isPublicCall) throws Exception {
+        if(isPublicCall && !canConfigurePlugin()){
+            log.error("saveScormCloudConfiguration called without canConfigurePlugin permission!");
+            throw new Exception("saveScormCloudConfiguration called without canConfigurePlugin permission!");
+        }
+        
+        Search s = new Search();
+        s.addRestriction(new Restriction("context", context));
+        List<ScormCloudConfiguration> configs = dao.findBySearch(ScormCloudConfiguration.class, s);
+        if(configs.size() == 0){
+            log.warn("Could not find SCORM Cloud configuration for context = " + context);
+            return null;
+        }
+        if(configs.size() > 1){
+            log.warn("Found more than one SCORM Cloud Configuration object for context = " + context);
+        }
+        return configs.get(0);
+    }
     
     
     
@@ -161,11 +166,17 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     public void removePackage(ScormCloudPackage pkg) {
         log.debug("In removePackage with item:" + 
                   pkg.getId() + ":" + pkg.getTitle());
-        // check if current user can remove this item
+        
         try {
-            scormEngineService
+            //Delete all associated registrations first
+            List<ScormCloudRegistration> regs = getRegistrationsByPackageId(pkg.getId());
+            for (ScormCloudRegistration reg : regs){
+                removeRegistration(reg);
+            }
+            //Then delete the package from the cloud
+            getScormEngineService(pkg.getContext())
                 .getCourseService()
-                .DeleteCourse(pkg.getScormCloudId());
+                    .DeleteCourse(pkg.getScormCloudId());
         } catch (Exception e) {
             log.debug(
                     "Exception occurred trying to delete package with id = "
@@ -173,7 +184,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
                             + pkg.getScormCloudId(), e);
         }
         dao.delete(pkg);
-        log.info("Removing package: " + pkg.getId() + ":" + pkg.getTitle());
+        log.info("Deleted package: " + pkg.getId() + ":" + pkg.getTitle());
     }
 
     public void addNewPackage(ScormCloudPackage pkg, File packageZip)
@@ -194,8 +205,10 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
         // save pkg if new OR check if the current user can update the existing pkg
         if (pkg.getId() == null) {
-            scormEngineService.getCourseService().ImportCourse(
-                    pkg.getScormCloudId(), packageZip.getAbsolutePath());
+            getScormEngineService(pkg.getContext())
+                .getCourseService()
+                    .ImportCourse(pkg.getScormCloudId(), 
+                                  packageZip.getAbsolutePath());
             dao.save(pkg);
             log.info("Saved package: " + pkg.getId() + ":" + pkg.getTitle());
         } else {
@@ -225,11 +238,11 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
     }
     
-    public String getPackagePropertiesUrl(ScormCloudPackage pkg){
+    public String getPackagePropertiesUrl(ScormCloudPackage pkg, String styleSheetUrl){
         try {
-            return scormEngineService
+            return getScormEngineService(pkg.getContext())
                     .getCourseService()
-                        .GetPropertyEditorUrl(pkg.getScormCloudId());
+                        .GetPropertyEditorUrl(pkg.getScormCloudId(), styleSheetUrl, null);
         } catch (Exception e) {
             log.error("Encountered exception while trying to get " +
                       "property editor url for package with SCORM " +
@@ -240,8 +253,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     
     public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl){
         try {
-            return scormEngineService.getCourseService()
-                        .GetPreviewUrl(pkg.getScormCloudId(), redirectOnExitUrl);
+            return getScormEngineService(pkg.getContext())
+                       .getCourseService()
+                           .GetPreviewUrl(pkg.getScormCloudId(), redirectOnExitUrl);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
                       "preview url from SCORM Cloud", e);
@@ -264,7 +278,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         
         Assignment assignment = null;
         if (assignmentKey != null && assignmentKey != ""){
-            externalLogic.getAssignmentFromAssignmentKey(
+            assignment = externalLogic.getAssignmentFromAssignmentKey(
                     pkg.getContext(), userId, assignmentKey);
         }
 
@@ -279,7 +293,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
 
         try {
             String cloudRegId = "sakai-reg-" + userDisplayId + "-" + UUID.randomUUID().toString();
-            scormEngineService.getRegistrationService().CreateRegistration(
+            getScormEngineService(pkg.getContext())
+                .getRegistrationService().CreateRegistration(
                     cloudRegId, pkg.getScormCloudId(), userId, firstName, lastName);
             
             ScormCloudRegistration reg = new ScormCloudRegistration();
@@ -399,14 +414,16 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         log.debug("In removeRegistration with regId:" + reg.getId());
         // check if current user can remove this item
         try {
-            scormEngineService.getRegistrationService().DeleteRegistration(reg.getScormCloudId());
+            getScormEngineService(reg.getContext())
+                .getRegistrationService()
+                    .DeleteRegistration(reg.getScormCloudId());
         }
         catch (Exception e){
             log.debug("Exception thrown trying to delete registration with id = " +
                       reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
         }
         dao.delete(reg);
-        log.info("Removing reg with id: " + reg.getId());
+        log.info("Removed reg with id: " + reg.getId());
     }
     
     public void resetRegistration(ScormCloudRegistration reg) {
@@ -414,7 +431,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         // check if current user can remove this item
         try {
             log.info("Resetting reg with id: " + reg.getId());
-            scormEngineService.getRegistrationService().ResetRegistration(reg.getScormCloudId());
+            getScormEngineService(reg.getContext())
+                .getRegistrationService()
+                    .ResetRegistration(reg.getScormCloudId());
             reg.setComplete("unknown");
             reg.setSuccess("unknown");
             reg.setScore("unknown");
@@ -463,7 +482,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
         try {
             log.debug("Updating registration " + reg.getId() + " with results from SCORM Cloud...");
-            RegistrationSummary sum = scormEngineService
+            RegistrationSummary sum = getScormEngineService(reg.getContext())
                                         .getRegistrationService()
                                         .GetRegistrationSummary(
                                                 reg.getScormCloudId());
@@ -482,8 +501,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     
     public String getLaunchUrl(ScormCloudRegistration reg, String redirectOnExitUrl) {
         try {
-            return scormEngineService.getRegistrationService()
-                        .GetLaunchUrl(reg.getScormCloudId(), redirectOnExitUrl);
+            return getScormEngineService(reg.getContext())
+                        .getRegistrationService()
+                            .GetLaunchUrl(reg.getScormCloudId(), redirectOnExitUrl);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
                       "launch url from SCORM Cloud, returning null", e);
@@ -491,12 +511,43 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
     }
     
+    public String getLaunchHistoryReport(ScormCloudRegistration reg){
+        try {
+            List<LaunchInfo> launchHistory = getScormEngineService(reg.getContext())
+                                                .getRegistrationService()
+                                                    .GetLaunchHistory(reg.getScormCloudId());
+            return (new LaunchHistoryReportHelper()).getLaunchLinks(reg.getId(), launchHistory);
+        } catch (Exception e) {
+            log.error("Caught exception while trying to retrieve launch history", e);
+            return null;
+        }
+    }
+    
+    public String getLaunchInfoXml(ScormCloudRegistration reg, String launchId){
+        try {
+            List<LaunchInfo> launchHistory = getScormEngineService(reg.getContext())
+                                                .getRegistrationService()
+                                                    .GetLaunchHistory(reg.getScormCloudId());
+            
+            LaunchInfo launchInfo = getScormEngineService(reg.getContext())
+                                        .getRegistrationService()
+                                            .GetLaunchInfo(launchId);
+            
+            return (new LaunchHistoryReportHelper())
+                            .getLaunchInfoXml(reg.getId(), launchInfo, launchHistory);
+        } catch (Exception e) {
+            log.error("Caught exception while trying to retrieve launch info xml", e);
+            return null;
+        }
+    }
+    
     public Document getRegistrationReport(ScormCloudRegistration reg){
         try {
-            String resultsXml = scormEngineService.getRegistrationService()
-                .GetRegistrationResult(
-                        reg.getScormCloudId(),
-                        RegistrationResultsFormat.FULL_DETAIL);
+            String resultsXml = getScormEngineService(reg.getContext())
+                                    .getRegistrationService()
+                                        .GetRegistrationResult(
+                                                reg.getScormCloudId(),
+                                                RegistrationResultsFormat.FULL_DETAIL);
             return Utils.parseXmlString(resultsXml);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
@@ -612,12 +663,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     }
 
 
-
-    public String getAssignmentNameFromId(String id) {
-        return externalLogic.getAssignmentNameFromId(id);
-    }
-
-
+    //------------------ Security ---------------------
+    
     public boolean isCurrentUserSakaiAdmin(){
         String currentUserId = externalLogic.getCurrentUserId();
         return externalLogic.isUserAdmin(currentUserId);
@@ -629,11 +676,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         return externalLogic.isUserAllowedInLocation(
                     currentUserId, ExternalLogic.SCORMCLOUD_ADMIN, currentLocation);
     }
-
-    public boolean isPluginConfigured() {
-        ScormCloudConfiguration configuration = getScormCloudConfiguration();
-        return (configuration != null);
-    }
+    
 
     public boolean canConfigurePlugin() {
         //Sakai admins can do whatever they please...

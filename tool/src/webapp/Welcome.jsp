@@ -38,7 +38,7 @@
 	<c:if test="${isAdmin}">
 		<div class="navIntraTool">
 		    <a href="controller?action=viewPackages">List Resources</a>
-		    <a href="controller?action=viewRegistrations">List Registrations</a>
+		    <a href="controller?action=viewRegistrations">Search Registrations</a>
 		    <c:if test="${canConfigure}">
 			    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
 		    </c:if>

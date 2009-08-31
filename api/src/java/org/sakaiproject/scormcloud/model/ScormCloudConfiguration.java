@@ -4,6 +4,7 @@ public class ScormCloudConfiguration {
     public final String DEFAULT_SERVICE_URL = "http://cloud.scorm.com/EngineWebServices/";
     
     private String id;
+    private String context;
     private String appId;
     private String secretKey;
     private String serviceUrl = DEFAULT_SERVICE_URL;
@@ -26,6 +27,12 @@ public class ScormCloudConfiguration {
     }
     public void setId(String id) {
         this.id = id;
+    }
+    public String getContext(){
+        return context;
+    }
+    public void setContext(String context){
+        this.context = context;
     }
     public String getAppId() {
         return appId;

@@ -38,7 +38,7 @@
 
 <div class="navIntraTool">
     <a href="controller?action=viewPackages">List Resources</a>
-    <a href="controller?action=viewRegistrations">List Registrations</a>
+    <a href="controller?action=viewRegistrations">Search Registrations</a>
     <c:if test="${canConfigure}">
 	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
     </c:if>
@@ -65,6 +65,8 @@
         <thead>
             <tr>
                 <th>Title</th>
+                <th>Grade Contributor</th>
+                <th>Non-assignment Launch</th>
                 <th>Configure Package</th>
                 <th>Preview Package</th>
                 <th>Registration Results</th>
@@ -78,13 +80,19 @@
                         ${pkg.title}           
                     </td>
                     <td>
+                    	${pkg.contributesToAssignmentGrade ? "yes" : "no"}
+                    </td>
+                    <td>
+                    	${pkg.allowLaunchOutsideAssignment ? "yes" : "no"}
+                    </td>
+                    <td>
                     	<a href="controller?action=viewPackageProperties&id=${pkg.id}">Configure</a>
                     </td>
                     <td>
                     	<a href="controller?action=previewPackage&id=${pkg.id}">Preview</a>
                     </td>
                     <td>
-                        <a href="controller?action=viewRegistrations&packageId=${pkg.id}">Results</a>
+                        <a href="controller?action=viewRegistrations&packageId=${pkg.id}">Registrations</a>
                     </td>
                     <td>
                         <fmt:formatDate value="${pkg.dateCreated}" type="both" 

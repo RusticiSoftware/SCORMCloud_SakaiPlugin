@@ -56,6 +56,7 @@ public class RequestController extends HttpServlet {
 	public static final String PAGE_WELCOME = "Welcome.jsp";
 	public static final String PAGE_CLOSER = "Closer.html";
 	private static final String PAGE_ACTIVITY_REPORT = "ActivityReport.jsp";
+	private static final String PAGE_LAUNCH_HISTORY_REPORT = "LaunchHistory.jsp";
 	
 	private static final List<String> pagesAllowedByNonAdmin = 
 	    Arrays.asList(new String[]{PAGE_WELCOME, PAGE_REGISTRATION_LAUNCH, PAGE_CLOSER});
@@ -165,6 +166,10 @@ public class RequestController extends HttpServlet {
 			if(action.equals("viewLaunchHistoryReport")){
 			    processViewLaunchHistoryReport(request, response);
 			}
+			if(action.equals("getLaunchInfoXml")){
+			    output.print(getLaunchHistoryInfoXml(request, response));
+			    return;
+			}
 			if(action.equals("postLaunchActions")){
 			    processPostLaunchActions(request, response);
 			}
@@ -195,9 +200,24 @@ public class RequestController extends HttpServlet {
 		}
 	}
 
+    private String getLaunchHistoryInfoXml(
+            HttpServletRequest request, HttpServletResponse response) {
+        String registrationId = request.getParameter("regId");
+        String launchId = request.getParameter("launchId");
+        ScormCloudRegistration reg = logic.getRegistrationById(registrationId);
+        return logic.getLaunchInfoXml(reg, launchId);
+    }
+
     private void processViewLaunchHistoryReport(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        
+        String registrationId = request.getParameter("registrationId");
+        ScormCloudRegistration reg = logic.getRegistrationById(registrationId);
+        ScormCloudPackage pkg = logic.getPackageById(reg.getPackageId());
+        request.setAttribute("reg", reg);
+        request.setAttribute("pkg", pkg);
+        request.setAttribute("launchHistoryReport", logic.getLaunchHistoryReport(reg));
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_LAUNCH_HISTORY_REPORT);
+        rd.forward(request, response);
     }
 
     private void processViewActivityReportRequest(HttpServletRequest request,
@@ -208,7 +228,8 @@ public class RequestController extends HttpServlet {
         Document reportXml = logic.getRegistrationReport(reg);
         request.setAttribute("reg", reg);
         request.setAttribute("pkg", pkg);
-        request.setAttribute("reportXml", reportXml);
+        request.setAttribute("activityReport",
+                (new ActivityReporter()).createReport(reportXml));
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_ACTIVITY_REPORT);
         rd.forward(request, response);
     }
@@ -254,12 +275,16 @@ public class RequestController extends HttpServlet {
             String appId = request.getParameter("appId");
             String secretKey = request.getParameter("secretKey");
             String serviceUrl = request.getParameter("serviceUrl");
-            
-            ScormCloudConfiguration config = new ScormCloudConfiguration();
+
+            ScormCloudConfiguration config = logic.getScormCloudConfiguration();
+            if(config == null){
+                config = new ScormCloudConfiguration();
+                config.setContext(extLogic.getCurrentContext());
+            }
             config.setAppId(appId);
             config.setSecretKey(secretKey);
             config.setServiceUrl(serviceUrl);
-            logic.setScormCloudConfiguration(config);
+            logic.saveScormCloudConfiguration(config);
 	    }
 	    RequestDispatcher rd = request.getRequestDispatcher(PAGE_WELCOME);
 	    rd.forward(request, response);
@@ -269,7 +294,8 @@ public class RequestController extends HttpServlet {
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
         ScormCloudPackage pkg = logic.getPackageById(packageId);
-        String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg);
+        String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg, 
+                getAbsoluteUrlTo(request, "/scormcloud-tool/css/PackagePropertyEditor.css"));
         request.setAttribute("pkg", pkg);
         request.setAttribute("packagePropertiesUrl", packagePropertiesUrl);
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_EDIT);
@@ -358,17 +384,19 @@ public class RequestController extends HttpServlet {
         String userSearch = request.getParameter("userSearch");
         String assignmentSearch = request.getParameter("assignmentSearch");
         
-        if(!isNullOrEmpty(packageId)){
+        HashMap<String, Object> propertyMap = new HashMap<String, Object>();
+        if (!isNullOrEmpty(packageId)) {
+            propertyMap.put("packageId", packageId);
             request.setAttribute("pkg", logic.getPackageById(packageId));
         }
-        
-        HashMap<String, Object> propertyMap = new HashMap<String, Object>();
-        if (!isNullOrEmpty(packageId)) 
-            propertyMap.put("packageId", packageId);
-        if (!isNullOrEmpty(userSearch)) 
+        if (!isNullOrEmpty(userSearch)) { 
             propertyMap.put("userName", userSearch);
-        if (!isNullOrEmpty(assignmentSearch)) 
+            request.setAttribute("userSearch", userSearch);
+        }
+        if (!isNullOrEmpty(assignmentSearch)){ 
             propertyMap.put("assignmentName", assignmentSearch);
+            request.setAttribute("assignmentSearch", assignmentSearch);
+        }
         
         List<ScormCloudRegistration> regList = logic.getRegistrationsWherePropertiesLike(propertyMap);
         
@@ -519,12 +547,6 @@ public class RequestController extends HttpServlet {
 		//Go get the package specified by the id in the request
 		ScormCloudPackage pkg = logic.getPackageById(packageId);
 		
-		log.debug("isNullOrEmpty(assignmentKey)? " + isNullOrEmpty(assignmentKey));
-		log.debug("assignmentKey == null? " + (assignmentKey == null));
-		log.debug("assignmentKey.length()? " + assignmentKey.length());
-		log.debug("getAllowLaunchOutsideAssignment? " + pkg.getAllowLaunchOutsideAssignment());
-		log.debug("!getAllowLaunchOutsideAssignment? " + !pkg.getAllowLaunchOutsideAssignment());
-		
 		//If no assignment context, make sure we can still launch...
         if(isNullOrEmpty(assignmentKey) && !pkg.getAllowLaunchOutsideAssignment()){
             sendToMessagePage(request, response, 
@@ -542,6 +564,17 @@ public class RequestController extends HttpServlet {
             reg = logic.addNewRegistration(pkg, userId, assignmentKey);
         }
 
+        //If in an assignment context, make sure we the 
+        //assignment can still accept submissions from this user
+        if(extLogic.isAssignmentSubmitted(reg.getContext(), reg.getAssignmentId(), reg.getOwnerId())){
+            sendToMessagePage(request, response, 
+                    "Launch Not Allowed", 
+                    "We're sorry, but this resource appears to be associated with " +
+                    "an assignment which cannot recieve any more submissions from " +
+                    "user " + reg.getUserName());
+                return;
+        }
+        
         //Now get the launch url associated with the registration...
 		String launchUrl = logic.getLaunchUrl(reg, 
 		        getAbsoluteUrlToSelf(request) + "?action=postLaunchActions&regId=" + reg.getId());
@@ -585,12 +618,15 @@ public class RequestController extends HttpServlet {
 	
 	
 	private String getAbsoluteUrlToSelf(HttpServletRequest request) throws Exception {
-	    
-	    URL controllerUrl = new URL(request.getScheme(),
-	                                   request.getServerName(),
-	                                   request.getServerPort(),
-	                                   request.getRequestURI());
-	    return controllerUrl.toString();
+	    return getAbsoluteUrlTo(request, request.getRequestURI());
+	}
+	
+	private String getAbsoluteUrlTo (HttpServletRequest request, String relativeUrl) throws Exception {
+	    URL theUrl = new URL(request.getScheme(), 
+	            request.getServerName(), 
+	            request.getServerPort(),
+	            relativeUrl);
+	    return theUrl.toString();
 	}
 	
 	private boolean isNullOrEmpty(String str){

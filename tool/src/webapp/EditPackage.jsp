@@ -60,7 +60,7 @@
     <% bean.messages.clear(); %>
 </c:if>
 
-<iframe frameborder="no" width="98%" height="800px" src="${packagePropertiesUrl}" />
+<iframe id="packagePropertiesEditor" frameborder="no" src="${packagePropertiesUrl}" />
 
 
 </div>
