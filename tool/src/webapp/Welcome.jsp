@@ -65,18 +65,19 @@
 									</c:when><c:otherwise>
 										<c:choose>
 											<c:when test="${canConfigure}">
-												Please configure the plugin using the link above in the navigation toolbar.
+												Please configure the plugin using the "Configure Plugin" link above in the navigation toolbar.
 											</c:when><c:otherwise>
 												Before you can use any of the features of the plugin, it must be configured
 												by your local Sakai administrator or a role that has been granted the ability of "scormcloud.configure". 
 											</c:otherwise>
 										</c:choose>
-										Once the plugin is configured, you can use the links above to view detailed 
+										Once the plugin is configured, a new resource type "SCORM Package" will become available via
+										the resources tool, and you can use the links above to view detailed 
 										reporting of your learner's interaction with the SCORM resources that you 
 										have imported.
 									</c:otherwise>
 								</c:choose>
-								Documentation on the usage of the SCORM Cloud plugin can be found <a href="Documentation.html">here.</a>
+								<!-- Documentation on the usage of the SCORM Cloud plugin can be found <a href="Documentation.html">here.</a> -->
 							</c:when><c:otherwise>
 								The SCORM Cloud Plugin for Sakai is currently ${isConfigured ? "" : "not"} active for this site.
 							</c:otherwise>
