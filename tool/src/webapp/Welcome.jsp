@@ -5,8 +5,7 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
-<%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -15,7 +14,7 @@
     // Get the backing bean from the spring context
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
-    ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
     pageContext.setAttribute("bean", bean);
     pageContext.setAttribute("isAdmin", bean.isCurrentUserSakaiAdmin() || bean.isCurrentUserPluginAdmin());
     pageContext.setAttribute("isConfigured", bean.isPluginConfigured());

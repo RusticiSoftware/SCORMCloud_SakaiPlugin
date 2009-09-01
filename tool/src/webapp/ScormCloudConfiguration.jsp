@@ -5,7 +5,7 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -15,7 +15,7 @@
     // Get the backing bean from the spring context
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
-    ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
     
     bean.allowOnlyAdmin(request, response);
     
@@ -27,6 +27,26 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <script src="/library/js/headscripts.js" language="JavaScript" type="text/javascript"></script>
+<script type="text/javascript">
+	function validateForm(){
+		var appId = document.getElementById('appId');
+		var secretKey = document.getElementById('secretKey');
+		var serviceUrl = document.getElementById('serviceUrl');
+		if(appId.value === null || appId.value == ""){
+			alert("Please provide your AppId");
+			return false;
+		} 
+		if(secretKey.value === null || secretKey.value == ""){
+			alert("Please provide your Secret Key");
+			return false;
+		}
+		if(serviceUrl.value === null || serviceUrl.value == ""){
+			alert("Please provide a Service URL");
+			return false;
+		}
+		return true;
+	}
+</script>
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
@@ -44,7 +64,7 @@
 <h3 class="insColor insBak insBorder">SCORM Cloud Configuration</h3>
 
 <div class="instruction">Enter your AppId and Secret Key below to activate the SCORM Cloud Plugin.</div>
-<form name="cloudConfigForm" id="cloudConfigForm" action="controller?action=configureCloudPlugin" method="post">
+<form name="cloudConfigForm" id="cloudConfigForm" action="controller?action=configureCloudPlugin" method="post" onsubmit="return validateForm()">
 	<table cellspacing="8">
 		<tr>
 			<td>AppId</td>

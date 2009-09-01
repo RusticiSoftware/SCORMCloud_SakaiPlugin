@@ -5,7 +5,7 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudRegistration" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -16,7 +16,7 @@
     // Get the backing bean from the spring context
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
-    ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
     
     bean.doPageChecks(request, response);
     
@@ -129,7 +129,7 @@
 	                    <td>
 	                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score}</span>
 	                    </td>
-	                    <td>
+	                    <td style="text-align:right">
 	                    	<span><%= bean.formatSeconds(reg.getTotalTime()) %></span>
 	                    </td>
 	                    <td>

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page errorPage="error.jsp" %>
-<%@ page import="java.util.List" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -14,7 +12,7 @@
 	// Get the backing bean from the spring context
 	WebApplicationContext context = 
 		WebApplicationContextUtils.getWebApplicationContext(application);
-	ScormCloudPackagesBean bean = (ScormCloudPackagesBean) context.getBean("packagesBean");
+	ScormCloudToolBean bean = (ScormCloudToolBean) context.getBean("scormCloudToolBean");
 
     bean.doPageChecks(request, response);
 %>
@@ -23,6 +21,21 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <script src="/library/js/headscripts.js" language="JavaScript" type="text/javascript"></script>
+<script type="text/javascript">
+	function validateForm(){
+		var filedata = document.getElementById('filedata');
+		var titleInput = document.getElementById('package-title');
+		if(filedata.value === null || filedata.value == ""){
+			alert("Please choose a file to upload");
+			return false;
+		} 
+		if(titleInput.value === null || titleInput.value == ""){
+			alert("Please provide a title");
+			return false;
+		} 
+		return true;
+	}
+</script>
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
@@ -33,19 +46,9 @@
 
 <h3 class="insColor insBak insBorder">Import Package</h3>
 
-<% if (bean.messages.size() > 0) { %>
-<div class="alertMessage">
-	<ul style="margin:0px;">
-	<% for (int i=0; i<bean.messages.size(); i++) { %>
-		<li><%= (String) bean.messages.get(i) %></li>
-	<% } %>
-	</ul>
-</div>
-<% } bean.messages.clear(); %>
-
 <div class="instruction">Choose a zip file containing SCORM content</div>
 
-<form name="importPackageForm" action="controller?action=importPackage" method="post" enctype="multipart/form-data">
+<form name="importPackageForm" action="controller?action=importPackage" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
 	<input name="helper" id="helper" type="hidden" value="${param.helper}" />
 	<p class="shorttext">
 			<span class="reqStar">*</span>

@@ -39,22 +39,23 @@
     </bean>
     
     
-    <bean id="org.sakaiproject.content.api.ResourceType.scormcloud"
-      class="org.sakaiproject.scormcloud.content.types.ScormCollectionType"
-      singleton="true">
-      <!--<property name="resourceTypeRegistry">
+   <bean id="org.sakaiproject.content.api.ResourceType.scormcloud"
+      class="org.sakaiproject.scormcloud.content.types.ScormCloudResourceType"
+      singleton="true"
+      init-method="init">
+      <property name="resourceTypeRegistry">
          <ref bean="org.sakaiproject.content.api.ResourceTypeRegistry" />
-      </property>-->
+      </property>
    </bean>
 
    <bean id="org.sakaiproject.entity.api.EntityProducer.scormcloud"
-      class="org.sakaiproject.scormcloud.content.types.ScormCloudEntityProducer"
+      class="org.sakaiproject.scormcloud.logic.entity.ScormCloudEntityProducer"
       init-method="init"
       singleton="true">
       <property name="httpAccess" ref="org.sakaiproject.entity.api.HttpAccess.scormcloud"/>
    </bean>
 
    <bean id="org.sakaiproject.entity.api.HttpAccess.scormcloud"
-         class="org.sakaiproject.scormcloud.content.types.ScormCloudHttpAccess"/>
+         class="org.sakaiproject.scormcloud.logic.entity.ScormCloudHttpAccess"/>
 
 </beans>

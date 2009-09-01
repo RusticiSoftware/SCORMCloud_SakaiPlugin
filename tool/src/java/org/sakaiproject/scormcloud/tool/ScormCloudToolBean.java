@@ -18,8 +18,8 @@ import org.sakaiproject.scormcloud.model.ScormCloudConfiguration;
 import org.sakaiproject.scormcloud.model.ScormCloudPackage;
 import org.sakaiproject.scormcloud.model.ScormCloudRegistration;
 
-public class ScormCloudPackagesBean {
-	private static Log log = LogFactory.getLog(ScormCloudPackagesBean.class);
+public class ScormCloudToolBean {
+	private static Log log = LogFactory.getLog(ScormCloudToolBean.class);
 
 	public ScormCloudPackage newItem = new ScormCloudPackage();
 	public Map selectedIds = new HashMap();
@@ -43,7 +43,7 @@ public class ScormCloudPackagesBean {
 		log.debug("init");
 	}
 
-	public ScormCloudPackagesBean() {
+	public ScormCloudToolBean() {
 		log.debug("constructor");
 	}
 

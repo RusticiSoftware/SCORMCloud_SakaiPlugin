@@ -6,8 +6,8 @@
 <beans>
 
 	<!-- list the backing beans here -->
-	<bean id="packagesBean"
-			class="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean"
+	<bean id="scormCloudToolBean"
+			class="org.sakaiproject.scormcloud.tool.ScormCloudToolBean"
 			init-method="init">
 		<property name="logic"
 			ref="org.sakaiproject.scormcloud.logic.ScormCloudLogic" />

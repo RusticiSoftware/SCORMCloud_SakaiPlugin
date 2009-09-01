@@ -1,0 +1,5 @@
+Around line 975 of ${CATALINA_HOME}/webapps/library/skin/default/portal.css
+.icon-sakai-scormcloud {
+        background-image: url(../../../scormcloud-tool/images/cloud_icon_tiny.gif);
+}
+

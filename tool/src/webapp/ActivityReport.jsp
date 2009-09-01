@@ -4,7 +4,7 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
 <%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
 <%@ page import="org.sakaiproject.scormcloud.tool.ActivityReporter" %>
 <%@ page import="org.w3c.dom.Document" %>
@@ -16,7 +16,7 @@
     // Get the backing bean from the spring context
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
-    ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
 
     bean.doPageChecks(request, response);
     

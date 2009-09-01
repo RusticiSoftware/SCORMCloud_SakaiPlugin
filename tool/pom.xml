@@ -17,7 +17,7 @@
    <parent>
       <groupId>org.sakaiproject</groupId>
       <artifactId>scormcloud</artifactId>
-      <version>0.1</version><!--ScormCloud.version-->
+        <version>${scormcloud.version}</version>
    </parent>
 
    <dependencies>
@@ -55,14 +55,7 @@
     <dependency>
       <groupId>org.sakaiproject.kernel</groupId>
       <artifactId>sakai-kernel-util</artifactId>
-      <!--<version>1.0RC2-SNAPSHOT</version>-->
     </dependency>
-     <!-- <dependency>
-         <groupId>org.sakaiproject</groupId>
-         <artifactId>sakai-util</artifactId>
-         <version>${sakai.version}</version>
-         <scope>runtime</scope>
-      </dependency>-->
 
       <!-- standard tag libraries -->
       <dependency>

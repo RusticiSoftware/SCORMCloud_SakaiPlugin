@@ -1,8 +1,6 @@
-package org.sakaiproject.scormcloud.content.types;
+package org.sakaiproject.scormcloud.logic.entity;
 
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +13,8 @@ import org.sakaiproject.entity.api.EntityNotDefinedException;
 import org.sakaiproject.entity.api.EntityPermissionException;
 import org.sakaiproject.entity.api.HttpAccess;
 import org.sakaiproject.entity.api.Reference;
-import org.sakaiproject.tool.cover.SessionManager;
-import org.sakaiproject.tool.cover.ToolManager;
+import org.sakaiproject.scormcloud.content.types.ScormCloudResourceType;
+
 
 public class ScormCloudHttpAccess implements HttpAccess {
     private static Log log = LogFactory.getLog(ScormCloudHttpAccess.class);
@@ -25,7 +23,7 @@ public class ScormCloudHttpAccess implements HttpAccess {
         try {
             String packageId = (String)ref.getEntity()
                                         .getProperties()
-                                        .get(ScormCollectionType.PROP_SCORMCLOUD_PACKAGE_ID);
+                                        .get(ScormCloudResourceType.PROP_SCORMCLOUD_PACKAGE_ID);
            
             String refId = ref.getId();
             

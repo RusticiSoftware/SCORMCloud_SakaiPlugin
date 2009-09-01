@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page errorPage="error.jsp" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.text.DateFormat" %>
-<%@ page import="org.springframework.web.context.WebApplicationContext" %>
-<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
-<%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -40,7 +33,3 @@
 </div>
 </body>
 </html>
-
-<!-- <script>
-   history.back()
-</script> -->

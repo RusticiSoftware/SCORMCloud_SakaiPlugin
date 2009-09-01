@@ -1,4 +1,4 @@
-package org.sakaiproject.scormcloud.content.types;
+package org.sakaiproject.scormcloud.logic.entity;
 
 import java.util.Collection;
 import java.util.Stack;

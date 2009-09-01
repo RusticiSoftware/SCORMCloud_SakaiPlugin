@@ -69,7 +69,7 @@ public class RequestController extends HttpServlet {
 	private ApplicationContext appContext;
 	private ScormCloudLogic logic;
 	private ExternalLogic extLogic;
-	private ScormCloudPackagesBean pkgsBean;
+	private ScormCloudToolBean toolBean;
 	
 	private void initInterfaces(){
 	    if(appContext == null){
@@ -83,9 +83,9 @@ public class RequestController extends HttpServlet {
 	        extLogic = (ExternalLogic)appContext
 	            .getBean("org.sakaiproject.scormcloud.logic.ExternalLogic");
 	    }
-	    if (pkgsBean == null){
-	        pkgsBean = (ScormCloudPackagesBean)appContext
-	            .getBean("packagesBean");
+	    if (toolBean == null){
+	        toolBean = (ScormCloudToolBean)appContext
+	            .getBean("scormCloudToolBean");
 	    }
 	}
 
@@ -339,13 +339,13 @@ public class RequestController extends HttpServlet {
                 ScormCloudRegistration reg = logic.getRegistrationById(id);
                 logic.updateRegistrationResultsFromCloud(reg);
             }
-            pkgsBean.getMessages().add("Updated " + itemsUpdated + " items");
+            toolBean.getMessages().add("Updated " + itemsUpdated + " items");
         }
     }
 
     private void processDeleteRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ScormCloudPackagesBean bean = pkgsBean;
+        ScormCloudToolBean bean = toolBean;
         String[] selectedItems = request.getParameterValues("select-item");
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsRemoved = 0;
@@ -362,7 +362,7 @@ public class RequestController extends HttpServlet {
     
     private void processResetRegistrationsRequest(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ScormCloudPackagesBean bean = pkgsBean;
+        ScormCloudToolBean bean = toolBean;
         String[] selectedItems = request.getParameterValues("select-item");
         if (selectedItems != null && selectedItems.length > 0) {
             int itemsReset = 0;

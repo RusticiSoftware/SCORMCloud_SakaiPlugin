@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudPackagesBean" %>
-<%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ActivityReporter" %>
+<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
 <%@ page import="org.w3c.dom.Document" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
@@ -16,7 +12,7 @@
     // Get the backing bean from the spring context
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
-    ScormCloudPackagesBean bean = (ScormCloudPackagesBean)context.getBean("packagesBean");
+    ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
 
     bean.doPageChecks(request, response);
     

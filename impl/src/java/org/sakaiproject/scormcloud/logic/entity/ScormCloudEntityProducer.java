@@ -1,4 +1,4 @@
-package org.sakaiproject.scormcloud.content.types;
+package org.sakaiproject.scormcloud.logic.entity;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,8 +22,6 @@ import org.w3c.dom.Element;
 
 public class ScormCloudEntityProducer implements EntityProducer {
     protected final Log log = LogFactory.getLog(getClass());
-    private boolean m_shortRefs = true;
-    private boolean m_siteAlias = true;
     private static final String SCORM_LABEL = "scormcloud";
     public final static String REFERENCE_ROOT = Entity.SEPARATOR + SCORM_LABEL;
     private HttpAccess httpAccess;
@@ -41,15 +39,15 @@ public class ScormCloudEntityProducer implements EntityProducer {
     }
 
     public boolean willArchiveMerge() {
-       return false;  //To change body of implemented methods use File | Settings | File Templates.
+       return false;  
     }
 
     public String archive(String siteId, Document doc, Stack stack, String archivePath, List attachments) {
-       return null;  //To change body of implemented methods use File | Settings | File Templates.
+       return null;  
     }
 
     public String merge(String siteId, Element root, String archivePath, String fromSiteId, Map attachmentNames, Map userIdTrans, Set userListAllowImport) {
-       return null;  //To change body of implemented methods use File | Settings | File Templates.
+       return null; 
     }
 
      public boolean parseEntityReference(String reference, Reference ref)
@@ -65,17 +63,13 @@ public class ScormCloudEntityProducer implements EntityProducer {
              id = reference.replaceFirst(REFERENCE_ROOT + Entity.SEPARATOR + "content", "");
          }
 
-         // not mine
+         // doesn't refer to scormcloud type
          else {
              return false;
          }
 
          ref.set(REFERENCE_ROOT, null, id, null, context);
-
-         // because short refs or id/eid or alias processing may recognize a reference that is not the real reference,
-         // update the ref's string to reflect the real reference
          ref.updateReference(REFERENCE_ROOT + id);
-
          return true;
      }
 

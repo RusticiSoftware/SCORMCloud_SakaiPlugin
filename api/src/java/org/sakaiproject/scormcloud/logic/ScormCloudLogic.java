@@ -29,30 +29,12 @@ public interface ScormCloudLogic {
    
    public void saveScormCloudConfiguration(ScormCloudConfiguration config) throws Exception;
    public ScormCloudConfiguration getScormCloudConfiguration() throws Exception;
-    
-   /**
-    * This returns a package based on an id
-    * @param id the id of the package to fetch
-    * @return a ScormCloudPackage or null if none found
-    */
+   
    public ScormCloudPackage getPackageById(String id);
-
    public List<ScormCloudPackage> getAllSitePackages();
-
    public void addNewPackage(ScormCloudPackage pkg, File packageZip) throws Exception;
-   
-   /**
-    * Save (Create or Update) an item (uses the current site)
-    * @param item the ScormCloudItem to create or update
-    */
    public void updatePackage(ScormCloudPackage pkg);
-
-   /**
-    * Remove an item
-    * @param item the ScormCloudItem to remove
-    */
    public void removePackage(ScormCloudPackage pkg);
-   
    public String getPackagePropertiesUrl(ScormCloudPackage pkg, String styleSheetUrl);
    public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl);
    

@@ -25,6 +25,7 @@ import org.sakaiproject.assignment.api.AssignmentSubmission;
 import org.sakaiproject.assignment.api.AssignmentSubmissionEdit;
 import org.sakaiproject.authz.api.FunctionManager;
 import org.sakaiproject.authz.api.SecurityService;
+import org.sakaiproject.component.api.ServerConfigurationService;
 import org.sakaiproject.scormcloud.logic.ExternalLogic;
 import org.sakaiproject.service.gradebook.shared.AssignmentHasIllegalPointsException;
 import org.sakaiproject.service.gradebook.shared.ConflictingAssignmentNameException;
@@ -100,6 +101,11 @@ public class ExternalLogicImpl implements ExternalLogic {
         this.gbExternal = service;
     }
 
+    private ServerConfigurationService serverConfigurationService;
+    public void setServerConfigurationService(ServerConfigurationService service){
+        this.serverConfigurationService = service;
+    }
+    
 	/**
 	 * Place any code that should run when this class is initialized by spring here
 	 */
@@ -294,78 +300,5 @@ public class ExternalLogicImpl implements ExternalLogic {
             return true;
         }
     }
-    
-    
-    
-    
-    /*private GradebookExternalAssessmentService gradeBookExternalAssessmentService;
-    public void setGradebookExternalAssessmentService(GradebookExternalAssessmentService service){
-        this.gradeBookExternalAssessmentService = service;
-    }*/
-    
-    /*public boolean isGradebookAvailable() {
-        String context = toolManager.getCurrentPlacement().getContext();
-        return gradeBookExternalAssessmentService.isGradebookDefined(context);
-    }
-    
-    public void addGrade(String context, String gradeId, String externalUrl,
-            String title, Double points, Date dueDate, String externalServiceDescription, Boolean ungraded){
-        if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
-            if(!gradeBookExternalAssessmentService.isAssignmentDefined(context, gradeId)){
-                gradeBookExternalAssessmentService.addExternalAssessment(context, gradeId, externalUrl, title, points, dueDate, externalServiceDescription, ungraded);
-            } else {
-                gradeBookExternalAssessmentService.updateExternalAssessment(context, gradeId, externalUrl, title, points, dueDate, ungraded);
-            }
-        }
-    }
-    public void updateGrade(String context, String gradeId, String externalUrl,
-            String title, Double points, Date dueDate, String externalServiceDescription, Boolean ungraded){
-        gradeBookExternalAssessmentService.updateExternalAssessment(context, gradeId, externalUrl, title, points, dueDate, ungraded);
-    }
-    public void deleteGrade(String context, String gradeId){
-        gradeBookExternalAssessmentService.removeExternalAssessment(context, gradeId);
-    }
-    
-    public void addScore(String context, String gradeId, String userId, String score){
-        if(gradeBookExternalAssessmentService.isGradebookDefined(context)){
-            if(gradeBookExternalAssessmentService.isExternalAssignmentDefined(context, gradeId)){
-                log.debug("external logic addScore: context = " + context + ", gradeId = " + gradeId + ", userId = " + userId + ", score = " + score);
-                gradeBookExternalAssessmentService.updateExternalAssessmentScore(context, gradeId, userId, score);
-            } else {
-                log.debug("No external assignment found for context = " + 
-                     context + ", gradeId = " + gradeId + ". Not recording a grade");
-            }
-        } else {
-            log.error("Error in addScore, no grade book defined for context = " + context);
-        }
-    }*/
-    
-    /*public void updateAssignmentScore(String userId, String assignmentId, String score){
-        try {
-            User user = userDirectoryService.getUser(userId);
-            
-            AssignmentSubmission sub = assignmentService.getSubmission(assignmentId, user);
-            if(sub == null){
-                log.warn("In updateAssignmentScore, didn't find any submission for assignment with id = " + assignmentId); 
-                return;
-            }   
-            updateAssignmentSubmissionScore(sub, score);
-        } catch (Exception e){
-            log.debug("Exception thrown in updateAssignmentScore", e);
-        }
-    }*/
-    
-    /*public void updateAssignmentSubmissionScore(AssignmentSubmission sub, String score){
-        try {
-            log.debug("Updating existing assignment submission " + sub.getReference());
-            AssignmentSubmissionEdit edit = assignmentService.editSubmission(sub.getReference());
-            edit.setGrade(score);
-            edit.setGraded(true);
-            assignmentService.commitEdit(edit);
-            log.debug("Committed new score: " + score);
-        } catch (Exception e){
-            log.debug("Exception thrown in updateAssignmentSubmissionScore", e);
-        }
-    }*/
     
 }
