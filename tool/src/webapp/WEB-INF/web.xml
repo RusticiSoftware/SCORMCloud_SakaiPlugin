@@ -75,7 +75,7 @@
 	<servlet>
 		<servlet-name>sakai.scormcloud.remove.helper</servlet-name>
 		<servlet-class>
-			org.sakaiproject.scormcloud.tool.RequestController
+			com.rusticisoftware.scormcloud.tool.RequestController
 		</servlet-class>
 		<init-param>
 			<param-name>action</param-name>
@@ -88,7 +88,7 @@
 		<description>Servlet for processing requests</description>
 		<display-name>ScormCloudRequestController</display-name>
 		<servlet-name>ScormCloudRequestController</servlet-name>
-		<servlet-class>org.sakaiproject.scormcloud.tool.RequestController</servlet-class>
+		<servlet-class>com.rusticisoftware.scormcloud.tool.RequestController</servlet-class>
 	</servlet>
 	
 	

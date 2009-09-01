@@ -10,8 +10,8 @@
     <import resource="sakai-hibernate.xml" />
 
     <!-- create an external logic bean which abstracts out the Sakai bits -->
-    <bean id="org.sakaiproject.scormcloud.logic.ExternalLogic"
-        class="org.sakaiproject.scormcloud.logic.ExternalLogicImpl"
+    <bean id="com.rusticisoftware.scormcloud.logic.ExternalLogic"
+        class="com.rusticisoftware.scormcloud.logic.ExternalLogicImpl"
         init-method="init">
         <property name="functionManager" ref="org.sakaiproject.authz.api.FunctionManager" />
         <property name="securityService" ref="org.sakaiproject.authz.api.SecurityService" />
@@ -29,18 +29,18 @@
     </bean>
 
     <!-- create a logic bean, give it the dao from above -->
-    <bean id="org.sakaiproject.scormcloud.logic.ScormCloudLogic"
-        class="org.sakaiproject.scormcloud.logic.ScormCloudLogicImpl"
+    <bean id="com.rusticisoftware.scormcloud.logic.ScormCloudLogic"
+        class="com.rusticisoftware.scormcloud.logic.ScormCloudLogicImpl"
         init-method="init">
         <property name="dao" 
-            ref="org.sakaiproject.scormcloud.dao.ScormCloudDao" />
+            ref="com.rusticisoftware.scormcloud.dao.ScormCloudDao" />
         <property name="externalLogic"
-            ref="org.sakaiproject.scormcloud.logic.ExternalLogic" />
+            ref="com.rusticisoftware.scormcloud.logic.ExternalLogic" />
     </bean>
     
     
    <bean id="org.sakaiproject.content.api.ResourceType.scormcloud"
-      class="org.sakaiproject.scormcloud.content.types.ScormCloudResourceType"
+      class="com.rusticisoftware.scormcloud.content.types.ScormCloudResourceType"
       singleton="true"
       init-method="init">
       <property name="resourceTypeRegistry">
@@ -49,13 +49,13 @@
    </bean>
 
    <bean id="org.sakaiproject.entity.api.EntityProducer.scormcloud"
-      class="org.sakaiproject.scormcloud.logic.entity.ScormCloudEntityProducer"
+      class="com.rusticisoftware.scormcloud.logic.entity.ScormCloudEntityProducer"
       init-method="init"
       singleton="true">
       <property name="httpAccess" ref="org.sakaiproject.entity.api.HttpAccess.scormcloud"/>
    </bean>
 
    <bean id="org.sakaiproject.entity.api.HttpAccess.scormcloud"
-         class="org.sakaiproject.scormcloud.logic.entity.ScormCloudHttpAccess"/>
+         class="com.rusticisoftware.scormcloud.logic.entity.ScormCloudHttpAccess"/>
 
 </beans>

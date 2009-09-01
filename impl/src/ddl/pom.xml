@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>Sakai ScormCloud DB DDL generator</name>
-    <groupId>org.sakaiproject.scormcloud</groupId>
+    <groupId>com.rusticisoftware.scormcloud</groupId>
     <artifactId>scormcloud-ddl-generator</artifactId>
     <organization>
         <name>Sakai Project</name>
@@ -29,7 +29,7 @@
 
         <!-- pull in your hibernate persistent objects and HBM files -->
         <dependency>
-            <groupId>org.sakaiproject.scormcloud</groupId>
+            <groupId>com.rusticisoftware.scormcloud</groupId>
             <artifactId>scormcloud-api</artifactId>
         </dependency>
 

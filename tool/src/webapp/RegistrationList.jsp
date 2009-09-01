@@ -5,9 +5,9 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
-<%@ page import="org.sakaiproject.scormcloud.tool.ScormCloudToolBean" %>
-<%@ page import="org.sakaiproject.scormcloud.model.ScormCloudPackage" %>
-<%@ page import="org.sakaiproject.scormcloud.model.ScormCloudRegistration" %>
+<%@ page import="com.rusticisoftware.scormcloud.tool.ScormCloudToolBean" %>
+<%@ page import="com.rusticisoftware.scormcloud.model.ScormCloudPackage" %>
+<%@ page import="com.rusticisoftware.scormcloud.model.ScormCloudRegistration" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -129,7 +129,7 @@
 	                    <td>
 	                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score}</span>
 	                    </td>
-	                    <td style="text-align:right">
+	                    <td>
 	                    	<span><%= bean.formatSeconds(reg.getTotalTime()) %></span>
 	                    </td>
 	                    <td>

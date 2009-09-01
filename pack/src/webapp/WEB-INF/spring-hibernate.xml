@@ -6,38 +6,38 @@
 <beans>
 
     <!-- define the list of HBM mapping files -->
-    <bean id="org.sakaiproject.scormcloud.HBMMappingList" class="java.util.ArrayList">
+    <bean id="com.rusticisoftware.scormcloud.HBMMappingList" class="java.util.ArrayList">
         <constructor-arg>
             <list>
-                <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudPackage.hbm.xml</value>
-                <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudRegistration.hbm.xml</value>
-                <value>org/sakaiproject/scormcloud/dao/hbm/ScormCloudConfiguration.hbm.xml</value>
+                <value>com/rusticisoftware/scormcloud/dao/hbm/ScormCloudPackage.hbm.xml</value>
+                <value>com/rusticisoftware/scormcloud/dao/hbm/ScormCloudRegistration.hbm.xml</value>
+                <value>com/rusticisoftware/scormcloud/dao/hbm/ScormCloudConfiguration.hbm.xml</value>
             </list>
         </constructor-arg>
     </bean>
 
     <!-- create a DAO bean, use the hibernate implementation -->
-    <bean id="org.sakaiproject.scormcloud.dao.ScormCloudDaoTarget"
-            class="org.sakaiproject.scormcloud.dao.ScormCloudDaoImpl"
+    <bean id="com.rusticisoftware.scormcloud.dao.ScormCloudDaoTarget"
+            class="com.rusticisoftware.scormcloud.dao.ScormCloudDaoImpl"
             init-method="init">
         <property name="sessionFactory" 
             ref="org.sakaiproject.springframework.orm.hibernate.GlobalSessionFactory" />
         <property name="persistentClasses">
             <list>
-                <value>org.sakaiproject.scormcloud.model.ScormCloudPackage</value>
-                <value>org.sakaiproject.scormcloud.model.ScormCloudRegistration</value>
-                <value>org.sakaiproject.scormcloud.model.ScormCloudConfiguration</value>
+                <value>com.rusticisoftware.scormcloud.model.ScormCloudPackage</value>
+                <value>com.rusticisoftware.scormcloud.model.ScormCloudRegistration</value>
+                <value>com.rusticisoftware.scormcloud.model.ScormCloudConfiguration</value>
             </list>
         </property>
     </bean>
 
 	<!-- This wraps our DAO so that the transactions are managed -->
-	<bean id="org.sakaiproject.scormcloud.dao.ScormCloudDao"
+	<bean id="com.rusticisoftware.scormcloud.dao.ScormCloudDao"
 			class="org.sakaiproject.genericdao.springutil.CurrentClassLoaderTxProxyFactoryBean">
 		<property name="transactionManager" 
 			ref="org.sakaiproject.springframework.orm.hibernate.GlobalTransactionManager" />
 		<property name="target" 
-			ref="org.sakaiproject.scormcloud.dao.ScormCloudDaoTarget" />
+			ref="com.rusticisoftware.scormcloud.dao.ScormCloudDaoTarget" />
 		<property name="transactionAttributes">
 			<props>
                 <prop key="get*">PROPAGATION_REQUIRED,readOnly</prop>
@@ -49,11 +49,11 @@
 	</bean>
 
 	<!-- create a data preloading bean that has transaction protection -->
-	<!--<bean id="org.sakaiproject.scormcloud.dao.PreloadData"
-			class="org.sakaiproject.scormcloud.dao.PreloadDataImpl"
+	<!--<bean id="com.rusticisoftware.scormcloud.dao.PreloadData"
+			class="com.rusticisoftware.scormcloud.dao.PreloadDataImpl"
 			init-method="init">
 		<property name="dao"
-			ref="org.sakaiproject.scormcloud.dao.ScormCloudDao" />
+			ref="com.rusticisoftware.scormcloud.dao.ScormCloudDao" />
 	</bean>-->
 
 </beans>

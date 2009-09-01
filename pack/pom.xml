@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>Sakai ScormCloud Components Pack</name>
-    <groupId>org.sakaiproject.scormcloud</groupId>
+    <groupId>com.rusticisoftware.scormcloud</groupId>
     <artifactId>scormcloud-pack</artifactId>
     <organization>
         <name>Sakai Project</name>
@@ -28,7 +28,7 @@
 
         <!-- internal dependencies -->
         <dependency>
-            <groupId>org.sakaiproject.scormcloud</groupId>
+            <groupId>com.rusticisoftware.scormcloud</groupId>
             <artifactId>scormcloud-impl</artifactId>
             <scope>runtime</scope>
         </dependency>

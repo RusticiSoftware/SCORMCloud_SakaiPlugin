@@ -7,12 +7,12 @@
 
 	<!-- list the backing beans here -->
 	<bean id="scormCloudToolBean"
-			class="org.sakaiproject.scormcloud.tool.ScormCloudToolBean"
+			class="com.rusticisoftware.scormcloud.tool.ScormCloudToolBean"
 			init-method="init">
 		<property name="logic"
-			ref="org.sakaiproject.scormcloud.logic.ScormCloudLogic" />
+			ref="com.rusticisoftware.scormcloud.logic.ScormCloudLogic" />
 		<property name="externalLogic" 
-			ref="org.sakaiproject.scormcloud.logic.ExternalLogic" />
+			ref="com.rusticisoftware.scormcloud.logic.ExternalLogic" />
 	</bean>
 
 </beans>

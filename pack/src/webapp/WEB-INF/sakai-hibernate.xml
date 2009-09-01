@@ -6,7 +6,7 @@
 
     <!-- Add our HBM files to the Sakai global session factory -->
     <bean class="org.sakaiproject.springframework.orm.hibernate.impl.AdditionalHibernateMappingsImpl">
-        <property name="mappingResources" ref="org.sakaiproject.scormcloud.HBMMappingList" />
+        <property name="mappingResources" ref="com.rusticisoftware.scormcloud.HBMMappingList" />
     </bean>
 
 </beans>

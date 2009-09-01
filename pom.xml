@@ -63,13 +63,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.sakaiproject.scormcloud</groupId>
+                <groupId>com.rusticisoftware.scormcloud</groupId>
                 <artifactId>scormcloud-api</artifactId>
                 <version>${scormcloud.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.sakaiproject.scormcloud</groupId>
+                <groupId>com.rusticisoftware.scormcloud</groupId>
                 <artifactId>scormcloud-impl</artifactId>
                 <version>${scormcloud.version}</version>
             </dependency>
