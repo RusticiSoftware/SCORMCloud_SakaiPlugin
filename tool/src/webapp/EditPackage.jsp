@@ -16,7 +16,7 @@
         WebApplicationContextUtils.getWebApplicationContext(application);
     ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
 
-    bean.doPageChecks(request, response);
+    bean.allowOnlyAdmin(request, response);
     
     pageContext.setAttribute("bean", bean);
     pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
@@ -45,7 +45,7 @@
 
 <h3 class="insColor insBak insBorder">Editing SCORM Cloud Package Properties for ${pkg.title}</h3>
 
-<div class="instruction">When you are finished, please click <a href="javascript:history.back()">here</a> to go back.</div>
+<div class="instruction">When you are finished, please click <a href='${empty returnUrl ? "javascript:history.back()" : returnUrl}'>here</a> to go back.</div>
 
 
 <c:if test="${fn:length(bean.messages) > 0}">

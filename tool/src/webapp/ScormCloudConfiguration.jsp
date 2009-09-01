@@ -79,13 +79,31 @@
 			<td><input id="serviceUrl" name="serviceUrl" type="text" value="${config.serviceUrl}" size="40" /></td>
 		</tr>
 		<tr>
-			<td colspan="2">&nbsp;</td>
+			<td colspan="2">
+			<h4>Configuration Scope</h4>
+				<p class="checkbox  indnt2">
+					<input type="radio" 
+						name="is-master-config"
+						id="is-master-config-true"
+						${config.isMasterConfig ? "checked='checked'" : ""}
+						value="true" />
+					<label for="contribute-to-assigment-grade-true">Use this configuration for all sites in this Sakai installation</label>
+					<br />
+					<input type="radio" 
+						name="is-master-config"
+						id="is-master-config-false"
+						${config.isMasterConfig ? "" : "checked='checked'"}
+						value="false" />
+					<label for="contribute-to-assigment-grade-false">Use this configuration for only this site (overrides installation-wide configuration)</label>
+				</p>
+			</td>
 		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr>
 			<td colspan="2">
 			    <input type="submit" name="submit" value="Submit" />
 			    &nbsp;
-			    <input type="submit" name="cancel" value="Cancel" />
+			    <input type="submit" name="cancel" value="Cancel" onclick="javascript:history.back()" />
 			</td>
 		</tr>
 	</table>

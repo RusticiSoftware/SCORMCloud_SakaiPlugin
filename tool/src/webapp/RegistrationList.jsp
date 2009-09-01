@@ -72,11 +72,11 @@
 	<table>
 		<tr>
 			<td>
-				<label for="userSearch">${empty pkg ? "Search" : "Filter"} By User</label>
+				<label for="userSearch">${empty pkg ? "Search" : "Filter"} By Student Name</label>
 				<input type="text" id="userSearch" name="userSearch" value="${userSearch}" size="40" />
 			</td>
 			<td>
-				<label for="assignmentSearch">${empty pkg ? "Search" : "Filter"} By Assignment</label>
+				<label for="assignmentSearch">${empty pkg ? "Search" : "Filter"} By Assignment Name</label>
 				<input type="text" id="assignmentSearch" name="assignmentSearch" value="${assignmentSearch}" size="40" />
 			</td>
 			<td style="vertical-align:bottom">
@@ -96,14 +96,14 @@
 	        <thead>
 	            <tr>
 	                <th></th>
-	                <th>Username</th>
+	                <th>User Name</th>
 	                <th>Assignment Name</th>
+	                <th>Resource Name</th>
 	                <th>Complete</th>
 	                <th>Success</th>
 	                <th>Score</th>
 	                <th>Time Spent</th>
-	                <th>Activity Report</th>
-	                <th>Launch History</th>
+	                <th>Detailed Reports</th>
 	                <th>Creation Date</th>
 	            </tr>
 	        </thead>
@@ -115,10 +115,13 @@
 	                        <input name="select-item" value="${reg.id}" type="checkbox" />
 	                    </td>
 	                    <td>
-	                        <span>${reg.userName}</span>                 
+	                        <span>${reg.userDisplayName}</span>                 
 	                    </td>
 	                    <td>
 	                    	<span>${reg.assignmentName}</span>
+	                    </td>
+	                    <td>
+	                    	<span>${reg.packageTitle}</span>
 	                    </td>
 	                    <td>
 	                    	<span>${reg.complete}</span>
@@ -134,8 +137,7 @@
 	                    </td>
 	                    <td>
 	                    	<a href="controller?action=viewActivityReport&registrationId=${reg.id}">Activity Report</a>
-	                    </td>
-	                    <td>
+							<br />
 	                    	<a href="controller?action=viewLaunchHistoryReport&registrationId=${reg.id}">Launch History</a>
 	                    </td>
 	                    <td>

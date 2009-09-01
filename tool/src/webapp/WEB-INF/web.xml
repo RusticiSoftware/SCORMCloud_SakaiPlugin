@@ -82,7 +82,28 @@
 			<param-value>deletePackageResource</param-value>
 		</init-param>
 	</servlet>
-
+	
+	<servlet>
+		<servlet-name>sakai.scormcloud.preview.helper</servlet-name>
+		<servlet-class>
+			com.rusticisoftware.scormcloud.tool.RequestController
+		</servlet-class>
+		<init-param>
+			<param-name>action</param-name>
+			<param-value>previewPackageResource</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet>
+		<servlet-name>sakai.scormcloud.configure.helper</servlet-name>
+		<servlet-class>
+			com.rusticisoftware.scormcloud.tool.RequestController
+		</servlet-class>
+		<init-param>
+			<param-name>action</param-name>
+			<param-value>configurePackageResource</param-value>
+		</init-param>
+	</servlet>
 	
 	<servlet>
 		<description>Servlet for processing requests</description>

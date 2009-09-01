@@ -16,6 +16,7 @@
 		<!--<property name="title" type="string" length="255" not-null="true" />-->
 		<property name="ownerId" type="string" length="255" not-null="true" />
 		<property name="userName" type="string" length="255" />
+		<property name="userDisplayName" type="string" length="255" />
 		<property name="locationId" type="string" length="255" />
 		<property name="context" type="string" length="255" />
 		<property name="assignmentId" type="string" length="255" />
@@ -26,6 +27,7 @@
 		<property name="dateCreated" type="java.util.Date" />
 		<property name="scormCloudId" type="string" length="255" not-null="true" />
 		<property name="packageId" type="string" length="255" not-null="true" />
+		<property name="packageTitle" type="string" length="255" not-null="true" />
 		
 		<property name="complete" type="string" length="255" />
 		<property name="success" type="string" length="255" />

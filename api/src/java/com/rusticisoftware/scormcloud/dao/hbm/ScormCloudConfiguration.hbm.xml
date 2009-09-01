@@ -13,6 +13,7 @@
 		<id name="id" type="string" length="128">
 	    	<generator class="uuid" />
 		</id>
+		<property name="isMasterConfig" type="java.lang.Boolean" />
 		<property name="context" type="string" length="255" />
 		<property name="appId" type="string" length="255" />
 		<property name="secretKey" type="string" length="255" />

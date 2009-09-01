@@ -36,6 +36,8 @@ import org.sakaiproject.content.util.BaseInteractionAction;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.entity.api.ResourceProperties;
 
+import com.rusticisoftware.scormcloud.logic.ScormCloudLogic;
+
 
 public class ScormCloudResourceType extends BaseResourceType {
 	
@@ -47,12 +49,16 @@ public class ScormCloudResourceType extends BaseResourceType {
 	public static final String SCORM_CONTENT_TYPE_ID="scormcloud.type";
 	
 	public static final String SCORM_UPLOAD_LABEL="Upload SCORM Package";
-	public static final String SCORM_LAUNCH_LABEL="Launch";
+	public static final String SCORM_CONFIGURE_LABEL="Configure";
+	public static final String SCORM_PREVIEW_LABEL="Preview";
 	public static final String SCORM_REMOVE_LABEL="Remove";
 
+	public static final String SCORM_PREVIEW_ACTION_ID="scormcloud.preview";
+	public static final String SCORM_CONFIGURE_ACTION_ID="scormcloud.configure";
+	
 	public static final String SCORM_UPLOAD_HELPER_ID="sakai.scormcloud.upload.helper"; 
-	public static final String SCORM_LAUNCH_TOOL_ID="sakai.scormcloud";
-    public static final String SCORM_ACCESS_HELPER_ID="sakai.scormcloud";
+	public static final String SCORM_CONFIGURE_HELPER_ID="sakai.scormcloud.configure.helper";
+	public static final String SCORM_PREVIEW_HELPER_ID="sakai.scormcloud.preview.helper";
     public static final String SCORM_REMOVE_HELPER_ID="sakai.scormcloud.remove.helper";
 	
     protected ResourceTypeRegistry resourceTypeRegistry;
@@ -60,6 +66,10 @@ public class ScormCloudResourceType extends BaseResourceType {
         this.resourceTypeRegistry = registry;
     }
     
+    protected ScormCloudLogic scormCloudLogic;
+    public void setScormCloudLogic(ScormCloudLogic scormCloudLogic){
+        this.scormCloudLogic = scormCloudLogic;
+    }
     
 	public ScormCloudResourceType() {	
 		
@@ -76,9 +86,12 @@ public class ScormCloudResourceType extends BaseResourceType {
                 return SCORM_UPLOAD_LABEL; 
             }
             
-            public void finalizeAction(Reference reference, String initializationId) 
-            {
-                log.warn("Finalizing upload action for scorm content!");
+            public void finalizeAction(Reference reference, String initializationId) {
+                log.warn("Finalizing upload action for SCORM Cloud content!");
+            }
+            
+            public boolean available(ContentEntity entity){
+                return scormCloudLogic.isCurrentUserSakaiAdmin() || scormCloudLogic.isCurrentUserPluginAdmin();
             }
         };   
         
@@ -87,13 +100,42 @@ public class ScormCloudResourceType extends BaseResourceType {
             public String getLabel() {
                 return SCORM_REMOVE_LABEL;
             }
+            public boolean available(ContentEntity entity){
+                return scormCloudLogic.isCurrentUserSakaiAdmin() || scormCloudLogic.isCurrentUserPluginAdmin();
+            }
+        };
+        
+        ResourceToolAction configure = new BaseInteractionAction(SCORM_CONFIGURE_ACTION_ID, ResourceToolAction.ActionType.VIEW_CONTENT, SCORM_CONTENT_TYPE_ID, SCORM_CONFIGURE_HELPER_ID, requiredKeys){
+            public String getLabel() {
+                return SCORM_CONFIGURE_LABEL;
+            }
+            public boolean available(ContentEntity entity){
+                return scormCloudLogic.isCurrentUserSakaiAdmin() || scormCloudLogic.isCurrentUserPluginAdmin();
+            }
+        };
+        
+        ResourceToolAction preview = new BaseInteractionAction(SCORM_PREVIEW_ACTION_ID, ResourceToolAction.ActionType.VIEW_CONTENT, SCORM_CONTENT_TYPE_ID, SCORM_PREVIEW_HELPER_ID, requiredKeys){
+            public String getLabel() {
+                return SCORM_PREVIEW_LABEL;
+            }
+            public boolean available(ContentEntity entity){
+                return scormCloudLogic.isCurrentUserSakaiAdmin() || scormCloudLogic.isCurrentUserPluginAdmin();
+            }
         };
             
-            
+
+        List<ResourceToolAction> customActions = new ArrayList<ResourceToolAction>();
+        customActions.add(configure);
+        customActions.add(preview);
+        
         actionMap.put(create.getActionType(), makeList(create));
+        //actionMap.put(preview.getActionType(), makeList(preview));
+        actionMap.put(preview.getActionType(), customActions);
         actionMap.put(remove.getActionType(), makeList(remove));
         
         actions.put(create.getId(), create);
+        actions.put(configure.getId(), configure);
+        actions.put(preview.getId(), preview);
         actions.put(remove.getId(), remove);
         
         resourceTypeRegistry.register(this);

@@ -11,10 +11,7 @@
 
 package com.rusticisoftware.scormcloud.logic;
 
-import java.io.CharArrayReader;
 import java.io.File;
-import java.io.Reader;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -22,25 +19,18 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.UUID;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.sakaiproject.assignment.api.Assignment;
 import org.sakaiproject.assignment.api.AssignmentSubmission;
-import org.sakaiproject.assignment.api.AssignmentSubmissionEdit;
 import org.sakaiproject.assignment.cover.AssignmentService;
 import org.sakaiproject.entity.api.Reference;
 import org.sakaiproject.event.api.Event;
-import org.sakaiproject.exception.PermissionException;
 import org.sakaiproject.genericdao.api.search.Restriction;
 import org.sakaiproject.genericdao.api.search.Search;
 
-
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import com.rusticisoftware.hostedengine.client.Configuration;
 import com.rusticisoftware.hostedengine.client.LaunchInfo;
@@ -117,8 +107,25 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             log.error("saveScormCloudConfiguration called without canConfigurePlugin permission!");
             throw new Exception("saveScormCloudConfiguration called without canConfigurePlugin permission!");
         }
-        log.debug("saveScormCloudConfiguration called w/ context = " + config.getContext());
-        dao.save(config);
+        log.debug("saveScormCloudConfiguration called w/ context = " + config.getContext() +
+                  ", isMasterConfig = " + config.getIsMasterConfig());
+        //If this is supposed to be the master config, make sure to overwrite any existing master
+        if(config.getIsMasterConfig()){
+            log.debug("Fullfilling request to create/update a master SCORM Cloud configuration");
+            ScormCloudConfiguration existingMaster = getScormCloudMasterConfig();
+            if(existingMaster != null){
+                existingMaster.copyFrom(config);
+                log.debug("Updating existing SCORM Cloud Master config w/ appId = " + config.getAppId());
+                dao.save(existingMaster);
+            } else {
+                log.debug("Saving new SCORM Cloud Master config w/ appId = " + config.getAppId());
+                dao.save(config);
+            }
+        } else {
+            log.debug("Saving new site specific cloud configuration for context = " + 
+                    config.getContext() + " and appId = " + config.getAppId());
+            dao.save(config);
+        }
     }
     
     public ScormCloudConfiguration getScormCloudConfiguration() throws Exception {
@@ -141,15 +148,33 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         
         Search s = new Search();
         s.addRestriction(new Restriction("context", context));
+        s.addRestriction(new Restriction("isMasterConfig", Boolean.FALSE));
         List<ScormCloudConfiguration> configs = dao.findBySearch(ScormCloudConfiguration.class, s);
+        
         if(configs.size() == 0){
-            log.warn("Could not find SCORM Cloud configuration for context = " + context);
-            return null;
+            log.warn("Could not find SCORM Cloud configuration for context = " + context + ", returning master config (if present)");
+            return getScormCloudMasterConfig();
         }
         if(configs.size() > 1){
             log.warn("Found more than one SCORM Cloud Configuration object for context = " + context);
         }
+        log.debug("Found site specific SCORM Cloud configuration with context = " + context);
         return configs.get(0);
+    }
+    
+    private ScormCloudConfiguration getScormCloudMasterConfig() throws Exception {
+        Search s = new Search();
+        s.addRestriction(new Restriction("isMasterConfig", Boolean.TRUE));
+        List<ScormCloudConfiguration> masterConfigs = dao.findBySearch(ScormCloudConfiguration.class, s);
+        if(masterConfigs.size() == 0){
+            log.warn("Found no master SCORM Cloud configurations");
+            return null;
+        }
+        if(masterConfigs.size() > 1){
+            log.warn("Found more than one SCORM Cloud master configuration");
+        }
+        log.debug("Found SCORM Cloud master configuration");
+        return masterConfigs.get(0);
     }
     
     
@@ -304,8 +329,10 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             reg.setContext(pkg.getContext());
             
             reg.setUserName(userDisplayId);
+            reg.setUserDisplayName(userDisplayName);
             reg.setScormCloudId(cloudRegId);
             reg.setPackageId(pkg.getId());
+            reg.setPackageTitle(pkg.getTitle());
             
             if(assignment != null){
                 reg.setAssignmentKey(assignmentKey);

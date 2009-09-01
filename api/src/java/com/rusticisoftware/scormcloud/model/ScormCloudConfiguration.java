@@ -4,6 +4,7 @@ public class ScormCloudConfiguration {
     public final String DEFAULT_SERVICE_URL = "http://cloud.scorm.com/EngineWebServices/";
     
     private String id;
+    private Boolean isMasterConfig; //If true, is used when site config is missing...
     private String context;
     private String appId;
     private String secretKey;
@@ -17,11 +18,18 @@ public class ScormCloudConfiguration {
     }
     
     public void copyFrom(ScormCloudConfiguration orig){
+        this.setContext(orig.getContext());
+        this.setIsMasterConfig(orig.getIsMasterConfig());
         this.setAppId(orig.getAppId());
         this.setSecretKey(orig.getSecretKey());
         this.setServiceUrl(orig.getServiceUrl());
     }
-    
+    public Boolean getIsMasterConfig(){
+        return isMasterConfig;
+    }
+    public void setIsMasterConfig(Boolean isMasterConfig){
+        this.isMasterConfig = isMasterConfig;
+    }
     public String getId() {
         return id;
     }

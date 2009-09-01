@@ -9,12 +9,14 @@ public class ScormCloudRegistration implements Serializable {
 	private String id;
 	private String scormCloudId;
     private String packageId;
+    private String packageTitle;
 	private String ownerId; // Sakai userId
 	private String locationId; // Sakai locationId
 	private String context; //Sakai tool context id
 	
 	private Date dateCreated;
 	private String userName;
+	private String userDisplayName;
 	
 	private String assignmentId; //assignment related to this reg
     private String assignmentKey; //assignment "context" related to resource attachment
@@ -95,11 +97,23 @@ public class ScormCloudRegistration implements Serializable {
 	public void setPackageId(String packageId) {
 		this.packageId = packageId;
 	}
+	public String getPackageTitle(){
+	    return packageTitle;
+	}
+	public void setPackageTitle(String packageTitle){
+	    this.packageTitle = packageTitle;
+	}
 	public String getUserName() {
 	    return userName;
 	}
 	public void setUserName(String userName) {
 	    this.userName = userName;
+	}
+	public String getUserDisplayName(){
+	    return userDisplayName;
+	}
+	public void setUserDisplayName(String userDisplayName){
+	    this.userDisplayName = userDisplayName;
 	}
     public String getComplete() {
         return complete;

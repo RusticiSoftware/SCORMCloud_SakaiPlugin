@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -137,69 +138,123 @@ public class RequestController extends HttpServlet {
             if(action.equals("viewPackages")){
                 processViewPackagesRequest(request, response);
             }
-            if(action.equals("viewCloudConfiguration")){
+            else if(action.equals("viewCloudConfiguration")){
                 proccessViewCloudConfigurationAction(request, response);
             }
-			if(action.equals("configureCloudPlugin")){
+            else if(action.equals("configureCloudPlugin")){
 			    processConfigureCloudPluginAction(request, response);
 			}
-			if(action.equals("importPackage")){
+            else if(action.equals("importPackage")){
 				processImportRequest(request, response);
 			}
-			if(action.equals("deletePackageResource")){
+            else if(action.equals("configurePackageResource")){
+                processConfigurePackageResourceRequest(request, response);
+            }
+            else if(action.equals("previewPackageResource")){
+                processPreviewPackageResourceRequest(request, response);
+            }
+            else if(action.equals("deletePackageResource")){
 			    processDeletePackageResourceRequest(request, response);
 			}
-			if(action.equals("previewPackage")){
+            else if(action.equals("previewPackage")){
 			    processPreviewRequest(request, response);
 			}
-			if(action.equals("launchPackage")){
+            else if(action.equals("launchPackage")){
 				processLaunchRequest(request, response);
 			}
-			if(action.equals("processRegistrationListAction")){
+            else if(action.equals("processRegistrationListAction")){
 			    processRegistrationListRequest(request, response);
 			}
-			if(action.equals("viewRegistrations")){
+            else if(action.equals("viewRegistrations")){
 			    processViewRegistrationsRequest(request, response);
 			}
-			if(action.equals("viewActivityReport")){
+            else if(action.equals("viewActivityReport")){
 			    processViewActivityReportRequest(request, response);
 			}
-			if(action.equals("viewLaunchHistoryReport")){
+            else if(action.equals("viewLaunchHistoryReport")){
 			    processViewLaunchHistoryReport(request, response);
 			}
-			if(action.equals("getLaunchInfoXml")){
+            else if(action.equals("getLaunchInfoXml")){
 			    output.print(getLaunchHistoryInfoXml(request, response));
 			    return;
 			}
-			if(action.equals("postLaunchActions")){
+            else if(action.equals("postLaunchActions")){
 			    processPostLaunchActions(request, response);
 			}
-			if(action.equals("updatePackage")){
-				/* Not implemented yet */
-			}
-			if(action.equals("updateRegSummaryData")){
-				/* Not implemented yet */
-			}
-			if(action.equals("viewPackageProperties")){
+            else if(action.equals("viewPackageProperties")){
 				processViewPackagePropertiesRequest(request, response);
 			}
-			if(action.equals("closeWindow")){
+            else if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
 			}
-			if(action.equals("debugParams")){
+            else if(action.equals("debugParams")){
 			    log.debug("Debugging params sent");
 			    Map params = request.getParameterMap();
 			    for (Object key : params.keySet()){
 			        log.debug((String)key + " = " + (String)request.getParameter((String)key));
 			    }
 			}
-			
-			output.println("error: Action " + action + " not found");
+            else {
+                output.println("error: Action " + action + " not found");
+            }
 		}
 		catch (Exception e){
 			throw new ServletException(e);
 		}
 	}
+
+    private void processConfigurePackageResourceRequest(
+            HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ToolSession toolSession = SessionManager.getCurrentToolSession();
+            ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+            ContentEntity contentEntity = pipe.getContentEntity();
+            
+            String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
+
+            //This also works, but displays course inside the portlet window, instead of a new browser
+            //window (which makes it less of a true preview)
+            //ScormCloudPackage pkg = logic.getPackageById(packageId);
+            //String relativeRedirectUrl = endToolHelperSession(toolSession, pipe);
+            //String absoluteRedirectUrl = getAbsoluteUrlTo(request, relativeRedirectUrl);
+            //String previewUrl = logic.getPackagePreviewUrl(pkg, absoluteRedirectUrl);
+            //response.sendRedirect(previewUrl);
+            
+            String returnUrl = endToolHelperSession(toolSession, pipe);
+            returnUrl = URLEncoder.encode(returnUrl);
+            //response.sendRedirect(getAbsoluteUrlTo(request, "/scormcloud-tool/controller?action=viewPackageProperties&id=" + packageId));
+            response.sendRedirect("/scormcloud-tool/controller?action=viewPackageProperties&id=" + packageId + "&returnUrl=" + returnUrl);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+    }
+
+    private void processPreviewPackageResourceRequest(
+            HttpServletRequest request, HttpServletResponse response) {
+        try {
+            ToolSession toolSession = SessionManager.getCurrentToolSession();
+            ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+            ContentEntity contentEntity = pipe.getContentEntity();
+            
+            String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
+
+            //This also works, but displays course inside the portlet window, instead of a new browser
+            //window (which makes it less of a true preview)
+            //ScormCloudPackage pkg = logic.getPackageById(packageId);
+            //String relativeRedirectUrl = endToolHelperSession(toolSession, pipe);
+            //String absoluteRedirectUrl = getAbsoluteUrlTo(request, relativeRedirectUrl);
+            //String previewUrl = logic.getPackagePreviewUrl(pkg, absoluteRedirectUrl);
+            //response.sendRedirect(previewUrl);
+            
+            endToolHelperSession(toolSession, pipe);
+            response.sendRedirect(getAbsoluteUrlTo(request, "/scormcloud-tool/controller?action=previewPackage&id=" + packageId));
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private String getLaunchHistoryInfoXml(
             HttpServletRequest request, HttpServletResponse response) {
@@ -276,12 +331,15 @@ public class RequestController extends HttpServlet {
             String appId = request.getParameter("appId");
             String secretKey = request.getParameter("secretKey");
             String serviceUrl = request.getParameter("serviceUrl");
+            String isMasterConfigStr = request.getParameter("is-master-config");
+            Boolean isMasterConfig = Boolean.parseBoolean(isMasterConfigStr);
 
             ScormCloudConfiguration config = logic.getScormCloudConfiguration();
-            if(config == null){
+            if(config == null || (config.getIsMasterConfig() && !isMasterConfig)){
                 config = new ScormCloudConfiguration();
-                config.setContext(extLogic.getCurrentContext());
             }
+            config.setContext(extLogic.getCurrentContext());
+            config.setIsMasterConfig(isMasterConfig);
             config.setAppId(appId);
             config.setSecretKey(secretKey);
             config.setServiceUrl(serviceUrl);
@@ -294,11 +352,19 @@ public class RequestController extends HttpServlet {
     private void processViewPackagePropertiesRequest(
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
+        String returnUrl = request.getParameter("returnUrl");
+        
         ScormCloudPackage pkg = logic.getPackageById(packageId);
         String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg, 
                 getAbsoluteUrlTo(request, "/scormcloud-tool/css/PackagePropertyEditor.css"));
+        
         request.setAttribute("pkg", pkg);
         request.setAttribute("packagePropertiesUrl", packagePropertiesUrl);
+        if(returnUrl != null){
+            request.setAttribute("returnUrl", returnUrl);
+        } else {
+            request.setAttribute("returnUrl", request.getHeader("referer"));
+        }
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_EDIT);
         rd.forward(request, response);
     }
@@ -391,7 +457,7 @@ public class RequestController extends HttpServlet {
             request.setAttribute("pkg", logic.getPackageById(packageId));
         }
         if (!isNullOrEmpty(userSearch)) { 
-            propertyMap.put("userName", "%"+userSearch+"%");
+            propertyMap.put("userDisplayName", "%"+userSearch+"%");
             request.setAttribute("userSearch", userSearch);
         }
         if (!isNullOrEmpty(assignmentSearch)){ 
@@ -427,7 +493,7 @@ public class RequestController extends HttpServlet {
 	           throw new RuntimeException(e);
 	       }
 	       
-	       endToolHelperSession(toolSession, pipe, response);
+	       response.sendRedirect(endToolHelperSession(toolSession, pipe));
 	}
 	
 	/**
@@ -468,6 +534,7 @@ public class RequestController extends HttpServlet {
         if ("true".equals(helper)) {
             log.debug("Helper mode for import, creating resource type");
             processImportHelperActions(pkg, request, response);
+            return;
         }
         //Send the user back to the package list page
 		response.sendRedirect(PAGE_PACKAGE_LIST);
@@ -488,7 +555,7 @@ public class RequestController extends HttpServlet {
         getContentHostingService().commitResource(resource);
 	}
 	
-	private void endToolHelperSession(ToolSession toolSession, ResourceToolActionPipe pipe, HttpServletResponse response) {
+	private String endToolHelperSession(ToolSession toolSession, ResourceToolActionPipe pipe) {
 	    // Set the action completed in the action pipe
         pipe.setActionCanceled(false);
         pipe.setErrorEncountered(false);
@@ -502,14 +569,7 @@ public class RequestController extends HttpServlet {
         Tool tool = ToolManager.getCurrentTool();
         String url = (String) toolSession.getAttribute(tool.getId() + Tool.HELPER_DONE_URL);
         toolSession.removeAttribute(tool.getId() + Tool.HELPER_DONE_URL);
-        
-        try {
-           response.sendRedirect(url);
-        }
-        catch (IOException e) {
-           log.warn("IOException", e);
-        }
-        
+        return url;
 	}
 	
 	private void processImportHelperActions(ScormCloudPackage pkg, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -525,7 +585,7 @@ public class RequestController extends HttpServlet {
            throw new RuntimeException(e);
        }
        
-       endToolHelperSession(toolSession, pipe, response);
+       response.sendRedirect(endToolHelperSession(toolSession, pipe));
 	}
 	
 	

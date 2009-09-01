@@ -71,8 +71,8 @@
 												by your local Sakai administrator or a role that has been granted the ability of "scormcloud.configure". 
 											</c:otherwise>
 										</c:choose>
-										Once the plugin is configured, a new resource type "SCORM Package" will become available via
-										the resources tool, and you can use the links above to view detailed 
+										Once the plugin is configured, you'll be able to utilize the new resource type "SCORM Package" 
+										via the resources tool, and you can use the links above to view detailed 
 										reporting of your learner's interaction with the SCORM resources that you 
 										have imported.
 									</c:otherwise>
