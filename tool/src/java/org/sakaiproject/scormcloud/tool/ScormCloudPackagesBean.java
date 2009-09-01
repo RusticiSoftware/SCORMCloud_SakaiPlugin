@@ -88,4 +88,19 @@ public class ScormCloudPackagesBean {
         ensureConfigured(request, response);
         allowOnlyAdmin(request, response);
     }
+	
+	public String formatSeconds(String seconds){
+	    try {
+	        int secondNum = Integer.parseInt(seconds);
+	        if(secondNum > 30){
+	            int minutes = (secondNum/30);
+	            int remainingSeconds = (secondNum%30);
+	            return minutes+" min " + remainingSeconds + " s";
+	        } else {
+	            return secondNum + " s";
+	        }
+	    } catch (NumberFormatException e){
+	        return null;
+	    }
+	}
 }

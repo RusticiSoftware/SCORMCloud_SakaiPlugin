@@ -25,27 +25,29 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">	
 	
-	<h2 class="insColor insBak insBorder">SCORM Cloud Plugin by Rustici Software</h2>
-	
-	<table>
-		<tr>
-			<td>
-				<img class="messageIcon" src="images/icon_cloud.jpg" />
-			</td>
-			<td style="vertical-align:top">
-				<div style="padding-left:20px">
-					<h3 class="messageTitle">${messageTitle}</h3>
-					<div class="instruction">
-						${message}
-						<c:if test="${empty hideBackLink}">
-							<br /><br />
-							You can click <a href="javascript:history.back()">here</a> to go back.
-						</c:if> 
+	<div style="padding-left:20px; padding-right:40px">
+		<h2 class="insColor insBak insBorder">SCORM Cloud Plugin by Rustici Software</h2>
+		
+		<table>
+			<tr>
+				<td>
+					<img class="messageIcon" src="images/icon_cloud.jpg" />
+				</td>
+				<td style="vertical-align:top">
+					<div style="padding-left:20px">
+						<h3 class="messageTitle">${messageTitle}</h3>
+						<div class="instruction">
+							${message}
+							<c:if test="${empty hideBackLink}">
+								<br /><br />
+								You can click <a href="javascript:history.back()">here</a> to go back.
+							</c:if> 
+						</div>
 					</div>
-				</div>
-			</td>
-		</tr>
-	</table>
+				</td>
+			</tr>
+		</table>
+	</div>
 
 </div>
 </body>

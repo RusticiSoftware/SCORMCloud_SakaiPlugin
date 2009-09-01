@@ -130,7 +130,7 @@
 	                    	<span>${(reg.score == "unknown") ? "unknown" : reg.score}</span>
 	                    </td>
 	                    <td>
-	                    	<span>${reg.totalTime}</span>
+	                    	<span><%= bean.formatSeconds(reg.getTotalTime()) %></span>
 	                    </td>
 	                    <td>
 	                    	<a href="controller?action=viewActivityReport&registrationId=${reg.id}">Activity Report</a>

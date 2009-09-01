@@ -80,5 +80,5 @@ public interface ExternalLogic {
     
     public Assignment getAssignmentFromAssignmentKey(String context, String userId, String assignmentKey);
     public void updateAssignmentScore(Assignment asn, String userId, String score);
-    public boolean isAssignmentSubmitted(String context, String assignmentId, String userId);
+    public boolean canSubmitAssignment(String context, String assignmentId);
 }

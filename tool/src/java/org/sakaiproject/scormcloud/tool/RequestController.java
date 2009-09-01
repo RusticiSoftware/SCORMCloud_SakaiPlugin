@@ -390,11 +390,11 @@ public class RequestController extends HttpServlet {
             request.setAttribute("pkg", logic.getPackageById(packageId));
         }
         if (!isNullOrEmpty(userSearch)) { 
-            propertyMap.put("userName", userSearch);
+            propertyMap.put("userName", "%"+userSearch+"%");
             request.setAttribute("userSearch", userSearch);
         }
         if (!isNullOrEmpty(assignmentSearch)){ 
-            propertyMap.put("assignmentName", assignmentSearch);
+            propertyMap.put("assignmentName", "%"+assignmentSearch+"%");
             request.setAttribute("assignmentSearch", assignmentSearch);
         }
         
@@ -566,13 +566,15 @@ public class RequestController extends HttpServlet {
 
         //If in an assignment context, make sure we the 
         //assignment can still accept submissions from this user
-        if(extLogic.isAssignmentSubmitted(reg.getContext(), reg.getAssignmentId(), reg.getOwnerId())){
-            sendToMessagePage(request, response, 
-                    "Launch Not Allowed", 
-                    "We're sorry, but this resource appears to be associated with " +
-                    "an assignment which cannot recieve any more submissions from " +
-                    "user " + reg.getUserName());
-                return;
+        if(reg.getAssignmentId() != null){
+            if(!extLogic.canSubmitAssignment(reg.getContext(), reg.getAssignmentId())){
+                sendToMessagePage(request, response, 
+                        "Launch Not Allowed", 
+                        "We're sorry, but this resource appears to be associated with " +
+                        "an assignment which cannot recieve any more submissions from " +
+                        "user " + reg.getUserName());
+                    return;
+            }
         }
         
         //Now get the launch url associated with the registration...

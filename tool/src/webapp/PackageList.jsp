@@ -69,7 +69,7 @@
                 <th>Non-assignment Launch</th>
                 <th>Configure Package</th>
                 <th>Preview Package</th>
-                <th>Registration Results</th>
+                <th>View Registrations</th>
                 <th>Creation Date</th>
             </tr>
         </thead>

@@ -277,16 +277,22 @@ public class ExternalLogicImpl implements ExternalLogic {
         }
     }
 
-    public boolean isAssignmentSubmitted(String context, String assignmentId, String userId){
+    public boolean canSubmitAssignment(String context, String assignmentId){
         try {
-            AssignmentSubmissionEdit edit = assignmentService.addSubmission(context, assignmentId, userId);
-            assignmentService.cancelEdit(edit);
+            Assignment asn = assignmentService.getAssignment(assignmentId);
+            if(asn == null){
+                log.debug("In canSubmitAssignment, found no assignment with id = " + assignmentId);
+                return false;
+            }
+            
+            boolean canSubmit = assignmentService.canSubmit(context, asn);
+            log.debug("canSubmitAssignment(" + context + ", " + context + ") = " + canSubmit);
+            return canSubmit;
+            
         } catch (Exception e){
-            log.debug("Assignment " + assignmentId + " will NOT take any more submissions from user " + userId);
+            log.debug("Exception in canSubmitAssignment(" + context + "," + assignmentId +")", e);
             return true;
         }
-        log.debug("Assignment " + assignmentId + " still available for submissions from user " + userId);
-        return false;
     }
     
     
