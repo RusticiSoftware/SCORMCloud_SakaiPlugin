@@ -633,8 +633,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     public void update(Observable o, Object args){
         Event evt = (Event)args;
         log.debug("SCORM_CLOUD_LOGIC_EVENT_OBSERVATION: " + 
-                  " event = " + evt.getEvent() +
-                  " context = " + evt.getContext() + 
+                  " event = " + evt.getEvent() + 
                   " userId = " + evt.getUserId() +
                   " resource = " + evt.getResource());
         
