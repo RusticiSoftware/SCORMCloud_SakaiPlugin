@@ -1,7 +1,8 @@
 #!/bin/sh
 
-VERSION=0.8
-OUTPUT_FOLDER=scormcloud-sakai-plugin-${VERSION}
+. ./packaging_env.sh
+
+OUTPUT_FOLDER=${OUTPUT_NAME}
 
 mkdir ${OUTPUT_FOLDER}
 cp -rv ${CATALINA_HOME}/components/scormcloud-pack ${OUTPUT_FOLDER}/
@@ -11,4 +12,5 @@ cp -rv ../doc/ ${OUTPUT_FOLDER}/
 cp -v ../doc/binary-install.txt ${OUTPUT_FOLDER}/INSTALL.txt
 cp install.sh ${OUTPUT_FOLDER}/
 cp install.bat ${OUTPUT_FOLDER}/
-zip -r scormcloud-sakai-plugin-${VERSION}.zip ${OUTPUT_FOLDER}/
+zip -r ${OUTPUT_NAME}-binary.zip ${OUTPUT_FOLDER}/
+rm -fdr ${OUTPUT_FOLDER}
