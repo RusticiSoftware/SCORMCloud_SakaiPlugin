@@ -37,6 +37,7 @@ import com.rusticisoftware.hostedengine.client.LaunchInfo;
 import com.rusticisoftware.hostedengine.client.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
 import com.rusticisoftware.hostedengine.client.Utils;
+import com.rusticisoftware.hostedengine.client.XmlUtils;
 import com.rusticisoftware.hostedengine.client.Enums.RegistrationResultsFormat;
 import com.rusticisoftware.scormcloud.dao.ScormCloudDao;
 import com.rusticisoftware.scormcloud.logic.ExternalLogic;
@@ -575,7 +576,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
                                         .GetRegistrationResult(
                                                 reg.getScormCloudId(),
                                                 RegistrationResultsFormat.FULL_DETAIL);
-            return Utils.parseXmlString(resultsXml);
+            return XmlUtils.parseXmlString(resultsXml);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
                       "report xml from SCORM Cloud, returning null", e);
