@@ -31,7 +31,7 @@
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Package Properties Editor</title>
+<title>SCORM Cloud Signup</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
@@ -51,11 +51,6 @@
     </c:if>
 </div>
 
-<h3 class="insColor insBak insBorder">Editing SCORM Cloud Package Properties for ${pkg.title}</h3>
-
-<div class="instruction">When you are finished, please click <a href='${empty returnUrl ? "javascript:history.back()" : returnUrl}'>here</a> to go back.</div>
-
-
 <c:if test="${fn:length(bean.messages) > 0}">
     <div class="alertMessage">
         <ul style="margin:0px;">
@@ -67,8 +62,7 @@
     <% bean.messages.clear(); %>
 </c:if>
 
-<iframe id="packagePropertiesEditor" frameborder="no" src="${packagePropertiesUrl}" />
-
+<iframe id="embeddedSignup" frameborder="no" width="400" height="800" src="${signupUrl}" />
 
 </div>
 </body>

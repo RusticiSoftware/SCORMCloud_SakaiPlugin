@@ -48,6 +48,9 @@ public class RequestController extends HttpServlet {
     private static Log log = LogFactory.getLog(RequestController.class);
 	private static final long serialVersionUID = 1L;
 	
+	private static final String URL_EMBEDDED_SIGNUP = "https://accounts.scorm.com/scorm-cloud-manager/public/signup-embedded";
+	private static final String URL_USAGE_METER = "https://accounts.scorm.com/scorm-cloud-manager/public/usage-meter";
+	
 	public static final String PAGE_PLUGIN_CONFIGURE = "ScormCloudConfiguration.jsp";
 	public static final String PAGE_PACKAGE_IMPORT = "ImportPackage.jsp";
 	public static final String PAGE_PACKAGE_LIST = "PackageList.jsp";
@@ -59,6 +62,8 @@ public class RequestController extends HttpServlet {
 	public static final String PAGE_CLOSER = "Closer.html";
 	private static final String PAGE_ACTIVITY_REPORT = "ActivityReport.jsp";
 	private static final String PAGE_LAUNCH_HISTORY_REPORT = "LaunchHistory.jsp";
+	private static final String PAGE_SIGNUP = "Signup.jsp";
+	private static final String PAGE_USAGE = "Usage.jsp";
 	
 	private static final List<String> pagesAllowedByNonAdmin = 
 	    Arrays.asList(new String[]{PAGE_WELCOME, PAGE_REGISTRATION_LAUNCH, PAGE_CLOSER});
@@ -187,6 +192,12 @@ public class RequestController extends HttpServlet {
             else if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
 			}
+            else if(action.equals("viewSignup")){
+                processViewSignupRequest(request, response);
+            }
+            else if(action.equals("viewUsage")){
+                processViewUsageRequest(request, response);
+            }
             else if(action.equals("debugParams")){
 			    log.debug("Debugging params sent");
 			    Map params = request.getParameterMap();
@@ -202,6 +213,25 @@ public class RequestController extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
+
+    private void processViewUsageRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String params = 
+            getEncodedParam("appId", logic.getScormCloudConfiguration().getAppId()) + "&" +
+            getEncodedParam("cssurl", getAbsoluteUrlTo(request, "/scormcloud-tool/css/SignupAndUsage.css"));
+
+        request.setAttribute("usageUrl", URL_USAGE_METER + "?" + params);
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_USAGE);
+        rd.forward(request, response);
+    }
+
+    private void processViewSignupRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String params =
+            getEncodedParam("cssurl", getAbsoluteUrlTo(request, "/scormcloud-tool/css/SignupAndUsage.css"));
+        
+        request.setAttribute("signupUrl", URL_EMBEDDED_SIGNUP + "?" + params);
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_SIGNUP);
+        rd.forward(request, response);
+    }
 
     private void processConfigurePackageResourceRequest(
             HttpServletRequest request, HttpServletResponse response) {
@@ -691,6 +721,10 @@ public class RequestController extends HttpServlet {
 	            relativeUrl);
 	    return theUrl.toString();
 	}
+
+	public static String getEncodedParam(String paramName, String paramVal) throws Exception {
+        return URLEncoder.encode(paramName, "UTF-8") + "=" + URLEncoder.encode(paramVal, "UTF-8");
+    }
 	
 	private boolean isNullOrEmpty(String str){
 	    return (str == null || str.length() == 0);
