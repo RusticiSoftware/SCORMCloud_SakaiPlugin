@@ -21,6 +21,7 @@
     bean.doPageChecks(request, response);
     
     pageContext.setAttribute("bean", bean);
+    pageContext.setAttribute("isConfigured", bean.isPluginConfigured());
     pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -41,6 +42,13 @@
     <a href="controller?action=viewRegistrations">Search Registrations</a>
     <c:if test="${canConfigure}">
 	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
+	    <c:choose>
+		    <c:when test="${isConfigured}">
+		    	<a href="controller?action=viewUsage">View Usage</a>
+		    </c:when><c:otherwise>
+		    	<a href="controller?action=viewSignup">Sign Up</a>
+		    </c:otherwise>
+	    </c:choose>
     </c:if>
 </div>
 
