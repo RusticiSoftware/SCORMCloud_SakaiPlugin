@@ -13,15 +13,9 @@
  *   permissions and limitations under the License.
  */
 
-package com.rusticisoftware.scormcloud.dao;
 
-import org.sakaiproject.genericdao.api.GeneralGenericDao;
+All java source files included in this application that are not covered by 
+another license which is included therein include the above copyrights.
 
-/**
- * This is a specialized DAO that allows the developer to extend
- * the functionality of the generic dao package
- * @author Sakai App Builder -AZ
- */
-public interface ScormCloudDao extends GeneralGenericDao {
-
-}
+All other files included this application that are not covered by another
+license which is included therein are covered under the above copyrights.
