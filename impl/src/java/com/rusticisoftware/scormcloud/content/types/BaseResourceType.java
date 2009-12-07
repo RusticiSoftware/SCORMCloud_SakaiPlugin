@@ -18,6 +18,7 @@
  * limitations under the License.
  *
  **********************************************************************************/
+
 package com.rusticisoftware.scormcloud.content.types;
 
 import java.util.ArrayList;
