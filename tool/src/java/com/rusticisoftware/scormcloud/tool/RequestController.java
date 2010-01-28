@@ -301,12 +301,30 @@ public class RequestController extends HttpServlet {
         String appId = logic.getScormCloudConfiguration().getAppId();
         String reportageAuth = logic.getReportageAuth("FREENAV", true);
         
-        String courseSummaryUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php?appId=" + appId + "&srt=singleCourse" +
-                "&courseId=" + URLEncoder.encode(pkg.getScormCloudId(), "UTF-8") +
-                "&standalone=true&embedded=true&expand=true&showTitle=true" +
-                "&scriptBased=true&divname=courseSummary";
+        String courseId = URLEncoder.encode(pkg.getScormCloudId(), "UTF-8");
+
+        String summaryUrlParams = "&appId=" + appId + "&courseId=" + courseId + 
+            "&standalone=true&embedded=true&expand=true&showTitle=true&scriptBased=true";
         
-        request.setAttribute("summaryUrl", logic.getReportUrl(reportageAuth, courseSummaryUrl));
+        String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
+        String detailUrlParams = summaryUrlParams + "&expand=true";
+
+        String courseSummary = "/Reportage/scormreports/widgets/summary/SummaryWidget.php?srt=singleCourse" +
+            "&divname=courseSummary" + summaryUrlParams;
+        
+        String learnerDetails = detailsWidgetUrl + "?drt=learnerRegistration" +  detailUrlParams + "&divname=learnerDetails";
+        String courseActivities = detailsWidgetUrl + "?drt=courseActivities" +  detailUrlParams + "&divname=courseActivities";
+        String learnerObjectives = detailsWidgetUrl + "?drt=learnerObjectives" +  detailUrlParams + "&divname=learnerObjectives";
+        String courseInteractions = detailsWidgetUrl + "?drt=courseInteractions" +  detailUrlParams + "&divname=courseInteractions";
+        String courseComments = detailsWidgetUrl + "?drt=courseComments" +  detailUrlParams + "&divname=courseComments";
+        
+        request.setAttribute("pkgTitle", pkg.getTitle());
+        request.setAttribute("courseSummaryUrl", logic.getReportUrl(reportageAuth, courseSummary));
+        request.setAttribute("learnerDetailsUrl", logic.getReportUrl(reportageAuth, learnerDetails));
+        request.setAttribute("courseActivitiesUrl", logic.getReportUrl(reportageAuth, courseActivities));
+        request.setAttribute("learnerObjectivesUrl", logic.getReportUrl(reportageAuth, learnerObjectives));
+        request.setAttribute("courseInteractionsUrl", logic.getReportUrl(reportageAuth, courseInteractions));
+        request.setAttribute("courseCommentsUrl", logic.getReportUrl(reportageAuth, courseComments));
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_COURSE_REPORT);
         rd.forward(request, response);
 	}

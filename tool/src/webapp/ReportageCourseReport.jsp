@@ -36,7 +36,12 @@
 
 <script language="Javascript" type="text/javascript">
 	$(document).ready( function() {
-		loadScript('${summaryUrl}');
+		loadScript('${courseSummaryUrl}');
+		loadScript('${learnerDetailsUrl}');
+		loadScript('${courseActivitiesUrl}');
+		loadScript('${learnerObjectivesUrl}');
+		loadScript('${courseInteractionsUrl}');
+		loadScript('${courseCommentsUrl}');
 	});
 </script>
 
@@ -75,8 +80,9 @@
 	
 	
 	<div class="instruction">
-		Shown below are some reports showing aggregate information about 
-		all of your learner registrations that have been launched via SCORM Cloud.
+		Shown below are reports which show aggregate information about 
+		all of your learner registrations for <b>${pkgTitle}</b>
+		that have been launched via SCORM Cloud.
 		To access the Reportage application directly, please 
 		<a target="_blank" href="controller?action=launchReportage">click here</a>.
 	</div>
@@ -91,11 +97,25 @@
 		<table class="group_report_details_table">
 			<tr>
 				<td class="group_report_details_holder">
-					<div id="reportageLearnerDetails" class="reportage_details gray_text">Loading...</div>
+					<div id="learnerDetails" class="reportage_details gray_text">Loading...</div>
 				</td>
 				<td><div style="width:20px"></div></td>
 				<td class="group_report_details_holder">
-					<div id="reportageCourseDetails" class="reportage_details gray_text">Loading...</div>
+					<div id="courseActivities" class="reportage_details gray_text">Loading...</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_report_details_holder">
+					<div id="learnerObjectives" class="reportage_details gray_text">Loading...</div>
+				</td>
+				<td><div style="width:20px"></div></td>
+				<td class="group_report_details_holder">
+					<div id="courseInteractions" class="reportage_details gray_text">Loading...</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="group_report_details_holder">
+					<div id="courseComments" class="reportage_details gray_text">Loading...</div>
 				</td>
 			</tr>
 		</table>

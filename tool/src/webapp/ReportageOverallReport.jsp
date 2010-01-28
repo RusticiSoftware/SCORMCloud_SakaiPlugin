@@ -77,7 +77,7 @@
 	
 	
 	<div class="instruction">
-		Shown below are some reports showing aggregate information about 
+		Shown below are reports which show aggregate information about 
 		all of your learner registrations that have been launched via SCORM Cloud.
 		To access the Reportage application directly, please 
 		<a target="_blank" href="controller?action=launchReportage">click here</a>.
