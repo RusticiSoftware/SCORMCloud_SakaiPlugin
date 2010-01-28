@@ -211,6 +211,12 @@ public class RequestController extends HttpServlet {
             else if(action.equals("viewPackageProperties")){
 				processViewPackagePropertiesRequest(request, response);
 			}
+            
+            
+            //Reportage actions / pages
+            else if(action.equals("launchReportage")){
+                processLaunchReportageRequest(request, response);
+            }
             else if(action.equals("viewOverallGroupReport")){
                 processViewOverallGroupReportRequest(request, response);
             }
@@ -220,9 +226,11 @@ public class RequestController extends HttpServlet {
             else if(action.equals("viewLearnerReport")){
                 processViewLearnerReportRequest(request, response);
             }
-            else if(action.equals("launchReportage")){
-                processLaunchReportageRequest(request, response);
+            else if(action.equals("viewRegistrationReport")){
+                processViewRegistrationReportRequest(request, response);
             }
+            
+            
             else if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
 			}
@@ -376,6 +384,50 @@ public class RequestController extends HttpServlet {
         request.setAttribute("learnerCommentsUrl", logic.getReportUrl(reportageAuth, learnerComments));
         
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_LEARNER_REPORT);
+        rd.forward(request, response);
+    }
+	
+	private void processViewRegistrationReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String registrationId = request.getParameter("registrationId");
+        ScormCloudRegistration reg = logic.getRegistrationById(registrationId);
+        ScormCloudPackage pkg = logic.getPackageById(reg.getPackageId());
+        
+        String learnerTags = request.getParameter("learnerTags");
+        String courseTags = request.getParameter("courseTags");
+        
+        boolean learnerTagsPresent = !isNullOrEmpty(learnerTags);
+        boolean courseTagsPresent = !isNullOrEmpty(courseTags);
+        boolean tagsPresent = learnerTagsPresent || courseTagsPresent;
+        
+        String appId = logic.getScormCloudConfiguration().getAppId();
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        
+        String learnerId = URLEncoder.encode(reg.getOwnerId(), "UTF-8");
+        String courseId = URLEncoder.encode(pkg.getScormCloudId(), "UTF-8");
+
+        String summaryWidgetUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php";
+        String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
+        
+        String summaryUrlParams = "&appId=" + appId + "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
+        summaryUrlParams += "&learnerId=" + learnerId + "&courseId=" + courseId;
+        
+        String detailUrlParams = summaryUrlParams + "&expand=true";
+
+        String registrationSummary = summaryWidgetUrl + "?srt=singleLearnerSingleCourse" + summaryUrlParams + "&divname=registrationSummary";
+        String learnerCourseActivities = detailsWidgetUrl + "?drt=learnerCourseActivities" +  detailUrlParams + "&divname=learnerCourseActivities";
+        String learnerCourseInteractions = detailsWidgetUrl + "?drt=learnerCourseInteractions" +  detailUrlParams + "&divname=learnerCourseInteractions";
+        String learnerCourseComments = detailsWidgetUrl + "?drt=learnerCourseComments" +  detailUrlParams + "&divname=learnerCourseComments";
+        
+        request.setAttribute("learnerId", learnerId);
+        request.setAttribute("learnerName", reg.getUserDisplayName());
+        request.setAttribute("courseId", courseId);
+        request.setAttribute("pkgTitle", pkg.getTitle());
+        request.setAttribute("registrationSummaryUrl", logic.getReportUrl(reportageAuth, registrationSummary));
+        request.setAttribute("learnerCourseActivitiesUrl", logic.getReportUrl(reportageAuth, learnerCourseActivities));
+        request.setAttribute("learnerCourseInteractionsUrl", logic.getReportUrl(reportageAuth, learnerCourseInteractions));
+        request.setAttribute("learnerCourseCommentsUrl", logic.getReportUrl(reportageAuth, learnerCourseComments));
+        
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_REGISTRATION_REPORT);
         rd.forward(request, response);
     }
 

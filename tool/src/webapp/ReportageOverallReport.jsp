@@ -46,7 +46,7 @@
 
 	<%@ include file="Menu.jsp" %>
 	
-	<h3 class="insColor insBak insBorder">SCORM Cloud Reportage Reports</h3>
+	<h3 class="insColor insBak insBorder">SCORM Cloud Reportage Report</h3>
 	
 	<%@ include file="Messages.jsp" %>
 	
