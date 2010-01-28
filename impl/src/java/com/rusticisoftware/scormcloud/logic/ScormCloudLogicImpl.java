@@ -43,6 +43,7 @@ import com.rusticisoftware.hostedengine.client.ScormEngineService;
 import com.rusticisoftware.hostedengine.client.Utils;
 import com.rusticisoftware.hostedengine.client.XmlUtils;
 import com.rusticisoftware.hostedengine.client.Enums.RegistrationResultsFormat;
+import com.rusticisoftware.hostedengine.client.Enums.ReportageNavPermission;
 import com.rusticisoftware.scormcloud.dao.ScormCloudDao;
 import com.rusticisoftware.scormcloud.logic.ExternalLogic;
 import com.rusticisoftware.scormcloud.logic.ScormCloudLogic;
@@ -588,7 +589,6 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
     }
     
-    
     public Double getScoreFromRegistration(ScormCloudRegistration reg){
         Double score = null;
         try { 
@@ -627,6 +627,33 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         //This assumes all contributing registrations / resources are weighted equally
         return scoreSum / numberOfContributingResources;
     }
+    
+
+    
+    //------------------------------ Reportage ------------------------------------
+    
+    public String getReportageAuth(String navPermission, boolean isAdmin){
+        try {
+            return getScormEngineService(externalLogic.getCurrentContext())
+                        .getReportingService()
+                            .GetReportageAuth(ReportageNavPermission.getValue(navPermission), isAdmin);
+        } catch (Exception e) {
+            log.warn("Exception getting reportage authentication token: " + e.getMessage(), e);
+            return null;
+        }
+    }
+    
+    public String getReportUrl(String reportageAuth, String reportUrl){
+            try {
+                return getScormEngineService(externalLogic.getCurrentContext())
+                            .getReportingService()
+                                .GetReportUrl(reportageAuth, reportUrl);
+            } catch (Exception e) {
+                log.warn("Exception calling getReportUrl: " + e.getMessage(), e);
+                return null;
+            }
+    }
+    
     
     
     
