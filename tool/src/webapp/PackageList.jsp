@@ -75,6 +75,7 @@
                 <th>Configure Package</th>
                 <th>Preview Package</th>
                 <th>View Registrations</th>
+                <th>View Reports</th>
                 <th>Creation Date</th>
             </tr>
         </thead>
@@ -98,6 +99,9 @@
                     </td>
                     <td>
                         <a href="controller?action=viewRegistrations&packageId=${pkg.id}">Registrations</a>
+                    </td>
+                    <td>
+                    	<a href="controller?action=viewCourseReport&packageId=${pkg.id}">Reports</a>
                     </td>
                     <td>
                         <fmt:formatDate value="${pkg.dateCreated}" type="both" 

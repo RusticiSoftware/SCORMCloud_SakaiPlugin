@@ -48,6 +48,7 @@
 				    </c:otherwise>
 			    </c:choose>
 		    </c:if>
+		    <a href="controller?action=viewOverallGroupReport">Summary Reports</a>
 		</div>
 	</c:if>
 	

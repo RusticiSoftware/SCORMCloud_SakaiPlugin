@@ -72,7 +72,7 @@
 </c:if>
 
 
-<div id="activityReportContainer">
+<div id="activityReportContainer" class="activityReport">
 	${activityReport}
 </div>
 

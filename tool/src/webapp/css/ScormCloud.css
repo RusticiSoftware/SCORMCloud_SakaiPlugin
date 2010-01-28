@@ -68,7 +68,7 @@ td.intLblWidth {width:110px;}
 .actRuntimeData {position:relative;}
 
 .interactionsTable {display:none;}
-.sub_detail_arrows {margin-left:15px; width:16px; height:16px; overflow:hidden; position:absolute; left:90px; top:1px; cursor:pointer;}
+.activityReport .sub_detail_arrows {margin-left:15px; width:16px; height:16px; overflow:hidden; position:absolute; left:90px; top:1px; cursor:pointer;}
 .comment_arrow {left:190px;}
 .learnerComments {display:none;}
 
@@ -87,3 +87,8 @@ td.intLblWidth {width:110px;}
 .completed {color:green;}
 .incomplete {color:red;}
 
+.gray_text { color: #555555; }
+.group_report_details_holder { vertical-align:top; }
+.group_summary_report_wrapper { height: 1800px; width:900px;}
+.reportage_summary { border:1px solid #DDDDDD; color:#555555; padding:10px; width:890px; }
+.reportage_details { border: 1px solid #DDDDDD; padding: 8px; width: 422px; }
