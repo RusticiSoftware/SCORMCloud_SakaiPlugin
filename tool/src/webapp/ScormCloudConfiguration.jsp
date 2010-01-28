@@ -18,9 +18,7 @@
     ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
     
     bean.allowOnlyAdmin(request, response);
-    
     pageContext.setAttribute("bean", bean);
-    pageContext.setAttribute("isConfigured", bean.isPluginConfigured());
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -56,20 +54,11 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-<div class="navIntraTool">
-    <a href="controller?action=viewPackages">List Resources</a>
-    <a href="controller?action=viewRegistrations">List Registrations</a>
-	<a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
-	<c:choose>
-	    <c:when test="${isConfigured}">
-	    	<a href="controller?action=viewUsage">View Usage</a>
-	    </c:when><c:otherwise>
-	    	<a href="controller?action=viewSignup">Sign Up</a>
-	    </c:otherwise>
-    </c:choose>
-</div>
+<%@ include file="Menu.jsp" %>
 
 <h3 class="insColor insBak insBorder">SCORM Cloud Configuration</h3>
+
+<%@ include file="Messages.jsp" %>
 
 <div class="instruction">Enter your AppId and Secret Key below to activate the SCORM Cloud Plugin.</div>
 <form name="cloudConfigForm" id="cloudConfigForm" action="controller?action=configureCloudPlugin" method="post" onsubmit="return validateForm()">

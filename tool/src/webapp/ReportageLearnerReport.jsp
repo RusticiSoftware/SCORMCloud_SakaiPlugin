@@ -34,12 +34,10 @@
 
 <script language="Javascript" type="text/javascript">
 	$(document).ready( function() {
-		loadScript('${courseSummaryUrl}');
-		loadScript('${learnerDetailsUrl}');
-		loadScript('${courseActivitiesUrl}');
+		loadScript('${learnerSummaryUrl}');
+		loadScript('${learnerTranscriptUrl}');
 		loadScript('${learnerObjectivesUrl}');
-		loadScript('${courseInteractionsUrl}');
-		loadScript('${courseCommentsUrl}');
+		loadScript('${learnerCommentsUrl}');
 	});
 </script>
 
@@ -57,32 +55,29 @@
 	
 	<div class="instruction">
 		Shown below are reports which show aggregate information about 
-		all of your learner registrations for the resource <b>${pkgTitle}</b>.
-		To access this course's page in the Reportage application directly, please 
-		<a target="_blank" href="controller?action=launchReportage&courseId=${courseId}">click here</a>.
+		all of the registrations for the learner <b>${learnerName}</b>
+		that have been launched via SCORM Cloud.
+		To access this learner's page in the Reportage application directly, please 
+		<a target="_blank" href="controller?action=launchReportage&learnerId=${learnerId}">click here</a>.
 	</div>
 	
 	<div class="group_summary_report_wrapper">
 		<div style="height:20px"></div>
 	
-		<div id="courseSummary" class="reportage_summary gray_text">Loading...</div>
+		<div id="learnerSummary" class="reportage_summary gray_text">Loading...</div>
 	
 		<div style="height:20px"></div>
 		
 		<table class="group_report_details_table">
 			<tr>
 				<td class="group_report_details_holder">
-					<div id="learnerDetails" class="reportage_details gray_text">Loading...</div>
-					<div style="height:20px"></div>
-					<div id="learnerObjectives" class="reportage_details gray_text">Loading...</div>
-					<div style="height:20px"></div>
-					<div id="courseComments" class="reportage_details gray_text">Loading...</div>
+					<div id="learnerTranscript" class="reportage_details gray_text">Loading...</div>
 				</td>
 				<td><div style="width:20px"></div></td>
 				<td class="group_report_details_holder">
-					<div id="courseActivities" class="reportage_details gray_text">Loading...</div>
+					<div id="learnerObjectives" class="reportage_details gray_text">Loading...</div>
 					<div style="height:20px"></div>
-					<div id="courseInteractions" class="reportage_details gray_text">Loading...</div>
+					<div id="learnerComments" class="reportage_details gray_text">Loading...</div>
 				</td>
 			</tr>
 		</table>

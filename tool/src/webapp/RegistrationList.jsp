@@ -19,10 +19,7 @@
     ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
     
     bean.doPageChecks(request, response);
-    
     pageContext.setAttribute("bean", bean);
-    pageContext.setAttribute("isConfigured", bean.isPluginConfigured());
-    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -37,20 +34,7 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-<div class="navIntraTool">
-    <a href="controller?action=viewPackages">List Resources</a>
-    <a href="controller?action=viewRegistrations">Search Registrations</a>
-    <c:if test="${canConfigure}">
-	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
-	    <c:choose>
-		    <c:when test="${isConfigured}">
-		    	<a href="controller?action=viewUsage">View Usage</a>
-		    </c:when><c:otherwise>
-		    	<a href="controller?action=viewSignup">Sign Up</a>
-		    </c:otherwise>
-	    </c:choose>
-    </c:if>
-</div>
+<%@ include file="Menu.jsp" %>
 
 <h3 class="insColor insBak insBorder">
 	SCORM Cloud Registrations
@@ -59,17 +43,7 @@
 	</c:if>
 </h3>
 
-<c:if test="${fn:length(bean.messages) > 0}">
-    <div class="alertMessage">
-        <ul style="margin:0px;">
-        <c:forEach var="msg" items="${bean.messages}">
-            <li>${msg}</li>
-        </c:forEach>
-        </ul>
-    </div>
-    <% bean.messages.clear(); %>
-</c:if>
-
+<%@ include file="Messages.jsp" %>
 
 <div class="instruction">Use the inputs below to ${empty pkg ? "search for" : "filter the"} results.</div>
 
@@ -147,6 +121,10 @@
 	                    	<a href="controller?action=viewActivityReport&registrationId=${reg.id}">Activity Report</a>
 							<br />
 	                    	<a href="controller?action=viewLaunchHistoryReport&registrationId=${reg.id}">Launch History</a>
+	                    	<br />
+	                    	<a href="controller?action=viewLearnerReport&registrationId=${reg.id}">Learner Report</a>
+	                    	<br />
+	                    	<a href="controller?action=viewRegistrationReport&registrationId=${reg.id}">Registration Report</a>
 	                    </td>
 	                    <td>
 	                        <fmt:formatDate value="${reg.dateCreated}" type="both" 

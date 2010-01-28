@@ -15,10 +15,7 @@
     ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
     
     bean.doPageChecks(request, response);
-    
     pageContext.setAttribute("bean", bean);
-    pageContext.setAttribute("isConfigured", bean.isPluginConfigured());
-    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -47,34 +44,11 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-	<div class="navIntraTool">
-	    <a href="controller?action=viewPackages">List Resources</a>
-	    <a href="controller?action=viewRegistrations">Search Registrations</a>
-	    <c:if test="${canConfigure}">
-		    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
-		    <c:choose>
-			    <c:when test="${isConfigured}">
-			    	<a href="controller?action=viewUsage">View Usage</a>
-			    </c:when><c:otherwise>
-			    	<a href="controller?action=viewSignup">Sign Up</a>
-			    </c:otherwise>
-		    </c:choose>
-	    </c:if>
-	</div>
+	<%@ include file="Menu.jsp" %>
 	
 	<h3 class="insColor insBak insBorder">SCORM Cloud Reportage Reports</h3>
 	
-	<c:if test="${fn:length(bean.messages) > 0}">
-	    <div class="alertMessage">
-	        <ul style="margin:0px;">
-	        <c:forEach var="msg" items="${bean.messages}">
-	            <li>${msg}</li>
-	        </c:forEach>
-	        </ul>
-	    </div>
-	    <% bean.messages.clear(); %>
-	</c:if>
-	
+	<%@ include file="Messages.jsp" %>
 	
 	<div class="instruction">
 		Shown below are reports which show aggregate information about 
@@ -86,18 +60,18 @@
 	<div class="group_summary_report_wrapper">
 		<div style="height:20px"></div>
 	
-		<div id="reportageSummary" class="reportage_summary gray_text">Loading...</div>
+		<div id="overallSummary" class="reportage_summary gray_text">Loading...</div>
 	
 		<div style="height:20px"></div>
 		
 		<table class="group_report_details_table">
 			<tr>
 				<td class="group_report_details_holder">
-					<div id="reportageLearnerDetails" class="reportage_details gray_text">Loading...</div>
+					<div id="learnerDetails" class="reportage_details gray_text">Loading...</div>
 				</td>
 				<td><div style="width:20px"></div></td>
 				<td class="group_report_details_holder">
-					<div id="reportageCourseDetails" class="reportage_details gray_text">Loading...</div>
+					<div id="courseDetails" class="reportage_details gray_text">Loading...</div>
 				</td>
 			</tr>
 		</table>
