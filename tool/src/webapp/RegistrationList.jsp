@@ -117,7 +117,7 @@
 	                    <td>
 	                    	<span><%= bean.formatSeconds(reg.getTotalTime()) %></span>
 	                    </td>
-	                    <td>
+	                    <td style="white-space:nowrap;">
 	                    	<a href="controller?action=viewActivityReport&registrationId=${reg.id}">Activity Report</a>
 							<br />
 	                    	<a href="controller?action=viewLaunchHistoryReport&registrationId=${reg.id}">Launch History</a>

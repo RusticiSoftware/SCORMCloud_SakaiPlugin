@@ -48,9 +48,9 @@
                 <th>Grade Contributor</th>
                 <th>Non-assignment Launch</th>
                 <th>Configure</th>
-                <th>Previewe</th>
+                <th>Preview</th>
                 <th>View Registrations</th>
-                <th>View Reports</th>
+                <th>View Report</th>
                 <th>Creation Date</th>
             </tr>
         </thead>

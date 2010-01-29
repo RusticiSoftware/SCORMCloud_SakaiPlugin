@@ -1,69 +1,93 @@
-
-.reportage .jScrollPaneContainer {
-	position: relative;
-	overflow: hidden;
-	z-index: 1;
-}
-
-.reportage .jScrollPaneTrack {
-	position: absolute;
-	cursor: pointer;
-	right: 0;
-	top: 0;
-	height: 100%;
-	background: #aaa;
-}
-.reportage .jScrollPaneDrag {
-	position: absolute;
-	background: #666;
-	cursor: pointer;
-	overflow: hidden;
-}
-.reportage .jScrollPaneDragTop {
-	position: absolute;
-	top: 0;
-	left: 0;
-	overflow: hidden;
-}
-.reportage .jScrollPaneDragBottom {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	overflow: hidden;
-}
-.reportage a.jScrollArrowUp {
-	display: block;
-	position: absolute;
-	z-index: 1;
-	top: 0;
-	right: 0;
-	text-indent: -2000px;
-	overflow: hidden;
-	/*background-color: #666;*/
-	height: 9px;
-}
-.reportage a.jScrollArrowUp:hover {
-	/*background-color: #f60;*/
-}
-
-.reportage a.jScrollArrowDown {
-	display: block;
-	position: absolute;
-	z-index: 1;
-	bottom: 0;
-	right: 0;
-	text-indent: -2000px;
-	overflow: hidden;
-	/*background-color: #666;*/
-	height: 9px;
-}
-.reportage a.jScrollArrowDown:hover {
-	/*background-color: #f60;*/
-}
-.reportage a.jScrollActiveArrowButton, a.jScrollActiveArrowButton:hover {
-	/*background-color: #f00;*/
-}/*
-Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+/*Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+Code licensed under the BSD License:
+http://developer.yahoo.net/yui/license.txt
+version: 2.8.0r4
+*/
+html.reportage{color:#000;background:#FFF;}
+.reportage body, .reportage div, .reportage dl, .reportage dt, .reportage dd, .reportage ul, .reportage ol, .reportage li, .reportage h1, .reportage h2, .reportage h3, .reportage h4, .reportage h5, .reportage h6, .reportage pre, .reportage code, .reportage form, .reportage fieldset, .reportage legend, .reportage input, .reportage button, .reportage textarea, .reportage p, .reportage blockquote, .reportage th, .reportage td{margin:0;padding:0;}
+.reportage table{border-collapse:collapse;border-spacing:0;}
+.reportage fieldset, .reportage img{border:0;}
+.reportage address, .reportage caption, .reportage cite, .reportage code, .reportage dfn, .reportage em, .reportage strong, .reportage th, .reportage var, .reportage optgroup{font-style:inherit;font-weight:inherit;}
+.reportage del, .reportage ins{text-decoration:none;}
+.reportage li{list-style:none;}
+.reportage caption, .reportage th{text-align:left;}
+.reportage h1, .reportage h2, .reportage h3, .reportage h4, .reportage h5, .reportage h6{font-size:100%;font-weight:normal;}
+.reportage q:before, .reportage q:after{content:'';}
+.reportage abbr, .reportage acronym{border:0;font-variant:normal;}
+.reportage sup{vertical-align:baseline;}
+.reportage sub{vertical-align:baseline;}
+.reportage legend{color:#000;}
+.reportage input, .reportage button, .reportage textarea, .reportage select, .reportage optgroup, .reportage option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}
+.reportage input, .reportage button, .reportage textarea, .reportage select{*font-size:100%;}
+.reportage {font:13px/1.231 arial, helvetica, clean, sans-serif;*font-size:small;*font:x-small;}
+.reportage select, .reportage input, .reportage button, .reportage textarea, .reportage button{font:99% arial, helvetica, clean, sans-serif;}
+.reportage table{font-size:inherit;font:100%;}
+.reportage pre, .reportage code, .reportage kbd, .reportage samp, .reportage tt{font-family:monospace;*font-size:108%;line-height:100%;}
+.reportage body{text-align:center;}
+.reportage #doc, .reportage #doc2, .reportage #doc3, .reportage #doc4, .reportage .yui-t1, .reportage .yui-t2, .reportage .yui-t3, .reportage .yui-t4, .reportage .yui-t5, .reportage .yui-t6, .reportage .yui-t7{margin:auto;text-align:left;width:57.69em;*width:56.25em;}
+.reportage #doc2{width:73.076em;*width:71.25em;}
+.reportage #doc3{margin:auto 10px;width:auto;}
+.reportage #doc4{width:74.923em;*width:73.05em;}
+.reportage .yui-b{position:relative;}
+.reportage .yui-b{_position:static;}
+.reportage #yui-main .yui-b{position:static;}
+.reportage #yui-main, .reportage .yui-g .yui-u .yui-g{width:100%;}
+.reportage .yui-t1 #yui-main, .reportage .yui-t2 #yui-main, .reportage .yui-t3 #yui-main{float:right;margin-left:-25em;}
+.reportage .yui-t4 #yui-main, .reportage .yui-t5 #yui-main, .reportage .yui-t6 #yui-main{float:left;margin-right:-25em;}
+.reportage .yui-t1 .yui-b{float:left;width:12.30769em;*width:12.00em;}
+.reportage .yui-t1 #yui-main .yui-b{margin-left:13.30769em;*margin-left:13.05em;}
+.reportage .yui-t2 .yui-b{float:left;width:13.8461em;*width:13.50em;}
+.reportage .yui-t2 #yui-main .yui-b{margin-left:14.8461em;*margin-left:14.55em;}
+.reportage .yui-t3 .yui-b{float:left;width:23.0769em;*width:22.50em;}
+.reportage .yui-t3 #yui-main .yui-b{margin-left:24.0769em;*margin-left:23.62em;}
+.reportage .yui-t4 .yui-b{float:right;width:13.8456em;*width:13.50em;}
+.reportage .yui-t4 #yui-main .yui-b{margin-right:14.8456em;*margin-right:14.55em;}
+.reportage .yui-t5 .yui-b{float:right;width:18.4615em;*width:18.00em;}
+.reportage .yui-t5 #yui-main .yui-b{margin-right:19.4615em;*margin-right:19.125em;}
+.reportage .yui-t6 .yui-b{float:right;width:23.0769em;*width:22.50em;}
+.reportage .yui-t6 #yui-main .yui-b{margin-right:24.0769em;*margin-right:23.62em;}
+.reportage .yui-t7 #yui-main .yui-b{display:block;margin:0 0 1em 0;}
+.reportage #yui-main .yui-b{float:none;width:auto;}
+.reportage .yui-gb .yui-u, .reportage .yui-g .yui-gb .yui-u, .reportage .yui-gb .yui-g, .reportage .yui-gb .yui-gb, .reportage .yui-gb .yui-gc, .reportage .yui-gb .yui-gd, .reportage .yui-gb .yui-ge, .reportage .yui-gb .yui-gf, .reportage .yui-gc .yui-u, .reportage .yui-gc .yui-g, .reportage .yui-gd .yui-u{float:left;}
+.reportage .yui-g .yui-u, .reportage .yui-g .yui-g, .reportage .yui-g .yui-gb, .reportage .yui-g .yui-gc, .reportage .yui-g .yui-gd, .reportage .yui-g .yui-ge, .reportage .yui-g .yui-gf, .reportage .yui-gc .yui-u, .reportage .yui-gd .yui-g, .reportage .yui-g .yui-gc .yui-u, .reportage .yui-ge .yui-u, .reportage .yui-ge .yui-g, .reportage .yui-gf .yui-g, .reportage .yui-gf .yui-u{float:right;}
+.reportage .yui-g div.first, .reportage .yui-gb div.first, .reportage .yui-gc div.first, .reportage .yui-gd div.first, .reportage .yui-ge div.first, .reportage .yui-gf div.first, .reportage .yui-g .yui-gc div.first, .reportage .yui-g .yui-ge div.first, .reportage .yui-gc div.first div.first{float:left;}
+.reportage .yui-g .yui-u, .reportage .yui-g .yui-g, .reportage .yui-g .yui-gb, .reportage .yui-g .yui-gc, .reportage .yui-g .yui-gd, .reportage .yui-g .yui-ge, .reportage .yui-g .yui-gf{width:49.1%;}
+.reportage .yui-gb .yui-u, .reportage .yui-g .yui-gb .yui-u, .reportage .yui-gb .yui-g, .reportage .yui-gb .yui-gb, .reportage .yui-gb .yui-gc, .reportage .yui-gb .yui-gd, .reportage .yui-gb .yui-ge, .reportage .yui-gb .yui-gf, .reportage .yui-gc .yui-u, .reportage .yui-gc .yui-g, .reportage .yui-gd .yui-u{width:32%;margin-left:1.99%;}
+.reportage .yui-gb .yui-u{*margin-left:1.9%;*width:31.9%;}
+.reportage .yui-gc div.first, .reportage .yui-gd .yui-u{width:66%;}
+.reportage .yui-gd div.first{width:32%;}
+.reportage .yui-ge div.first, .reportage .yui-gf .yui-u{width:74.2%;}
+.reportage .yui-ge .yui-u, .reportage .yui-gf div.first{width:24%;}
+.reportage .yui-g .yui-gb div.first, .reportage .yui-gb div.first, .reportage .yui-gc div.first, .reportage .yui-gd div.first{margin-left:0;}
+.reportage .yui-g .yui-g .yui-u, .reportage .yui-gb .yui-g .yui-u, .reportage .yui-gc .yui-g .yui-u, .reportage .yui-gd .yui-g .yui-u, .reportage .yui-ge .yui-g .yui-u, .reportage .yui-gf .yui-g .yui-u{width:49%;*width:48.1%;*margin-left:0;}
+.reportage .yui-g .yui-g .yui-u{width:48.1%;}
+.reportage .yui-g .yui-gb div.first, .reportage .yui-gb .yui-gb div.first{*margin-right:0;*width:32%;_width:31.7%;}
+.reportage .yui-g .yui-gc div.first, .reportage .yui-gd .yui-g{width:66%;}
+.reportage .yui-gb .yui-g div.first{*margin-right:4%;_margin-right:1.3%;}
+.reportage .yui-gb .yui-gc div.first, .reportage .yui-gb .yui-gd div.first{*margin-right:0;}
+.reportage .yui-gb .yui-gb .yui-u, .reportage .yui-gb .yui-gc .yui-u{*margin-left:1.8%;_margin-left:4%;}
+.reportage .yui-g .yui-gb .yui-u{_margin-left:1.0%;}
+.reportage .yui-gb .yui-gd .yui-u{*width:66%;_width:61.2%;}
+.reportage .yui-gb .yui-gd div.first{*width:31%;_width:29.5%;}
+.reportage .yui-g .yui-gc .yui-u, .reportage .yui-gb .yui-gc .yui-u{width:32%;_float:right;margin-right:0;_margin-left:0;}
+.reportage .yui-gb .yui-gc div.first{width:66%;*float:left;*margin-left:0;}
+.reportage .yui-gb .yui-ge .yui-u, .reportage .yui-gb .yui-gf .yui-u{margin:0;}
+.reportage .yui-gb .yui-gb .yui-u{_margin-left:.7%;}
+.reportage .yui-gb .yui-g div.first, .reportage .yui-gb .yui-gb div.first{*margin-left:0;}
+.reportage .yui-gc .yui-g .yui-u, .reportage .yui-gd .yui-g .yui-u{*width:48.1%;*margin-left:0;}
+.reportage .yui-gb .yui-gd div.first{width:32%;}
+.reportage .yui-g .yui-gd div.first{_width:29.9%;}
+.reportage .yui-ge .yui-g{width:24%;}
+.reportage .yui-gf .yui-g{width:74.2%;}
+.reportage .yui-gb .yui-ge div.yui-u, .reportage .yui-gb .yui-gf div.yui-u{float:right;}
+.reportage .yui-gb .yui-ge div.first, .reportage .yui-gb .yui-gf div.first{float:left;}
+.reportage .yui-gb .yui-ge .yui-u, .reportage .yui-gb .yui-gf div.first{*width:24%;_width:20%;}
+.reportage .yui-gb .yui-ge div.first, .reportage .yui-gb .yui-gf .yui-u{*width:73.5%;_width:65.5%;}
+.reportage .yui-ge div.first .yui-gd .yui-u{width:65%;}
+.reportage .yui-ge div.first .yui-gd div.first{width:32%;}
+.reportage #hd:after, .reportage #bd:after, .reportage #ft:after, .reportage .yui-g:after, .reportage .yui-gb:after, .reportage .yui-gc:after, .reportage .yui-gd:after, .reportage .yui-ge:after, .reportage .yui-gf:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
+.reportage #hd, .reportage #bd, .reportage #ft, .reportage .yui-g, .reportage .yui-gb, .reportage .yui-gc, .reportage .yui-gd, .reportage .yui-ge, .reportage .yui-gf{zoom:1;}
+/*Copyright (c) 2009, Yahoo! Inc. All rights reserved.
 Code licensed under the BSD License:
 http://developer.yahoo.net/yui/license.txt
 version: 2.8.0r4
@@ -890,6 +914,7 @@ html.reportage {/*background-color:#333333;*/font-family: verdana, helvetica, ar
 .reportage .pad5  {padding:5px;}
 
 .reportage .details_widget {width: 100%; font-size:16px;}
+.reportage .viewall_details_widget {width: 100%; font-size:18px;}
 .reportage .details_widget_fixed_size {height:240px;overflow:hidden;display:block;}
 .reportage .details_header {padding:5px 10px 5px 0px; cursor:pointer; text-align:left; font-size:14px;}
 .reportage .details_header li {display:inline; padding:5px 0px; }
@@ -909,6 +934,10 @@ html.reportage {/*background-color:#333333;*/font-family: verdana, helvetica, ar
 .reportage .details_utils a, .reportage .details_utils a:visited {color:#000000; text-decoration:none;vertical-align:text-top;}
 .reportage .view_all_moused {text-decoration:underline !important;}
 .reportage .text_default {color:#cdcdcd; font-weight:bold;}
+
+.reportage .exportLink {float:right;font-size:.7em;cursor:pointer; margin:6px 5px 0 0;color:#2554C7;}
+.reportage .exportLink img {margin-right:3px;position:relative;top:-4px;}
+.reportage #exportTarget {width:1px;height:1px; position:absolute; right:-1000px;}
 
 .reportage .details_table_wrapper {position:relative; }
 .reportage .details_table{width:100%;text-align:right;}
@@ -1010,93 +1039,70 @@ border:1px solid #C4C4BE;
 border-top:none;
 padding:1px;}
 
-.reportage .nowrap {white-space:nowrap;}/*
-Copyright (c) 2009, Yahoo! Inc. All rights reserved.
-Code licensed under the BSD License:
-http://developer.yahoo.net/yui/license.txt
-version: 2.8.0r4
-*/
-html.reportage{color:#000;background:#FFF;}
-.reportage body, .reportage div, .reportage dl, .reportage dt, .reportage dd, .reportage ul, .reportage ol, .reportage li, .reportage h1, .reportage h2, .reportage h3, .reportage h4, .reportage h5, .reportage h6, .reportage pre, .reportage code, .reportage form, .reportage fieldset, .reportage legend, .reportage input, .reportage button, .reportage textarea, .reportage p, .reportage blockquote, .reportage th, .reportage td{margin:0;padding:0;}
-.reportage table{border-collapse:collapse;border-spacing:0;}
-.reportage fieldset, .reportage img{border:0;}
-.reportage address, .reportage caption, .reportage cite, .reportage code, .reportage dfn, .reportage em, .reportage strong, .reportage th, .reportage var, .reportage optgroup{font-style:inherit;font-weight:inherit;}
-.reportage del, .reportage ins{text-decoration:none;}
-.reportage li{list-style:none;}
-.reportage caption, .reportage th{text-align:left;}
-.reportage h1, .reportage h2, .reportage h3, .reportage h4, .reportage h5, .reportage h6{font-size:100%;font-weight:normal;}
-.reportage q:before, .reportage q:after{content:'';}
-.reportage abbr, .reportage acronym{border:0;font-variant:normal;}
-.reportage sup{vertical-align:baseline;}
-.reportage sub{vertical-align:baseline;}
-.reportage legend{color:#000;}
-.reportage input, .reportage button, .reportage textarea, .reportage select, .reportage optgroup, .reportage option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit;}
-.reportage input, .reportage button, .reportage textarea, .reportage select{*font-size:100%;}
-.reportage {font:13px/1.231 arial, helvetica, clean, sans-serif;*font-size:small;*font:x-small;}
-.reportage select, .reportage input, .reportage button, .reportage textarea, .reportage button{font:99% arial, helvetica, clean, sans-serif;}
-.reportage table{font-size:inherit;font:100%;}
-.reportage pre, .reportage code, .reportage kbd, .reportage samp, .reportage tt{font-family:monospace;*font-size:108%;line-height:100%;}
-.reportage body{text-align:center;}
-.reportage #doc, .reportage #doc2, .reportage #doc3, .reportage #doc4, .reportage .yui-t1, .reportage .yui-t2, .reportage .yui-t3, .reportage .yui-t4, .reportage .yui-t5, .reportage .yui-t6, .reportage .yui-t7{margin:auto;text-align:left;width:57.69em;*width:56.25em;}
-.reportage #doc2{width:73.076em;*width:71.25em;}
-.reportage #doc3{margin:auto 10px;width:auto;}
-.reportage #doc4{width:74.923em;*width:73.05em;}
-.reportage .yui-b{position:relative;}
-.reportage .yui-b{_position:static;}
-.reportage #yui-main .yui-b{position:static;}
-.reportage #yui-main, .reportage .yui-g .yui-u .yui-g{width:100%;}
-.reportage .yui-t1 #yui-main, .reportage .yui-t2 #yui-main, .reportage .yui-t3 #yui-main{float:right;margin-left:-25em;}
-.reportage .yui-t4 #yui-main, .reportage .yui-t5 #yui-main, .reportage .yui-t6 #yui-main{float:left;margin-right:-25em;}
-.reportage .yui-t1 .yui-b{float:left;width:12.30769em;*width:12.00em;}
-.reportage .yui-t1 #yui-main .yui-b{margin-left:13.30769em;*margin-left:13.05em;}
-.reportage .yui-t2 .yui-b{float:left;width:13.8461em;*width:13.50em;}
-.reportage .yui-t2 #yui-main .yui-b{margin-left:14.8461em;*margin-left:14.55em;}
-.reportage .yui-t3 .yui-b{float:left;width:23.0769em;*width:22.50em;}
-.reportage .yui-t3 #yui-main .yui-b{margin-left:24.0769em;*margin-left:23.62em;}
-.reportage .yui-t4 .yui-b{float:right;width:13.8456em;*width:13.50em;}
-.reportage .yui-t4 #yui-main .yui-b{margin-right:14.8456em;*margin-right:14.55em;}
-.reportage .yui-t5 .yui-b{float:right;width:18.4615em;*width:18.00em;}
-.reportage .yui-t5 #yui-main .yui-b{margin-right:19.4615em;*margin-right:19.125em;}
-.reportage .yui-t6 .yui-b{float:right;width:23.0769em;*width:22.50em;}
-.reportage .yui-t6 #yui-main .yui-b{margin-right:24.0769em;*margin-right:23.62em;}
-.reportage .yui-t7 #yui-main .yui-b{display:block;margin:0 0 1em 0;}
-.reportage #yui-main .yui-b{float:none;width:auto;}
-.reportage .yui-gb .yui-u, .reportage .yui-g .yui-gb .yui-u, .reportage .yui-gb .yui-g, .reportage .yui-gb .yui-gb, .reportage .yui-gb .yui-gc, .reportage .yui-gb .yui-gd, .reportage .yui-gb .yui-ge, .reportage .yui-gb .yui-gf, .reportage .yui-gc .yui-u, .reportage .yui-gc .yui-g, .reportage .yui-gd .yui-u{float:left;}
-.reportage .yui-g .yui-u, .reportage .yui-g .yui-g, .reportage .yui-g .yui-gb, .reportage .yui-g .yui-gc, .reportage .yui-g .yui-gd, .reportage .yui-g .yui-ge, .reportage .yui-g .yui-gf, .reportage .yui-gc .yui-u, .reportage .yui-gd .yui-g, .reportage .yui-g .yui-gc .yui-u, .reportage .yui-ge .yui-u, .reportage .yui-ge .yui-g, .reportage .yui-gf .yui-g, .reportage .yui-gf .yui-u{float:right;}
-.reportage .yui-g div.first, .reportage .yui-gb div.first, .reportage .yui-gc div.first, .reportage .yui-gd div.first, .reportage .yui-ge div.first, .reportage .yui-gf div.first, .reportage .yui-g .yui-gc div.first, .reportage .yui-g .yui-ge div.first, .reportage .yui-gc div.first div.first{float:left;}
-.reportage .yui-g .yui-u, .reportage .yui-g .yui-g, .reportage .yui-g .yui-gb, .reportage .yui-g .yui-gc, .reportage .yui-g .yui-gd, .reportage .yui-g .yui-ge, .reportage .yui-g .yui-gf{width:49.1%;}
-.reportage .yui-gb .yui-u, .reportage .yui-g .yui-gb .yui-u, .reportage .yui-gb .yui-g, .reportage .yui-gb .yui-gb, .reportage .yui-gb .yui-gc, .reportage .yui-gb .yui-gd, .reportage .yui-gb .yui-ge, .reportage .yui-gb .yui-gf, .reportage .yui-gc .yui-u, .reportage .yui-gc .yui-g, .reportage .yui-gd .yui-u{width:32%;margin-left:1.99%;}
-.reportage .yui-gb .yui-u{*margin-left:1.9%;*width:31.9%;}
-.reportage .yui-gc div.first, .reportage .yui-gd .yui-u{width:66%;}
-.reportage .yui-gd div.first{width:32%;}
-.reportage .yui-ge div.first, .reportage .yui-gf .yui-u{width:74.2%;}
-.reportage .yui-ge .yui-u, .reportage .yui-gf div.first{width:24%;}
-.reportage .yui-g .yui-gb div.first, .reportage .yui-gb div.first, .reportage .yui-gc div.first, .reportage .yui-gd div.first{margin-left:0;}
-.reportage .yui-g .yui-g .yui-u, .reportage .yui-gb .yui-g .yui-u, .reportage .yui-gc .yui-g .yui-u, .reportage .yui-gd .yui-g .yui-u, .reportage .yui-ge .yui-g .yui-u, .reportage .yui-gf .yui-g .yui-u{width:49%;*width:48.1%;*margin-left:0;}
-.reportage .yui-g .yui-g .yui-u{width:48.1%;}
-.reportage .yui-g .yui-gb div.first, .reportage .yui-gb .yui-gb div.first{*margin-right:0;*width:32%;_width:31.7%;}
-.reportage .yui-g .yui-gc div.first, .reportage .yui-gd .yui-g{width:66%;}
-.reportage .yui-gb .yui-g div.first{*margin-right:4%;_margin-right:1.3%;}
-.reportage .yui-gb .yui-gc div.first, .reportage .yui-gb .yui-gd div.first{*margin-right:0;}
-.reportage .yui-gb .yui-gb .yui-u, .reportage .yui-gb .yui-gc .yui-u{*margin-left:1.8%;_margin-left:4%;}
-.reportage .yui-g .yui-gb .yui-u{_margin-left:1.0%;}
-.reportage .yui-gb .yui-gd .yui-u{*width:66%;_width:61.2%;}
-.reportage .yui-gb .yui-gd div.first{*width:31%;_width:29.5%;}
-.reportage .yui-g .yui-gc .yui-u, .reportage .yui-gb .yui-gc .yui-u{width:32%;_float:right;margin-right:0;_margin-left:0;}
-.reportage .yui-gb .yui-gc div.first{width:66%;*float:left;*margin-left:0;}
-.reportage .yui-gb .yui-ge .yui-u, .reportage .yui-gb .yui-gf .yui-u{margin:0;}
-.reportage .yui-gb .yui-gb .yui-u{_margin-left:.7%;}
-.reportage .yui-gb .yui-g div.first, .reportage .yui-gb .yui-gb div.first{*margin-left:0;}
-.reportage .yui-gc .yui-g .yui-u, .reportage .yui-gd .yui-g .yui-u{*width:48.1%;*margin-left:0;}
-.reportage .yui-gb .yui-gd div.first{width:32%;}
-.reportage .yui-g .yui-gd div.first{_width:29.9%;}
-.reportage .yui-ge .yui-g{width:24%;}
-.reportage .yui-gf .yui-g{width:74.2%;}
-.reportage .yui-gb .yui-ge div.yui-u, .reportage .yui-gb .yui-gf div.yui-u{float:right;}
-.reportage .yui-gb .yui-ge div.first, .reportage .yui-gb .yui-gf div.first{float:left;}
-.reportage .yui-gb .yui-ge .yui-u, .reportage .yui-gb .yui-gf div.first{*width:24%;_width:20%;}
-.reportage .yui-gb .yui-ge div.first, .reportage .yui-gb .yui-gf .yui-u{*width:73.5%;_width:65.5%;}
-.reportage .yui-ge div.first .yui-gd .yui-u{width:65%;}
-.reportage .yui-ge div.first .yui-gd div.first{width:32%;}
-.reportage #hd:after, .reportage #bd:after, .reportage #ft:after, .reportage .yui-g:after, .reportage .yui-gb:after, .reportage .yui-gc:after, .reportage .yui-gd:after, .reportage .yui-ge:after, .reportage .yui-gf:after{content:".";display:block;height:0;clear:both;visibility:hidden;}
-.reportage #hd, .reportage #bd, .reportage #ft, .reportage .yui-g, .reportage .yui-gb, .reportage .yui-gc, .reportage .yui-gd, .reportage .yui-ge, .reportage .yui-gf{zoom:1;}
+.reportage .nowrap {white-space:nowrap;}
+
+
+.reportage .jScrollPaneContainer {
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+}
+
+.reportage .jScrollPaneTrack {
+	position: absolute;
+	cursor: pointer;
+	right: 0;
+	top: 0;
+	height: 100%;
+	background: #aaa;
+}
+.reportage .jScrollPaneDrag {
+	position: absolute;
+	background: #666;
+	cursor: pointer;
+	overflow: hidden;
+}
+.reportage .jScrollPaneDragTop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+}
+.reportage .jScrollPaneDragBottom {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	overflow: hidden;
+}
+.reportage a.jScrollArrowUp {
+	display: block;
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	right: 0;
+	text-indent: -2000px;
+	overflow: hidden;
+	/*background-color: #666;*/
+	height: 9px;
+}
+.reportage a.jScrollArrowUp:hover {
+	/*background-color: #f60;*/
+}
+
+.reportage a.jScrollArrowDown {
+	display: block;
+	position: absolute;
+	z-index: 1;
+	bottom: 0;
+	right: 0;
+	text-indent: -2000px;
+	overflow: hidden;
+	/*background-color: #666;*/
+	height: 9px;
+}
+.reportage a.jScrollArrowDown:hover {
+	/*background-color: #f60;*/
+}
+.reportage a.jScrollActiveArrowButton, a.jScrollActiveArrowButton:hover {
+	/*background-color: #f00;*/
+}/*

@@ -85,16 +85,14 @@ public class RequestController extends HttpServlet {
 	private static final String PAGE_REPORTAGE_COURSE_REPORT = "ReportageCourseReport.jsp";
 	private static final String PAGE_REPORTAGE_LEARNER_REPORT = "ReportageLearnerReport.jsp";
 	private static final String PAGE_REPORTAGE_REGISTRATION_REPORT = "ReportageRegistrationReport.jsp";
+	private static final String PAGE_REPORTAGE_VIEWALL_REPORT = "ReportageViewAllDetailsReport.jsp";
 	
 	private static final List<String> pagesAllowedByNonAdmin = 
 	    Arrays.asList(new String[]{PAGE_WELCOME, PAGE_REGISTRATION_LAUNCH, PAGE_CLOSER});
 	
 	private static final List<String> actionsAllowedByNonAdmin =
 	    Arrays.asList(new String[]{"launchPackage", "postLaunchActions", "closeWindow"});
-    
-    
-	
-	
+
 	private ApplicationContext appContext;
 	private ScormCloudLogic logic;
 	private ExternalLogic extLogic;
@@ -229,6 +227,9 @@ public class RequestController extends HttpServlet {
             else if(action.equals("viewRegistrationReport")){
                 processViewRegistrationReportRequest(request, response);
             }
+            else if(action.equals("viewAllDetailsReport")){
+                processViewAllDetailsReportRequest(request, response);
+            }
             
             
             else if(action.equals("closeWindow")){
@@ -290,6 +291,7 @@ public class RequestController extends HttpServlet {
         String summaryUrlParams = "&appId=" + appId +  "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
         String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
         String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
         
         String summaryUrl = summaryWidgetUrl + "?srt=allLearnersAllCourses"  + summaryUrlParams + "&divname=overallSummary";
         String learnerDetailsUrl = detailsWidgetUrl + "?drt=learnerRegistration" + detailUrlParams + "&divname=learnerDetails";
@@ -331,7 +333,7 @@ public class RequestController extends HttpServlet {
         String learnerDetails = detailsWidgetUrl + "?drt=learnerRegistration" +  detailUrlParams + "&divname=learnerDetails";
         String courseActivities = detailsWidgetUrl + "?drt=courseActivities" +  detailUrlParams + "&divname=courseActivities";
         String learnerObjectives = detailsWidgetUrl + "?drt=learnerObjectives" +  detailUrlParams + "&divname=learnerObjectives";
-        String courseInteractions = detailsWidgetUrl + "?drt=courseInteractions" +  detailUrlParams + "&divname=courseInteractions";
+        String courseInteractions = detailsWidgetUrl + "?drt=courseInteractionsShort" +  detailUrlParams + "&divname=courseInteractions";
         String courseComments = detailsWidgetUrl + "?drt=courseComments" +  detailUrlParams + "&divname=courseComments";
         
         request.setAttribute("courseId", pkg.getScormCloudId());
@@ -430,6 +432,19 @@ public class RequestController extends HttpServlet {
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_REGISTRATION_REPORT);
         rd.forward(request, response);
     }
+	
+	private void processViewAllDetailsReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+
+        String viewAllWidgetUrl = "/Reportage/scormreports/widgets/ViewAllDetailsWidget.php";
+        String widgetParams = "&standalone=true&embedded=true&showTitle=true&scriptBased=true&expand=true";
+        
+        String viewAllDetails = viewAllWidgetUrl + "?" + request.getQueryString() + widgetParams + "&divname=viewAllDetails";
+        
+        request.setAttribute("viewAllDetailsUrl", logic.getReportUrl(reportageAuth, viewAllDetails));
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_VIEWALL_REPORT);
+        rd.forward(request, response);
+	}
 
     private void processViewUsageRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String params = 
