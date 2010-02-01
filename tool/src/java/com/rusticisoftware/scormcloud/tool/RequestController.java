@@ -286,6 +286,7 @@ public class RequestController extends HttpServlet {
 	    
 	    String appId = logic.getScormCloudConfiguration().getAppId();
         String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
         
         String summaryWidgetUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php";
         String summaryUrlParams = "&appId=" + appId +  "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
@@ -297,6 +298,7 @@ public class RequestController extends HttpServlet {
         String learnerDetailsUrl = detailsWidgetUrl + "?drt=learnerRegistration" + detailUrlParams + "&divname=learnerDetails";
         String courseDetailsUrl = detailsWidgetUrl + "?drt=courseRegistration" + detailUrlParams + "&divname=courseDetails";
         
+        request.setAttribute("reportDate", reportDate);
         request.setAttribute("summaryUrl", logic.getReportUrl(reportageAuth, summaryUrl));
         request.setAttribute("learnerDetailsUrl", logic.getReportUrl(reportageAuth, learnerDetailsUrl));
         request.setAttribute("courseDetailsUrl", logic.getReportUrl(reportageAuth, courseDetailsUrl));
@@ -318,6 +320,7 @@ public class RequestController extends HttpServlet {
         
         String appId = logic.getScormCloudConfiguration().getAppId();
         String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
         
         String courseId = URLEncoder.encode(pkg.getScormCloudId(), "UTF-8");
 
@@ -336,6 +339,7 @@ public class RequestController extends HttpServlet {
         String courseInteractions = detailsWidgetUrl + "?drt=courseInteractionsShort" +  detailUrlParams + "&divname=courseInteractions";
         String courseComments = detailsWidgetUrl + "?drt=courseComments" +  detailUrlParams + "&divname=courseComments";
         
+        request.setAttribute("reportDate", reportDate);
         request.setAttribute("courseId", pkg.getScormCloudId());
         request.setAttribute("pkgTitle", pkg.getTitle());
         request.setAttribute("courseSummaryUrl", logic.getReportUrl(reportageAuth, courseSummary));
@@ -362,6 +366,7 @@ public class RequestController extends HttpServlet {
         
         String appId = logic.getScormCloudConfiguration().getAppId();
         String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
         
         String learnerId = URLEncoder.encode(reg.getOwnerId(), "UTF-8");
 
@@ -378,6 +383,7 @@ public class RequestController extends HttpServlet {
         String learnerObjectives = detailsWidgetUrl + "?drt=learnerObjectives" +  detailUrlParams + "&divname=learnerObjectives";
         String learnerComments = detailsWidgetUrl + "?drt=learnerComments" +  detailUrlParams + "&divname=learnerComments";
         
+        request.setAttribute("reportDate", reportDate);
         request.setAttribute("learnerId", learnerId);
         request.setAttribute("learnerName", reg.getUserDisplayName());
         request.setAttribute("learnerSummaryUrl", logic.getReportUrl(reportageAuth, learnerSummary));
@@ -403,6 +409,7 @@ public class RequestController extends HttpServlet {
         
         String appId = logic.getScormCloudConfiguration().getAppId();
         String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
         
         String learnerId = URLEncoder.encode(reg.getOwnerId(), "UTF-8");
         String courseId = URLEncoder.encode(pkg.getScormCloudId(), "UTF-8");
@@ -420,6 +427,7 @@ public class RequestController extends HttpServlet {
         String learnerCourseInteractions = detailsWidgetUrl + "?drt=learnerCourseInteractions" +  detailUrlParams + "&divname=learnerCourseInteractions";
         String learnerCourseComments = detailsWidgetUrl + "?drt=learnerCourseComments" +  detailUrlParams + "&divname=learnerCourseComments";
         
+        request.setAttribute("reportDate", reportDate);
         request.setAttribute("learnerId", learnerId);
         request.setAttribute("learnerName", reg.getUserDisplayName());
         request.setAttribute("courseId", courseId);

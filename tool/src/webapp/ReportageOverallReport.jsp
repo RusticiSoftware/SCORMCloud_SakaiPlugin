@@ -27,9 +27,8 @@
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
 
-<script language="Javascript" type="text/javascript" src="http://dev.cloud.scorm.com/Reportage/scripts/reportage.combined.js"></script>
+<script language="Javascript" type="text/javascript" src="javascript/reportage.combined.js"></script>
 <link media="all" rel="stylesheet" type="text/css" href="css/reportage.combined.sakai.css"></link>
-<!-- <link media="all" rel="stylesheet" type="text/css" href="http://dev.cloud.scorm.com/Reportage/css/reportage.combined.css"></link> -->
 
 <script language="Javascript" type="text/javascript">
 	$(document).ready( function() {
@@ -55,6 +54,7 @@
 		all of your learner registrations that have been launched via SCORM Cloud.
 		To access the Reportage application directly, please 
 		<a target="_blank" href="controller?action=launchReportage">click here</a>.
+		Report data current as of ${reportDate} UTC.
 	</div>
 	
 	<div class="group_summary_report_wrapper">

@@ -654,6 +654,17 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             }
     }
     
+    public String getReportDate(){
+        try {
+            return getScormEngineService(externalLogic.getCurrentContext())
+                        .getReportingService()
+                            .GetReportDate();
+        } catch (Exception e) {
+            log.warn("Exception calling getReportDate: " + e.getMessage(), e);
+            return null;
+        }
+    }
+    
     
     
     
