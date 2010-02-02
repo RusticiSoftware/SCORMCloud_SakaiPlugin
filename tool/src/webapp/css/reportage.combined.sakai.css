@@ -931,8 +931,10 @@ html.reportage {/*background-color:#333333;*/font-family: verdana, helvetica, ar
 .reportage .details_utils li {margin-right:15px; display:inline;}
 .reportage .details_utils td.right {text-align:right;}
 .reportage .details_utils img {vertical-align:text-top;}
-.reportage .details_utils a, .reportage .details_utils a:visited {color:#000000; text-decoration:none;vertical-align:text-top;}
-.reportage .view_all_moused {text-decoration:underline !important;}
+.reportage .details_utils a,
+.reportage .details_utils a:hover,
+.reportage .details_utils a:active,
+.reportage .details_utils a:visited {color:#555555;text-decoration:none !important;vertical-align:text-top;}
 .reportage .text_default {color:#cdcdcd; font-weight:bold;}
 
 .reportage .exportLink {float:right;font-size:.7em;cursor:pointer; margin:6px 5px 0 0;color:#2554C7;}

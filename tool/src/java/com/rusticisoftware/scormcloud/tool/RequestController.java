@@ -331,6 +331,7 @@ public class RequestController extends HttpServlet {
         summaryUrlParams += "&courseId=" + courseId;
         
         String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
 
         String courseSummary = summaryWidgetUrl + "?srt=singleCourse" + summaryUrlParams + "&divname=courseSummary";
         String learnerDetails = detailsWidgetUrl + "?drt=learnerRegistration" +  detailUrlParams + "&divname=learnerDetails";
@@ -377,6 +378,7 @@ public class RequestController extends HttpServlet {
         summaryUrlParams += "&learnerId=" + learnerId;
         
         String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
 
         String learnerSummary = summaryWidgetUrl + "?srt=singleLearner" + summaryUrlParams + "&divname=learnerSummary";
         String learnerTranscript = detailsWidgetUrl + "?drt=learnerTranscript" +  detailUrlParams + "&divname=learnerTranscript";
@@ -421,6 +423,7 @@ public class RequestController extends HttpServlet {
         summaryUrlParams += "&learnerId=" + learnerId + "&courseId=" + courseId;
         
         String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
 
         String registrationSummary = summaryWidgetUrl + "?srt=singleLearnerSingleCourse" + summaryUrlParams + "&divname=registrationSummary";
         String learnerCourseActivities = detailsWidgetUrl + "?drt=learnerCourseActivities" +  detailUrlParams + "&divname=learnerCourseActivities";
