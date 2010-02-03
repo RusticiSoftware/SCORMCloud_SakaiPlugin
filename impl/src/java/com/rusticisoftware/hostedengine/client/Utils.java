@@ -29,44 +29,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public class Utils {
-	public static String getXmlString (Document xmlDoc) throws TransformerFactoryConfigurationError, TransformerException {
-		Transformer transformer = TransformerFactory.newInstance().newTransformer();
-		transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-		//initialize StreamResult with File object to save to file
-		StreamResult result = new StreamResult(new StringWriter());
-		DOMSource source = new DOMSource(xmlDoc);
-		transformer.transform(source, result);
-		
-		return result.getWriter().toString();
-	}
-    
-    public static String getXmlString (Node xmlNode) throws TransformerFactoryConfigurationError, TransformerException {
-        Transformer transformer = TransformerFactory.newInstance().newTransformer();
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-        //initialize StreamResult with File object to save to file
-        StreamResult result = new StreamResult(new StringWriter());
-        DOMSource source = new DOMSource(xmlNode);
-        transformer.transform(source, result);
-        
-        return result.getWriter().toString();
-    }
-    
-
-    public static Document parseXmlString (String xmlString) throws Exception {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-        return docBuilder.parse(new ByteArrayInputStream(xmlString.getBytes("UTF-8")));
-    }
-    
-    public static String xmlEncode (String str)
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    public static Date parseIsoDate(String isoDate) throws Exception
     {
-        return str.replace("&", "&amp;")
-                  .replace("<", "&lt;")
-                  .replace("<", "&gt;")
-                  .replace("\"", "&quot;")
-                  .replace("'", "&apos;");
+        return sdf.parse(isoDate);
+    }
+    public static String getIsoDateString(Date date)
+    {
+        return sdf.format(date);
     }
     
   //Copy inStream to outStream using Java's built in buffering, closing outStream when complete

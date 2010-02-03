@@ -55,15 +55,14 @@ public class UploadService
     {
         ServiceRequest request = new ServiceRequest(configuration);
         request.setFileToPost(absoluteFilePathToZip);
-
-        String servicesUrl = "http://" + token.getServer() + "/EngineWebServices";
+        request.setServer(token.getServer());
         request.getParameters().add("token", token.getTokenId());
 
         if (!Utils.isNullOrEmpty(permissionDomain)) {
             request.getParameters().add("pd", permissionDomain);
         }
 
-        Document response = request.callService("rustici.upload.uploadFile", servicesUrl);
+        Document response = request.callService("rustici.upload.uploadFile");
         Element location = (Element)response.getElementsByTagName("location").item(0);
         return location.getTextContent();
     }
@@ -85,11 +84,10 @@ public class UploadService
     public String GetUploadUrl(String redirectUrl, String permissionDomain) throws Exception
     {
         UploadToken token = GetUploadToken();
-
-        String servicesUrl = "http://" + token.getServer() + "/EngineWebServices";
         
         ServiceRequest request = new ServiceRequest(configuration);
         request.getParameters().add("token", token.getTokenId());
+        request.setServer(token.getServer());
         
         if (!Utils.isNullOrEmpty(permissionDomain)) {
             request.getParameters().add("pd", permissionDomain);
@@ -97,7 +95,7 @@ public class UploadService
         if (!Utils.isNullOrEmpty(redirectUrl)) {
             request.getParameters().add("redirecturl", redirectUrl);
         }
-        return request.constructUrl("rustici.upload.uploadFile", servicesUrl);
+        return request.constructUrl("rustici.upload.uploadFile");
     }
 
     /// <summary>

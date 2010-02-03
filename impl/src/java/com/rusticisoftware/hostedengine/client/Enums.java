@@ -110,4 +110,24 @@ public class Enums
             return this.name().toLowerCase();
         }
     }
+    
+    public enum ReportageNavPermission {
+    	NONAV, DOWNONLY, FREENAV;
+    	
+    	public static ReportageNavPermission getValue(String name) {
+            if (name == null)
+                return null;
+
+            for(ReportageNavPermission value : ReportageNavPermission.values()){
+                if (value.name().equalsIgnoreCase(name)){
+                    return value;
+                }
+            }
+            return null;    
+        }
+        
+        public String toString(){
+            return this.name().toLowerCase();
+        }
+    }
 }

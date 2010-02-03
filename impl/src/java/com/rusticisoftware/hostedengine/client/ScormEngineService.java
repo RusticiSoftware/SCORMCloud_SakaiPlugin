@@ -7,6 +7,8 @@ public class ScormEngineService
     private RegistrationService registrationService = null;
     private UploadService uploadService = null;
     private FtpService ftpService = null;
+    private ExportService exportService = null;
+    private ReportingService reportingService = null;
 
     /// <summary>
     /// SCORM Engine Service constructor that that takes the three required properties.
@@ -30,6 +32,8 @@ public class ScormEngineService
         registrationService = new RegistrationService(configuration, this);
         uploadService = new UploadService(configuration, this);
         ftpService = new FtpService(configuration, this);
+        exportService = new ExportService(configuration, this);
+        reportingService = new ReportingService(configuration, this);
     }
 
     /// <summary>
@@ -63,6 +67,22 @@ public class ScormEngineService
     public FtpService getFtpService()
     {
         return ftpService;
+    }
+    
+    /// <summary>
+    /// Contains all SCORM Engine Data Export functionality.
+    /// </summary>
+    public ExportService getExportService()
+    {
+        return exportService;
+    }
+    
+    /// <summary>
+    /// Contains SCORM Cloud reporting methods.
+    /// </summary>
+    public ReportingService getReportingService()
+    {
+        return reportingService;
     }
 
     /// <summary>

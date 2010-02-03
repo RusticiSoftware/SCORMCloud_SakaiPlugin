@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="java.text.DateFormat" %>
 <%@ page import="org.springframework.web.context.WebApplicationContext" %>
 <%@ page import="org.springframework.web.context.support.WebApplicationContextUtils" %>
 <%@ page import="com.rusticisoftware.scormcloud.tool.ScormCloudToolBean" %>
 <%@ page import="com.rusticisoftware.scormcloud.model.ScormCloudPackage" %>
-<%@ page import="com.rusticisoftware.scormcloud.tool.ActivityReporter" %>
-<%@ page import="org.w3c.dom.Document" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -17,8 +13,9 @@
     WebApplicationContext context = 
         WebApplicationContextUtils.getWebApplicationContext(application);
     ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
-
+    
     bean.doPageChecks(request, response);
+    
     pageContext.setAttribute("bean", bean);
 %>
 
@@ -27,28 +24,26 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
 <script src="/library/js/headscripts.js" language="JavaScript" type="text/javascript"></script>
-<script type="text/javascript" src="javascript/jquery-1.3.2.min.js"></script>
 <link media="all" href="/library/skin/tool_base.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="/library/skin/default/tool.css" rel="stylesheet" type="text/css"/>
 <link media="all" href="css/ScormCloud.css" rel="stylesheet" type="text/css"/>
-<title>SCORM Cloud Registration Activity Report</title>
+
+<script language="Javascript" type="text/javascript" src="javascript/reportage.combined.js"></script>
+<link media="all" rel="stylesheet" type="text/css" href="css/reportage.combined.sakai.css"></link>
+
+<script language="Javascript" type="text/javascript">
+	$(document).ready( function() {
+		loadScript('${viewAllDetailsUrl}');
+	});
+</script>
+
+<title>SCORM Cloud Reportage Report</title>
 </head>
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
-
-<%@ include file="Menu.jsp" %>
-
-<h3 class="insColor insBak insBorder">SCORM Cloud Registration Activity Report</h3>
-
-<div class="instruction">Displayed below is a report of ${reg.userName}'s activity with resource ${pkg.title}. 
-	When finished viewing, you can click <a href="javascript:history.back()">here</a> to go back.</div>
-
-<%@ include file="Messages.jsp" %>
-
-<div id="activityReportContainer" class="activityReport">
-	${activityReport}
-</div>
-
+	<div style="padding:10px;">
+		<div id="viewAllDetails" class="reportage_viewall_details gray_text">Loading...</div>
+	</div>
 
 </div>
 </body>

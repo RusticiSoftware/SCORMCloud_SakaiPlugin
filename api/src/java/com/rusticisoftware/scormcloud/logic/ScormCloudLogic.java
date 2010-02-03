@@ -57,6 +57,10 @@ public interface ScormCloudLogic {
    public String getLaunchInfoXml(ScormCloudRegistration reg, String launchId);
    public Document getRegistrationReport(ScormCloudRegistration reg);
    
+   public String getReportageAuth(String navPermission, boolean isAdmin);
+   public String getReportUrl(String reportageAuth, String reportUrl);
+   public String getReportDate();
+   
    public boolean isCurrentUserSakaiAdmin();
    public boolean isCurrentUserPluginAdmin();
    public boolean canConfigurePlugin();

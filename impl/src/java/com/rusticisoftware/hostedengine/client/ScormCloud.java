@@ -57,6 +57,22 @@ public class ScormCloud
     {
         return getService().getFtpService();
     }
+    
+    /// <summary>
+    /// Contains all SCORM Engine Data Export functionality
+    /// </summary>
+    public static ExportService getExportService() throws Exception
+    {
+        return getService().getExportService();
+    }
+    
+    /// <summary>
+    /// Contains SCORM Cloud reporting methods.
+    /// </summary>
+    public static ReportingService getReportingService() throws Exception
+    {
+        return getService().getReportingService();
+    }
 
     /// <summary>
     /// The Application ID obtained by registering with the SCORM Engine Service

@@ -81,14 +81,18 @@ public class RequestController extends HttpServlet {
 	private static final String PAGE_SIGNUP = "Signup.jsp";
 	private static final String PAGE_USAGE = "Usage.jsp";
 	
+	private static final String PAGE_REPORTAGE_OVERALL_REPORT = "ReportageOverallReport.jsp";
+	private static final String PAGE_REPORTAGE_COURSE_REPORT = "ReportageCourseReport.jsp";
+	private static final String PAGE_REPORTAGE_LEARNER_REPORT = "ReportageLearnerReport.jsp";
+	private static final String PAGE_REPORTAGE_REGISTRATION_REPORT = "ReportageRegistrationReport.jsp";
+	private static final String PAGE_REPORTAGE_VIEWALL_REPORT = "ReportageViewAllDetailsReport.jsp";
+	
 	private static final List<String> pagesAllowedByNonAdmin = 
 	    Arrays.asList(new String[]{PAGE_WELCOME, PAGE_REGISTRATION_LAUNCH, PAGE_CLOSER});
 	
 	private static final List<String> actionsAllowedByNonAdmin =
 	    Arrays.asList(new String[]{"launchPackage", "postLaunchActions", "closeWindow"});
-    
-	
-	
+
 	private ApplicationContext appContext;
 	private ScormCloudLogic logic;
 	private ExternalLogic extLogic;
@@ -205,6 +209,29 @@ public class RequestController extends HttpServlet {
             else if(action.equals("viewPackageProperties")){
 				processViewPackagePropertiesRequest(request, response);
 			}
+            
+            
+            //Reportage actions / pages
+            else if(action.equals("launchReportage")){
+                processLaunchReportageRequest(request, response);
+            }
+            else if(action.equals("viewOverallGroupReport")){
+                processViewOverallGroupReportRequest(request, response);
+            }
+            else if(action.equals("viewCourseReport")){
+                processViewCourseReportRequest(request, response);
+            }
+            else if(action.equals("viewLearnerReport")){
+                processViewLearnerReportRequest(request, response);
+            }
+            else if(action.equals("viewRegistrationReport")){
+                processViewRegistrationReportRequest(request, response);
+            }
+            else if(action.equals("viewAllDetailsReport")){
+                processViewAllDetailsReportRequest(request, response);
+            }
+            
+            
             else if(action.equals("closeWindow")){
 			    response.sendRedirect("Closer.html");
 			}
@@ -228,6 +255,206 @@ public class RequestController extends HttpServlet {
 		catch (Exception e){
 			throw new ServletException(e);
 		}
+	}
+
+    private void processLaunchReportageRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String courseId = request.getParameter("courseId");
+        String learnerId = request.getParameter("learnerId");
+        
+        String appId = logic.getScormCloudConfiguration().getAppId();
+        String reportageAuth = logic.getReportageAuth("FREENAV", true);
+        String reportageHome = "/Reportage/reportage.php?appId=" + appId;
+        if(!isNullOrEmpty(courseId)){
+            reportageHome += "&courseId=" + courseId;
+        }
+        if(!isNullOrEmpty(learnerId)){
+            reportageHome += "&learnerId=" + learnerId;
+        }
+        response.sendRedirect(logic.getReportUrl(reportageAuth, reportageHome));
+    }
+
+	private void processViewOverallGroupReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String learnerTags = request.getParameter("learnerTags");
+        String courseTags = request.getParameter("courseTags");
+        
+        boolean learnerTagsPresent = !isNullOrEmpty(learnerTags);
+        boolean courseTagsPresent = !isNullOrEmpty(courseTags);
+        boolean tagsPresent = learnerTagsPresent || courseTagsPresent;
+        
+        //TODO: Use the tag parameters, but first we need a place where the
+        //tags are used automatically or manually in sakai
+	    
+	    String appId = logic.getScormCloudConfiguration().getAppId();
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
+        
+        String summaryWidgetUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php";
+        String summaryUrlParams = "&appId=" + appId +  "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
+        String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
+        String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
+        
+        String summaryUrl = summaryWidgetUrl + "?srt=allLearnersAllCourses"  + summaryUrlParams + "&divname=overallSummary";
+        String learnerDetailsUrl = detailsWidgetUrl + "?drt=learnerRegistration" + detailUrlParams + "&divname=learnerDetails";
+        String courseDetailsUrl = detailsWidgetUrl + "?drt=courseRegistration" + detailUrlParams + "&divname=courseDetails";
+        
+        request.setAttribute("reportDate", reportDate);
+        request.setAttribute("summaryUrl", logic.getReportUrl(reportageAuth, summaryUrl));
+        request.setAttribute("learnerDetailsUrl", logic.getReportUrl(reportageAuth, learnerDetailsUrl));
+        request.setAttribute("courseDetailsUrl", logic.getReportUrl(reportageAuth, courseDetailsUrl));
+        
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_OVERALL_REPORT);
+        rd.forward(request, response);
+    }
+	
+	private void processViewCourseReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	    String packageId = request.getParameter("packageId");
+	    ScormCloudPackage pkg = logic.getPackageById(packageId);
+        
+	    String learnerTags = request.getParameter("learnerTags");
+        String courseTags = request.getParameter("courseTags");
+        
+        boolean learnerTagsPresent = !isNullOrEmpty(learnerTags);
+        boolean courseTagsPresent = !isNullOrEmpty(courseTags);
+        boolean tagsPresent = learnerTagsPresent || courseTagsPresent;
+        
+        String appId = logic.getScormCloudConfiguration().getAppId();
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
+        
+        String courseId = URLEncoder.encode(pkg.getScormCloudId(), "UTF-8");
+
+        String summaryWidgetUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php";
+        String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
+        
+        String summaryUrlParams = "&appId=" + appId + "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
+        summaryUrlParams += "&courseId=" + courseId;
+        
+        String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
+
+        String courseSummary = summaryWidgetUrl + "?srt=singleCourse" + summaryUrlParams + "&divname=courseSummary";
+        String learnerDetails = detailsWidgetUrl + "?drt=learnerRegistration" +  detailUrlParams + "&divname=learnerDetails";
+        String courseActivities = detailsWidgetUrl + "?drt=courseActivities" +  detailUrlParams + "&divname=courseActivities";
+        String learnerObjectives = detailsWidgetUrl + "?drt=learnerObjectives" +  detailUrlParams + "&divname=learnerObjectives";
+        String courseInteractions = detailsWidgetUrl + "?drt=courseInteractionsShort" +  detailUrlParams + "&divname=courseInteractions";
+        String courseComments = detailsWidgetUrl + "?drt=courseComments" +  detailUrlParams + "&divname=courseComments";
+        
+        request.setAttribute("reportDate", reportDate);
+        request.setAttribute("courseId", pkg.getScormCloudId());
+        request.setAttribute("pkgTitle", pkg.getTitle());
+        request.setAttribute("courseSummaryUrl", logic.getReportUrl(reportageAuth, courseSummary));
+        request.setAttribute("learnerDetailsUrl", logic.getReportUrl(reportageAuth, learnerDetails));
+        request.setAttribute("courseActivitiesUrl", logic.getReportUrl(reportageAuth, courseActivities));
+        request.setAttribute("learnerObjectivesUrl", logic.getReportUrl(reportageAuth, learnerObjectives));
+        request.setAttribute("courseInteractionsUrl", logic.getReportUrl(reportageAuth, courseInteractions));
+        request.setAttribute("courseCommentsUrl", logic.getReportUrl(reportageAuth, courseComments));
+        
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_COURSE_REPORT);
+        rd.forward(request, response);
+	}
+	
+	private void processViewLearnerReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String registrationId = request.getParameter("registrationId");
+        ScormCloudRegistration reg = logic.getRegistrationById(registrationId);
+        
+        String learnerTags = request.getParameter("learnerTags");
+        String courseTags = request.getParameter("courseTags");
+        
+        boolean learnerTagsPresent = !isNullOrEmpty(learnerTags);
+        boolean courseTagsPresent = !isNullOrEmpty(courseTags);
+        boolean tagsPresent = learnerTagsPresent || courseTagsPresent;
+        
+        String appId = logic.getScormCloudConfiguration().getAppId();
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
+        
+        String learnerId = URLEncoder.encode(reg.getOwnerId(), "UTF-8");
+
+        String summaryWidgetUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php";
+        String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
+        
+        String summaryUrlParams = "&appId=" + appId + "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
+        summaryUrlParams += "&learnerId=" + learnerId;
+        
+        String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
+
+        String learnerSummary = summaryWidgetUrl + "?srt=singleLearner" + summaryUrlParams + "&divname=learnerSummary";
+        String learnerTranscript = detailsWidgetUrl + "?drt=learnerTranscript" +  detailUrlParams + "&divname=learnerTranscript";
+        String learnerObjectives = detailsWidgetUrl + "?drt=learnerObjectives" +  detailUrlParams + "&divname=learnerObjectives";
+        String learnerComments = detailsWidgetUrl + "?drt=learnerComments" +  detailUrlParams + "&divname=learnerComments";
+        
+        request.setAttribute("reportDate", reportDate);
+        request.setAttribute("learnerId", learnerId);
+        request.setAttribute("learnerName", reg.getUserDisplayName());
+        request.setAttribute("learnerSummaryUrl", logic.getReportUrl(reportageAuth, learnerSummary));
+        request.setAttribute("learnerTranscriptUrl", logic.getReportUrl(reportageAuth, learnerTranscript));
+        request.setAttribute("learnerObjectivesUrl", logic.getReportUrl(reportageAuth, learnerObjectives));
+        request.setAttribute("learnerCommentsUrl", logic.getReportUrl(reportageAuth, learnerComments));
+        
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_LEARNER_REPORT);
+        rd.forward(request, response);
+    }
+	
+	private void processViewRegistrationReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String registrationId = request.getParameter("registrationId");
+        ScormCloudRegistration reg = logic.getRegistrationById(registrationId);
+        ScormCloudPackage pkg = logic.getPackageById(reg.getPackageId());
+        
+        String learnerTags = request.getParameter("learnerTags");
+        String courseTags = request.getParameter("courseTags");
+        
+        boolean learnerTagsPresent = !isNullOrEmpty(learnerTags);
+        boolean courseTagsPresent = !isNullOrEmpty(courseTags);
+        boolean tagsPresent = learnerTagsPresent || courseTagsPresent;
+        
+        String appId = logic.getScormCloudConfiguration().getAppId();
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+        String reportDate = logic.getReportDate();
+        
+        String learnerId = URLEncoder.encode(reg.getOwnerId(), "UTF-8");
+        String courseId = URLEncoder.encode(pkg.getScormCloudId(), "UTF-8");
+
+        String summaryWidgetUrl = "/Reportage/scormreports/widgets/summary/SummaryWidget.php";
+        String detailsWidgetUrl = "/Reportage/scormreports/widgets/DetailsWidget.php";
+        
+        String summaryUrlParams = "&appId=" + appId + "&standalone=true&embedded=true&showTitle=true&scriptBased=true";
+        summaryUrlParams += "&learnerId=" + learnerId + "&courseId=" + courseId;
+        
+        String detailUrlParams = summaryUrlParams + "&expand=true";
+        detailUrlParams += "&viewAllLinkPage=" + URLEncoder.encode("controller?action=viewAllDetailsReport", "UTF-8");
+
+        String registrationSummary = summaryWidgetUrl + "?srt=singleLearnerSingleCourse" + summaryUrlParams + "&divname=registrationSummary";
+        String learnerCourseActivities = detailsWidgetUrl + "?drt=learnerCourseActivities" +  detailUrlParams + "&divname=learnerCourseActivities";
+        String learnerCourseInteractions = detailsWidgetUrl + "?drt=learnerCourseInteractions" +  detailUrlParams + "&divname=learnerCourseInteractions";
+        String learnerCourseComments = detailsWidgetUrl + "?drt=learnerCourseComments" +  detailUrlParams + "&divname=learnerCourseComments";
+        
+        request.setAttribute("reportDate", reportDate);
+        request.setAttribute("learnerId", learnerId);
+        request.setAttribute("learnerName", reg.getUserDisplayName());
+        request.setAttribute("courseId", courseId);
+        request.setAttribute("pkgTitle", pkg.getTitle());
+        request.setAttribute("registrationSummaryUrl", logic.getReportUrl(reportageAuth, registrationSummary));
+        request.setAttribute("learnerCourseActivitiesUrl", logic.getReportUrl(reportageAuth, learnerCourseActivities));
+        request.setAttribute("learnerCourseInteractionsUrl", logic.getReportUrl(reportageAuth, learnerCourseInteractions));
+        request.setAttribute("learnerCourseCommentsUrl", logic.getReportUrl(reportageAuth, learnerCourseComments));
+        
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_REGISTRATION_REPORT);
+        rd.forward(request, response);
+    }
+	
+	private void processViewAllDetailsReportRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String reportageAuth = logic.getReportageAuth("DOWNONLY", true);
+
+        String viewAllWidgetUrl = "/Reportage/scormreports/widgets/ViewAllDetailsWidget.php";
+        String widgetParams = "&standalone=true&embedded=true&showTitle=true&scriptBased=true&expand=true";
+        
+        String viewAllDetails = viewAllWidgetUrl + "?" + request.getQueryString() + widgetParams + "&divname=viewAllDetails";
+        
+        request.setAttribute("viewAllDetailsUrl", logic.getReportUrl(reportageAuth, viewAllDetails));
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_REPORTAGE_VIEWALL_REPORT);
+        rd.forward(request, response);
 	}
 
     private void processViewUsageRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {

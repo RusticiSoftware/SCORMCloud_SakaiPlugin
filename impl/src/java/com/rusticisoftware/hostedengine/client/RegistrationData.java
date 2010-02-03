@@ -98,7 +98,7 @@ public class RegistrationData {
 		if(reportList.getLength() > 0){
 			Element report = (Element)reportList.item(0);
 			String regResults = null;
-			try { regResults = Utils.getXmlString(report); }
+			try { regResults = XmlUtils.getXmlString(report); }
 			catch (Exception e) {};
 			if(regResults != null){
 				data.setResultsData(regResults);
@@ -124,8 +124,8 @@ public class RegistrationData {
 		StringBuilder xml = new StringBuilder();
 		xml.append("<registrationlist>");
 		for(RegistrationData regData : regList){
-			xml.append("<registration id=\"" + Utils.xmlEncode(regData.getRegistrationId()) + "\" ");
-			xml.append("courseid=\"" + Utils.xmlEncode(regData.getCourseId()) + "\" ");
+			xml.append("<registration id=\"" + XmlUtils.xmlEncode(regData.getRegistrationId()) + "\" ");
+			xml.append("courseid=\"" + XmlUtils.xmlEncode(regData.getCourseId()) + "\" ");
 			xml.append(">");
 			
 			ArrayList<RegistrationData.InstanceData> instances = regData.getInstances();

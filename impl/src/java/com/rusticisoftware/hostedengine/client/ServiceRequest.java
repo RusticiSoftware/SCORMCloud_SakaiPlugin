@@ -48,10 +48,14 @@ public class ServiceRequest {
 	private ParameterMap methodParameters = new ParameterMap();
 	private String fileToPost = null;
 	private Configuration configuration = null;
+	private String engineServiceUrl = null;
 
 	
 	public ServiceRequest (Configuration configuration) {
 		this.configuration = configuration;
+		//Keep local copy of services url in case we need to change
+		//it (in just this request), like setting a particular server
+		this.engineServiceUrl = configuration.getScormEngineServiceUrl();
 	}
 	
 	public ParameterMap getParameters()
@@ -76,23 +80,29 @@ public class ServiceRequest {
 	    fileToPost = fileName;
 	}
 	
+	public String getServer()
+	{
+	    String serviceUrl = this.configuration.getScormEngineServiceUrl();
+        int beginIndex = serviceUrl.indexOf("://");
+        
+        String origServer = serviceUrl.substring(beginIndex + 3);
+        int endIndex = origServer.indexOf("/");
+        return origServer.substring(0, endIndex);
+	}
+	
+	public void setServer(String serverName)
+	{
+	    this.engineServiceUrl = this.engineServiceUrl.replace(getServer(), serverName);;
+	}
+	
 	public Document callService(String methodName) throws Exception
 	{
 	    return getXmlResponseFromUrl(constructUrl(methodName));
 	}
-	public Document callService(String methodName, String serviceUrl) throws Exception
-    {
-        return getXmlResponseFromUrl(constructUrl(methodName, serviceUrl));
-    }
 	
 	public String getFileFromService(String toFileName, String methodName) throws Exception
     {
         return getFileResponseFromUrl(toFileName, constructUrl(methodName));
-    }
-
-    public String getFileFromService(String toFileName, String methodName, String serviceUrl) throws Exception
-    {
-        return getFileResponseFromUrl(toFileName, constructUrl(methodName, serviceUrl));
     }
 
     public String getFileResponseFromUrl(String toFileName, String url) throws Exception
@@ -114,7 +124,7 @@ public class ServiceRequest {
         return assertNoErrorAndReturnXmlDoc(responseText);
     }
     
-    protected byte[] getResponseFromUrl(String urlStr) throws Exception
+    public byte[] getResponseFromUrl(String urlStr) throws Exception
     {
         URL url = new URL(urlStr);        
         URLConnection connection = url.openConnection();
@@ -144,17 +154,6 @@ public class ServiceRequest {
         raiseServiceExceptionIfPresent(xml);
         return xml;
     }
-    
-    /// <summary>
-    /// Given the method name and the parameters and configuration associated 
-    /// with this object, generate the full URL for the web service invocation.
-    /// </summary>
-    /// <param name="methodName">Method name for the HOSTED Engine api call</param>
-    /// <returns>Fully qualified URL to be used for invocation</returns>
-    public String constructUrl(String methodName) throws Exception
-    {
-        return constructUrl(methodName, configuration.getScormEngineServiceUrl());
-    }
 
     /// <summary>
     /// Given the method name and the parameters and configuration associated 
@@ -162,7 +161,7 @@ public class ServiceRequest {
     /// </summary>
     /// <param name="methodName">Method name for the HOSTED Engine api call</param>
     /// <returns>Fully qualified URL to be used for invocation</returns>
-    public String constructUrl(String methodName, String engineServiceUrl) throws Exception
+    public String constructUrl(String methodName) throws Exception
     {
         
         ParameterMap allParams = new ParameterMap();
@@ -220,7 +219,7 @@ public class ServiceRequest {
 	protected Document parseXmlResponse (String xmlString) throws Exception {
 		Document xmlDoc;
 		try {
-            xmlDoc = Utils.parseXmlString(xmlString);
+            xmlDoc = XmlUtils.parseXmlString(xmlString);
         }
         catch (SAXParseException e1) {
             throw new ServiceException(INVALID_WEB_SERVICE_RESPONSE, "Error parsing xml", e1);

@@ -36,39 +36,15 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-<div class="navIntraTool">
-    <a href="controller?action=viewPackages">List Resources</a>
-    <a href="controller?action=viewRegistrations">Search Registrations</a>
-    <c:if test="${canConfigure}">
-	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
-	    <c:choose>
-		    <c:when test="${isConfigured}">
-		    	<a href="controller?action=viewUsage">View Usage</a>
-		    </c:when><c:otherwise>
-		    	<a href="controller?action=viewSignup">Sign Up</a>
-		    </c:otherwise>
-	    </c:choose>
-    </c:if>
-</div>
+<%@ include file="Menu.jsp" %>
 
 <h3 class="insColor insBak insBorder">Editing SCORM Cloud Package Properties for ${pkg.title}</h3>
 
 <div class="instruction">When you are finished, please click <a href='${empty returnUrl ? "javascript:history.back()" : returnUrl}'>here</a> to go back.</div>
 
-
-<c:if test="${fn:length(bean.messages) > 0}">
-    <div class="alertMessage">
-        <ul style="margin:0px;">
-        <c:forEach var="msg" items="${bean.messages}">
-            <li>${msg}</li>
-        </c:forEach>
-        </ul>
-    </div>
-    <% bean.messages.clear(); %>
-</c:if>
+<%@ include file="Messages.jsp" %>
 
 <iframe id="packagePropertiesEditor" frameborder="no" src="${packagePropertiesUrl}" />
-
 
 </div>
 </body>

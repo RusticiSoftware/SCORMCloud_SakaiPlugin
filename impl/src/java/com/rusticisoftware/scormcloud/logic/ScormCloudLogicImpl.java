@@ -41,7 +41,9 @@ import com.rusticisoftware.hostedengine.client.LaunchInfo;
 import com.rusticisoftware.hostedengine.client.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
 import com.rusticisoftware.hostedengine.client.Utils;
+import com.rusticisoftware.hostedengine.client.XmlUtils;
 import com.rusticisoftware.hostedengine.client.Enums.RegistrationResultsFormat;
+import com.rusticisoftware.hostedengine.client.Enums.ReportageNavPermission;
 import com.rusticisoftware.scormcloud.dao.ScormCloudDao;
 import com.rusticisoftware.scormcloud.logic.ExternalLogic;
 import com.rusticisoftware.scormcloud.logic.ScormCloudLogic;
@@ -579,14 +581,13 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
                                         .GetRegistrationResult(
                                                 reg.getScormCloudId(),
                                                 RegistrationResultsFormat.FULL_DETAIL);
-            return Utils.parseXmlString(resultsXml);
+            return XmlUtils.parseXmlString(resultsXml);
         } catch (Exception e) {
             log.error("Encountered an exception while trying to get " +
                       "report xml from SCORM Cloud, returning null", e);
           return null;
         }
     }
-    
     
     public Double getScoreFromRegistration(ScormCloudRegistration reg){
         Double score = null;
@@ -626,6 +627,44 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         //This assumes all contributing registrations / resources are weighted equally
         return scoreSum / numberOfContributingResources;
     }
+    
+
+    
+    //------------------------------ Reportage ------------------------------------
+    
+    public String getReportageAuth(String navPermission, boolean isAdmin){
+        try {
+            return getScormEngineService(externalLogic.getCurrentContext())
+                        .getReportingService()
+                            .GetReportageAuth(ReportageNavPermission.getValue(navPermission), isAdmin);
+        } catch (Exception e) {
+            log.warn("Exception getting reportage authentication token: " + e.getMessage(), e);
+            return null;
+        }
+    }
+    
+    public String getReportUrl(String reportageAuth, String reportUrl){
+            try {
+                return getScormEngineService(externalLogic.getCurrentContext())
+                            .getReportingService()
+                                .GetReportUrl(reportageAuth, reportUrl);
+            } catch (Exception e) {
+                log.warn("Exception calling getReportUrl: " + e.getMessage(), e);
+                return null;
+            }
+    }
+    
+    public String getReportDate(){
+        try {
+            return getScormEngineService(externalLogic.getCurrentContext())
+                        .getReportingService()
+                            .GetReportDate();
+        } catch (Exception e) {
+            log.warn("Exception calling getReportDate: " + e.getMessage(), e);
+            return null;
+        }
+    }
+    
     
     
     

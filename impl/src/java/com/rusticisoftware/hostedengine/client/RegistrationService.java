@@ -164,7 +164,7 @@ public class RegistrationService
         // Return the subset of the xml starting with the top <summary>
         if(dataFormat == DataFormat.XML){
             Node reportElem = response.getElementsByTagName("registrationreport").item(0);
-            return Utils.getXmlString(reportElem);
+            return XmlUtils.getXmlString(reportElem);
         } else {
             return Utils.getNonXmlPayloadFromResponse(response);
         }
@@ -253,28 +253,24 @@ public class RegistrationService
     /// Gets the url to directly launch/view the course registration in a browser
     /// </summary>
     /// <param name="registrationId">Unique Identifier for the registration</param>
-    /// <returns>URL to launch</returns>
-    public String GetLaunchUrl (String registrationId) throws Exception
-    {
-        ServiceRequest request = new ServiceRequest(configuration);
-        request.getParameters().add("regid", registrationId);
-        return request.constructUrl("rustici.registration.launch");
-    }
-
-    /// <summary>
-    /// Gets the url to directly launch/view the course registration in a browser
-    /// </summary>
-    /// <param name="registrationId">Unique Identifier for the registration</param>
     /// <param name="redirectOnExitUrl">Upon exit, the url that the SCORM player will redirect to</param>
     /// <returns>URL to launch</returns>
     public String GetLaunchUrl(String registrationId, String redirectOnExitUrl) throws Exception
     {
-        ServiceRequest request = new ServiceRequest(configuration);
-        request.getParameters().add("regid", registrationId);
-        if (!Utils.isNullOrEmpty(redirectOnExitUrl))
-            request.getParameters().add("redirecturl", redirectOnExitUrl);
-        return request.constructUrl("rustici.registration.launch");
+        return GetLaunchUrl(registrationId, redirectOnExitUrl, null, null);
 
+    }
+    
+    /// <summary>
+    /// Gets the url to directly launch/view the course registration in a browser
+    /// </summary>
+    /// <param name="registrationId">Unique Identifier for the registration</param>
+    /// <param name="redirectOnExitUrl">Upon exit, the url that the SCORM player will redirect to</param>
+    /// <param name="cssUrl">Absolute url that points to a custom player style sheet</param>
+    /// <returns>URL to launch</returns>
+    public String GetLaunchUrl(String registrationId, String redirectOnExitUrl, String cssUrl) throws Exception
+    {
+    	return GetLaunchUrl(registrationId, redirectOnExitUrl, cssUrl, null);
     }
 
     /// <summary>
@@ -282,16 +278,18 @@ public class RegistrationService
     /// </summary>
     /// <param name="registrationId">Unique Identifier for the registration</param>
     /// <param name="redirectOnExitUrl">Upon exit, the url that the SCORM player will redirect to</param>
-    /// <returns>URL to launch</returns>
+    /// <param name="cssUrl">Absolute url that points to a custom player style sheet</param>
     /// <param name="debugLogPointerUrl">Url that the server will postback a "pointer" url regarding
     /// a saved debug log that resides on s3</param>
-    public String GetLaunchUrl(String registrationId, String redirectOnExitUrl, String debugLogPointerUrl) throws Exception
+    /// <returns>URL to launch</returns>
+    public String GetLaunchUrl(String registrationId, String redirectOnExitUrl, String cssUrl, String debugLogPointerUrl) throws Exception
     {
         ServiceRequest request = new ServiceRequest(configuration);
         request.getParameters().add("regid", registrationId);
         if (!Utils.isNullOrEmpty(redirectOnExitUrl))
             request.getParameters().add("redirecturl", redirectOnExitUrl);
-
+        if(!Utils.isNullOrEmpty(cssUrl))
+        	request.getParameters().add("cssurl", cssUrl);
         if (!Utils.isNullOrEmpty(debugLogPointerUrl))
             request.getParameters().add("saveDebugLogPointerUrl", debugLogPointerUrl);
 

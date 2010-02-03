@@ -1,6 +1,7 @@
 package com.rusticisoftware.hostedengine.client;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -40,22 +41,28 @@ public class RequestSigner {
 	
 	// Return the serialized request string. 
 	public static String getSerializedParams(Map<String, String[]> requestParams)
-	{
+	{	
 		StringBuilder paramString = new StringBuilder();
 		List<String> paramNames = new ArrayList<String>(requestParams.keySet());
 		Collections.sort(paramNames, String.CASE_INSENSITIVE_ORDER);
 		
 		for (String paramName : paramNames) {			
-			if (!isExcludedParam(paramName)){		
-				String[] vals = (String[])requestParams.get(paramName);
-				if(vals == null || vals.length < 1){
-					continue;
-				}
+			if (!isExcludedParam(paramName)){				
 				paramString.append(paramName);
-				List<String> valList = Arrays.asList(vals);
-				Collections.sort(valList, String.CASE_INSENSITIVE_ORDER);
-				for (String val : valList){
-					paramString.append(val);
+				
+				Object val = requestParams.get(paramName);
+				
+				// Allow the value to be a single string or
+				// an array of strings as is returned by
+				// request.getParameterMap()
+				if (val instanceof String[]) {	
+					List<String> valList = Arrays.asList((String[])val);
+					Collections.sort(valList);
+					for (String v : valList){
+						paramString.append(v);
+					}
+				} else {
+					paramString.append((String)val);
 				}
 			}
 		}

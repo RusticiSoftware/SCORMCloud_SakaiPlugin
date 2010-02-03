@@ -397,7 +397,7 @@ public class CourseService
         Document response = request.callService("rustici.course.getMetadata");
         
         // Return the subset of the xml starting with the top <object>
-        return Utils.getXmlString(response.getElementsByTagName("object").item(0));
+        return XmlUtils.getXmlString(response.getElementsByTagName("object").item(0));
     }
 
     /// <summary>
@@ -544,7 +544,7 @@ public class CourseService
         Document response = request.callService("rustici.course.getFileStructure");
         
         // Return the subset of the xml starting with the top <dir>
-        return Utils.getXmlString(response.getElementsByTagName("dir").item(0));
+        return XmlUtils.getXmlString(response.getElementsByTagName("dir").item(0));
     }
 
     /// <summary>

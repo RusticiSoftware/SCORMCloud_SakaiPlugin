@@ -129,16 +129,16 @@ public class LaunchInfo
     public LaunchInfo(Element launchInfoElem)
     {
         this.setId(launchInfoElem.getAttribute("id"));
-        this.setCompletion(getNamedElemValue(launchInfoElem, "completion"));
-        this.setSatisfaction(getNamedElemValue(launchInfoElem, "satisfaction"));
-        this.setMeasureStatus(getNamedElemValue(launchInfoElem, "measure_status"));
-        this.setNormalizedMeasure(getNamedElemValue(launchInfoElem, "normalized_measure"));
-        this.setExperiencedDurationTracked(getNamedElemValue(launchInfoElem, "experienced_duration_tracked"));
-        this.setLaunchTime(getNamedElemValue(launchInfoElem, "launch_time"));
-        this.setExitTime(getNamedElemValue(launchInfoElem, "exit_time"));
-        this.setLastUpdated(getNamedElemValue(launchInfoElem, "update_dt"));
+        this.setCompletion(XmlUtils.getNamedElemValue(launchInfoElem, "completion"));
+        this.setSatisfaction(XmlUtils.getNamedElemValue(launchInfoElem, "satisfaction"));
+        this.setMeasureStatus(XmlUtils.getNamedElemValue(launchInfoElem, "measure_status"));
+        this.setNormalizedMeasure(XmlUtils.getNamedElemValue(launchInfoElem, "normalized_measure"));
+        this.setExperiencedDurationTracked(XmlUtils.getNamedElemValue(launchInfoElem, "experienced_duration_tracked"));
+        this.setLaunchTime(XmlUtils.getNamedElemValue(launchInfoElem, "launch_time"));
+        this.setExitTime(XmlUtils.getNamedElemValue(launchInfoElem, "exit_time"));
+        this.setLastUpdated(XmlUtils.getNamedElemValue(launchInfoElem, "update_dt"));
         try {
-            this.setLog(getNamedElemXml(launchInfoElem, "log"));
+            this.setLog(XmlUtils.getNamedElemXml(launchInfoElem, "log"));
         }
         catch (Exception e) {}
     }
@@ -156,37 +156,5 @@ public class LaunchInfo
             launchList.add(new LaunchInfo((Element)launches.item(i)));
         }
         return launchList;
-    }
-
-    /// <summary>
-    /// Utility function to retrieve inner text of first elem with tag elementName, or null if not found
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="elementName"></param>
-    /// <returns></returns>
-    private String getNamedElemValue(Element parent, String elementName)
-    {
-        String val = null;
-        NodeList list = parent.getElementsByTagName(elementName);
-        if (list.getLength() > 0) {
-            val = ((Element)list.item(0)).getTextContent();
-        }
-        return val;
-    }
-
-    /// <summary>
-    /// Utility function to retrieve inner text of first elem with tag elementName, or null if not found
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="elementName"></param>
-    /// <returns></returns>
-    private String getNamedElemXml(Element parent, String elementName) throws Exception
-    {
-        String val = null;
-        NodeList list = parent.getElementsByTagName(elementName);
-        if (list.getLength() > 0) {
-            val = Utils.getXmlString(list.item(0));
-        }
-        return val;
     }
 }

@@ -17,8 +17,6 @@
     bean.doPageChecks(request, response);
     
     pageContext.setAttribute("bean", bean);
-    pageContext.setAttribute("isConfigured", bean.isPluginConfigured());
-    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
 %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -34,34 +32,11 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-<div class="navIntraTool">
-    <a href="controller?action=viewPackages">List Resources</a>
-    <a href="controller?action=viewRegistrations">Search Registrations</a>
-    <c:if test="${canConfigure}">
-	    <a href="controller?action=viewCloudConfiguration">Configure Plugin</a>
-	    <c:choose>
-		    <c:when test="${isConfigured}">
-		    	<a href="controller?action=viewUsage">View Usage</a>
-		    </c:when><c:otherwise>
-		    	<a href="controller?action=viewSignup">Sign Up</a>
-		    </c:otherwise>
-	    </c:choose>
-    </c:if>
-</div>
+<%@ include file="Menu.jsp" %>
 
 <h3 class="insColor insBak insBorder">SCORM Cloud Resources</h3>
 
-<c:if test="${fn:length(bean.messages) > 0}">
-    <div class="alertMessage">
-        <ul style="margin:0px;">
-        <c:forEach var="msg" items="${bean.messages}">
-            <li>${msg}</li>
-        </c:forEach>
-        </ul>
-    </div>
-    <% bean.messages.clear(); %>
-</c:if>
-
+<%@ include file="Messages.jsp" %>
 
 <div class="instruction">Hello, ${bean.currentUserDisplayName}.</div>
 
@@ -72,9 +47,10 @@
                 <th>Title</th>
                 <th>Grade Contributor</th>
                 <th>Non-assignment Launch</th>
-                <th>Configure Package</th>
-                <th>Preview Package</th>
+                <th>Configure</th>
+                <th>Preview</th>
                 <th>View Registrations</th>
+                <th>View Report</th>
                 <th>Creation Date</th>
             </tr>
         </thead>
@@ -98,6 +74,9 @@
                     </td>
                     <td>
                         <a href="controller?action=viewRegistrations&packageId=${pkg.id}">Registrations</a>
+                    </td>
+                    <td>
+                    	<a href="controller?action=viewCourseReport&packageId=${pkg.id}">Course Report</a>
                     </td>
                     <td>
                         <fmt:formatDate value="${pkg.dateCreated}" type="both" 
