@@ -18,5 +18,6 @@
 		    </c:choose>
 	    </c:if>
 	    <a href="controller?action=viewOverallGroupReport">Overall Report</a>
+	    <%--<a href="controller?action=updatePackage">Update Package</a>--%>
 	</div>
 </c:if>

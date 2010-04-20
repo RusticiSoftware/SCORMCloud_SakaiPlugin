@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -69,6 +70,7 @@ public class RequestController extends HttpServlet {
 	
 	public static final String PAGE_PLUGIN_CONFIGURE = "ScormCloudConfiguration.jsp";
 	public static final String PAGE_PACKAGE_IMPORT = "ImportPackage.jsp";
+	public static final String PAGE_PACKAGE_UPDATE = "UpdatePackage.jsp";
 	public static final String PAGE_PACKAGE_LIST = "PackageList.jsp";
 	public static final String PAGE_PACKAGE_EDIT = "EditPackage.jsp";
 	public static final String PAGE_REGISTRATION_LIST = "RegistrationList.jsp";
@@ -172,6 +174,9 @@ public class RequestController extends HttpServlet {
             else if(action.equals("importPackage")){
 				processImportRequest(request, response);
 			}
+            else if(action.equals("updatePackage")){
+                processUpdatePackageRequest(request, response);
+            }
             else if(action.equals("configurePackageResource")){
                 processConfigurePackageResourceRequest(request, response);
             }
@@ -253,6 +258,12 @@ public class RequestController extends HttpServlet {
             }
 		}
 		catch (Exception e){
+		    /*log.warn("Exception occurred while processing request: ", e);
+		    Throwable cause = e.getCause();
+		    while(cause != null){
+		        log.warn("Caused by: ", cause);
+		        cause = cause.getCause();
+		    }*/
 			throw new ServletException(e);
 		}
 	}
@@ -813,6 +824,51 @@ public class RequestController extends HttpServlet {
 		response.sendRedirect(PAGE_PACKAGE_LIST);
 	}
 	
+	/**
+     * Update the specified package, possibly creating a new version.
+     */
+    public void processUpdatePackageRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//        //These params will be set to the request params after we parse the file upload request
+//        HashMap<String, String> params = new HashMap<String, String>();
+//        
+//        //Write upload data to temp file
+//        File tempFile = File.createTempFile("sakai-scorm-cloud-", ".zip");
+//        FileUploadUtils.parseFileUploadRequest(request, tempFile, params);
+//        
+//        //Create new package object
+//        ScormCloudPackage pkg = new ScormCloudPackage();
+//        pkg.setTitle(params.get("package-title"));
+//        
+//        //Does the package contribute to associated assignments?
+//        String contributes = params.get("contribute-to-assigment-grade");
+//        pkg.setContributesToAssignmentGrade(Boolean.parseBoolean(contributes));
+//        
+//        //Allow the package to be launched outside of an assignment?
+//        String allowNonAssignmentLaunch = params.get("allow-non-assignment-launch");
+//        pkg.setAllowLaunchOutsideAssignment(Boolean.parseBoolean(allowNonAssignmentLaunch));
+//        
+//        //Create new cloud id for package
+//        String cloudId = UUID.randomUUID().toString();
+//        pkg.setScormCloudId("sakai-" + cloudId);
+//        
+//        //Add package through packages bean
+//        logic.addNewPackage(pkg, tempFile);     
+//        
+//        //Clean up the temp file now that we're done
+//        tempFile.delete();
+//
+//        String helper = params.get("helper");
+//        log.debug("helper = " + helper);
+//        if ("true".equals(helper)) {
+//            log.debug("Helper mode for import, creating resource type");
+//            processImportHelperActions(pkg, request, response);
+//            return;
+//        }
+//        //Send the user back to the package list page
+//        response.sendRedirect(PAGE_PACKAGE_LIST);
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_UPDATE);
+        rd.forward(request, response);
+    }
 	
 	
 	private void addResourceForScormCloudEntity(ContentEntity contentEntity, ScormCloudPackage pkg) throws Exception {
