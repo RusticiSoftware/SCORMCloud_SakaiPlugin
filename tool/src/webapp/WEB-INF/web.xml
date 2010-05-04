@@ -49,12 +49,10 @@
 			uk.ac.cam.caret.sakai.WebappToolServlet
 		</servlet-class>
 		<!-- use this to specify a starting page location if needed -->
-		<!--
 		<init-param>
 			<param-name>main-page</param-name>
-			<param-value>/</param-value>
+			<param-value>/Welcome.jsp</param-value>
 		</init-param>
-		-->
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	
