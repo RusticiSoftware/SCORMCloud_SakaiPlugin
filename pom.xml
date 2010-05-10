@@ -14,7 +14,7 @@
     <inceptionYear>2008</inceptionYear>
     <packaging>pom</packaging>
     <properties>
-      <scormcloud.version>0.8.5</scormcloud.version>
+      <scormcloud.version>0.8.6</scormcloud.version>
     </properties>
     <version>${scormcloud.version}</version>
 
