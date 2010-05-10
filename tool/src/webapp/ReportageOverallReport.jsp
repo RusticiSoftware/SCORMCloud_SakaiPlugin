@@ -30,6 +30,7 @@
 <script language="Javascript" type="text/javascript" src="javascript/reportage.combined.js"></script>
 <link media="all" rel="stylesheet" type="text/css" href="css/reportage.combined.sakai.css"></link>
 
+
 <script language="Javascript" type="text/javascript">
 	$(document).ready( function() {
 		loadScript('${summaryUrl}');
