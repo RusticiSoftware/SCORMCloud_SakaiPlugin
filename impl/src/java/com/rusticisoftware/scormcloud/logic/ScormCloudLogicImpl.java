@@ -147,9 +147,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     }
     
     private ScormCloudConfiguration getScormCloudConfiguration(String context, boolean isPublicCall) throws Exception {
-        if(isPublicCall && !canConfigurePlugin()){
-            log.error("saveScormCloudConfiguration called without canConfigurePlugin permission!");
-            throw new Exception("saveScormCloudConfiguration called without canConfigurePlugin permission!");
+        if(isPublicCall && !isCurrentUserPluginAdmin()){
+            log.error("getScormCloudConfiguration called without admin permission!");
+            throw new Exception("getScormCloudConfiguration called without admin permission!");
         }
         
         Search s = new Search();
@@ -676,7 +676,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     public void update(Observable o, Object args){
         Event evt = (Event)args;
         log.debug("SCORM_CLOUD_LOGIC_EVENT_OBSERVATION: " + 
-                  " event = " + evt.getEvent() +
+                  " event = " + evt.getEvent() + 
                   " userId = " + evt.getUserId() +
                   " resource = " + evt.getResource());
         
