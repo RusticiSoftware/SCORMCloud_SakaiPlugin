@@ -207,7 +207,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             //Then delete the package from the cloud
             getScormEngineService(pkg.getContext())
                 .getCourseService()
-                    .DeleteCourse(pkg.getScormCloudId());
+                    .DeleteCourse(pkg.getScormCloudId(),
+                                  false,
+                                  externalLogic.getUserEmail(externalLogic.getCurrentUserId()));
         } catch (Exception e) {
             log.debug(
                     "Exception occurred trying to delete package with id = "
@@ -239,7 +241,10 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             getScormEngineService(pkg.getContext())
                 .getCourseService()
                     .ImportCourse(pkg.getScormCloudId(), 
-                                  packageZip.getAbsolutePath());
+                                  packageZip.getAbsolutePath(),
+                                  null,
+                                  null,
+                                  externalLogic.getUserEmail(externalLogic.getCurrentUserId()));
             dao.save(pkg);
             log.info("Saved package: " + pkg.getId() + ":" + pkg.getTitle());
         } else {
@@ -306,6 +311,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             String userId, String assignmentKey) {
         String userDisplayName = externalLogic.getUserDisplayName(userId);
         String userDisplayId = externalLogic.getUserDisplayId(userId);
+        String userEmail = externalLogic.getUserEmail(userId);
         
         Assignment assignment = null;
         if (assignmentKey != null && assignmentKey != ""){
@@ -316,17 +322,19 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         String firstName = "sakai";
         String lastName = "learner";
         
+        
         if (userDisplayName != null && userDisplayName.contains(" ")) {
             String[] nameParts = userDisplayName.split(" ");
-            firstName = nameParts[0];
-            lastName = nameParts[1];
+            firstName = nameParts[nameParts.length - 2];
+            lastName = nameParts[nameParts.length - 1];
         }
 
         try {
             String cloudRegId = "sakai-reg-" + userDisplayId + "-" + UUID.randomUUID().toString();
+
             getScormEngineService(pkg.getContext())
                 .getRegistrationService().CreateRegistration(
-                    cloudRegId, pkg.getScormCloudId(), userId, firstName, lastName);
+                    cloudRegId, pkg.getScormCloudId(), userId, firstName, lastName, userEmail);
             
             ScormCloudRegistration reg = new ScormCloudRegistration();
             reg.setDateCreated(new Date());

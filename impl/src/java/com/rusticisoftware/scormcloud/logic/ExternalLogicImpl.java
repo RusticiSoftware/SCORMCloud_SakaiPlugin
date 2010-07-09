@@ -176,6 +176,16 @@ public class ExternalLogicImpl implements ExternalLogic {
 		}
 		return name;
 	}
+	
+	public String getUserEmail(String userId){
+	    String email = null;
+	    try {
+	        email = userDirectoryService.getUser(userId).getEmail();
+	    } catch (UserNotDefinedException e) {
+            log.warn("Cannot get user email for user with id: " + userId);
+        }
+        return email;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.rusticisoftware.scormcloud.logic.ExternalLogic#isUserAdmin(java.lang.String)
