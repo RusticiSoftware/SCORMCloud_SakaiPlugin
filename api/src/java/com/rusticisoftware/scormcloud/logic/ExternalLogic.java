@@ -45,6 +45,13 @@ public interface ExternalLogic {
 	 * @return display name (probably firstname lastname) or "----------" (10 hyphens) if none found
 	 */
 	public String getUserDisplayName(String userId);
+	
+	/**
+     * Get the email address for a user by their unique id
+     * @param userId the current sakai user id (not username)
+     * @return email or null if user not found
+     */
+	public String getUserEmail(String userId);
 
 	/**
 	 * @return the current location id of the current user
