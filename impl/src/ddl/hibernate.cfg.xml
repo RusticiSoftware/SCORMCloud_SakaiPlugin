@@ -6,7 +6,7 @@
     <session-factory>
         <!-- these mapping resource paths must point to your hibernate template files (.hbm.xml),
             this should be the classpath location (typically after the src directory) -->
-        <mapping resource="com/rusticisoftware/scormcloud/dao/hbm/ScormCloudItem.hbm.xml" />
+        <mapping resource="com/rusticisoftware/scormcloud/dao/hbm/ScormCloudConfiguration.hbm.xml" />
         <mapping resource="com/rusticisoftware/scormcloud/dao/hbm/ScormCloudPackage.hbm.xml" />
         <mapping resource="com/rusticisoftware/scormcloud/dao/hbm/ScormCloudRegistration.hbm.xml" />
     </session-factory>
