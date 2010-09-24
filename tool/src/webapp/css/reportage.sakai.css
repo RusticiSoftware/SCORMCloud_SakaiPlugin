@@ -1,0 +1,64 @@
+> /*Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+> /*Copyright (c) 2009, Yahoo! Inc. All rights reserved.
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menu_up_arrow.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menu_up_arrow_disabled.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menu_down_arrow.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menu_down_arrow_disabled.png);
+>     background: url(http://cloud.scorm.com/Reportage/img/menubaritem_submenuindicator.png) right center no-repeat;
+>     background: url(http://cloud.scorm.com/Reportage/img/menuitem_submenuindicator.png) right center no-repeat;
+>     background: url(http://cloud.scorm.com/Reportage/img/menuitem_checkbox.png) left center no-repeat;
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menubaritem_submenuindicator_selected.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menuitem_submenuindicator_selected.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menuitem_checkbox_selected.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menubaritem_submenuindicator_disabled.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menuitem_submenuindicator_disabled.png);
+>     background-image: url(http://cloud.scorm.com/Reportage/img/menuitem_checkbox_disabled.png);
+> .reportage #footer .col .title {color:#ffffff;font-size:1.3em}
+> 
+> .reportage #credit {color:#adacac;font-size:.8em;background: transparent url(http://cloud.scorm.com/Reportage/img/cog_btm.gif) no-repeat right bottom; clear:both;height:65px;}
+> .reportage .selection_dialog .selection_col.label {width:114px;color:#e5e5e5; background:#2554C7 url(http://cloud.scorm.com/Reportage/img/rtArrow_20x50.jpg) no-repeat right 5px; font-size:1.8em; font-weight:bold;padding-right:25px;}
+> .reportage .filter_header {color:#e5e5e5; background:#2554C7 url(http://cloud.scorm.com/Reportage/img/rtArrow_20x50.jpg) no-repeat right; font-size:1.8em; font-weight:bold;padding-right:25px;}
+> .reportage #header_wrapper {background: transparent url(http://cloud.scorm.com/Reportage/img/cog_top.jpg) no-repeat scroll 600px top;height: 95px;width:100%;}
+> .reportage #logo {	background: transparent url(http://cloud.scorm.com/Reportage/img/logo_inv.jpg) no-repeat scroll left top;
+> .reportage #title_logo{background: #e5e5e5 url(http://cloud.scorm.com/Reportage/img/reportage.jpg) no-repeat scroll left top;
+> .reportage .title_emphasis {font-weight:bold; font-size:1.0em; /*white-space:nowrap;*/}
+> .reportage .img_detail_arrows {background-image:url(../images/down-up-arrows.gif); position:absolute; width:32px; height:16px; right:-16px;}
+> .reporteage img.embedLinkArrow{position:relative}
+> .reportage .bs1_e6edf7{background:#E6EDF7 url(http://cloud.scorm.com/Reportage/img/corner_E6EDF7_tl.gif) no-repeat scroll left top;}
+> .reportage .bs2_e6edf7{background:transparent url(http://cloud.scorm.com/Reportage/img/corner_E6EDF7_bl.gif) no-repeat scroll left bottom;}
+> .reportage .bs3_e6edf7{background:transparent url(http://cloud.scorm.com/Reportage/img/corner_E6EDF7_br.gif) no-repeat scroll right bottom;}
+> .reportage .bs4_e6edf7{background:transparent url(http://cloud.scorm.com/Reportage/img/corner_E6EDF7_tr.gif) no-repeat scroll right top;}
+> 
+> .reportage .bs1_e5e5e5{background:#E5E5E5 url(http://cloud.scorm.com/Reportage/img/corn_e5e5e5_tl.gif) no-repeat scroll left top;}
+> .reportage .bs2_e5e5e5{background:transparent url(http://cloud.scorm.com/Reportage/img/corn_e5e5e5_bl.gif) no-repeat scroll left bottom;}
+> .reportage .bs3_e5e5e5{background:transparent url(http://cloud.scorm.com/Reportage/img/corn_e5e5e5_br.gif) no-repeat scroll right bottom;}
+> .reportage .bs4_e5e5e5{background:transparent url(http://cloud.scorm.com/Reportage/img/corn_e5e5e5_tr.gif) no-repeat scroll right top;}
+> 
+> 
+> .reportage .bt_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/sq1_BBBBBB.gif) 0 0 repeat-x;}
+> .reportage .bb_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/sq1_BBBBBB.gif) 0 100% repeat-x}
+> .reportage .bl_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/sq1_BBBBBB.gif) 0 0 repeat-y}
+> .reportage .br_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/sq1_BBBBBB.gif) 100% 0 repeat-y}
+> .reportage .bbl_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/cb_BBBBBB_bl.gif) 0 100% no-repeat;}
+> .reportage .bbr_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/cb_BBBBBB_br.gif) 100% 100% no-repeat;}
+> .reportage .btl_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/cb_BBBBBB_tl.gif) 0 0 no-repeat;}
+> .reportage .btr_BBBBBB {background: url(http://cloud.scorm.com/Reportage/img/cb_BBBBBB_tr.gif) 100% 0 no-repeat; } 
+> 
+> 
+> 
+> 
+> .reportage .summary_widget { font-size: 10px; width: 760px; }
+> .reportage .summary_table{width:380px;zoom:1;}
+> .reportage .summary_box{padding:5px 5px 15px; cursor:pointer;border:1px dashed #ffffff;zoom:1; height:50px;}
+> .reportage .summ_val_smaller{vertical-align:top;font-size:.8em;}
+> .reportage div.summary_value, .reportage  span.summary_value{font-size:1.4em; line-height:1em;}
+> .reportage .summary_comp_data{font-size:0.6em; color:#666666;background-color:#e5e5e5;float:left;clear:both;padding:1px 2px;}
+> .reportage .summary_chart{display:none; padding-top:10px; width: 500px;}
+> .reportage .details_widget {width: 100%; font-size:16px;}
+> .reportage .viewall_details_widget {width: 100%; font-size:18px;}
+> .reportage .details_widget_fixed_size {height:240px;overflow:hidden;display:block;}
+> .reportage .details_header {padding:5px 10px 5px 0px; cursor:pointer; text-align:left; font-size:14px;}
+> .reportage .details_utils {width:100%; background-color:#e5e5e5;border:1px solid #BBBBBB; text-align:left;}
+> .reportage .detail_section_header_txt .yuimenubaritem-hassubmenu {background-image: url(http://cloud.scorm.com/Reportage/img/menubaritem_submenuindicator.png);}
+> .reportage .detail_section_header_txt .yuimenubaritem-hassubmenu-selected {background-image: url(http://cloud.scorm.com/Reportage/img/menubaritem_submenuindicator.png);}
+> }/*

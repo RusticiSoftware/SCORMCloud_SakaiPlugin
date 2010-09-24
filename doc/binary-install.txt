@@ -1,0 +1,7 @@
+To install the SCORM Cloud Plugin for Sakai from the packaged binary files, you'll simply need to copy the following files/directories to the corresponding locations:
+
+scormcloud-pack (directory)   ->  ${CATALINA_HOME}/components/
+scormcloud-api-0.8.jar        ->  ${CATALINA_HOME}/shared/lib/
+scormcloud-tool.war           ->  ${CATALINA_HOME}/webapps/
+
+Included with the distribution are two files, install.sh and install.bat that will perform these copy operations automatically, based on the value of the environment variable $CATALINA_HOME.

@@ -1,0 +1,1 @@
+If you're planning to compile and install the SCORM Cloud Plugin from source, simply executing "mvn clean install sakai:deploy" should install and deploy the correct files to your Sakai installation, if your environment is correctly configured.

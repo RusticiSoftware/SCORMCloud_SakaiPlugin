@@ -1,0 +1,14 @@
+table {
+	font-family: 'Trebuchet MS',Verdana,Geneva,Arial,Helvetica,sans-serif;
+	color: #555555;
+	font-size: 94%;
+}
+
+.ditch-tab-pane-wrap {
+	font-size:90%;
+}
+
+input[type="button"], input[type="submit"]{
+	color: #555555;
+	font-size: 80%;
+}
