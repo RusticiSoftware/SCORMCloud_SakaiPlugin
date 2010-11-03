@@ -141,7 +141,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     private ScormCloudConfiguration getScormCloudConfigurationInternal(String context){
         try { return getScormCloudConfiguration(context, false); }
         catch (Exception e) {
-            log.debug("Exception thrown in getScormCloudConfigurationInternal", e);
+            log.error("Exception thrown in getScormCloudConfigurationInternal", e);
             return null;
         }
     }
@@ -211,7 +211,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
                                   false,
                                   externalLogic.getUserEmail(externalLogic.getCurrentUserId()));
         } catch (Exception e) {
-            log.debug(
+            log.error(
                     "Exception occurred trying to delete package with id = "
                             + pkg.getId() + ", cloud id = "
                             + pkg.getScormCloudId(), e);
@@ -362,7 +362,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             dao.save(reg);
             return reg;
         } catch (Exception e) {
-            log.debug("exception thrown creating reg", e);
+            log.error("Exception thrown creating reg", e);
             return null;
         }
     }
@@ -460,7 +460,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
                     .DeleteRegistration(reg.getScormCloudId());
         }
         catch (Exception e){
-            log.debug("Exception thrown trying to delete registration with id = " +
+            log.error("Exception thrown trying to delete registration with id = " +
                       reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
         }
         dao.delete(reg);
@@ -482,7 +482,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             dao.save(reg);
         }
         catch (Exception e){
-            log.debug("Exception thrown trying to reset registration with id = " +
+            log.error("Exception thrown trying to reset registration with id = " +
                       reg.getId() + ", cloud id = " + reg.getScormCloudId(), e);
         }
     }
@@ -533,7 +533,7 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             reg.setTotalTime(sum.getTotalTime());
             dao.save(reg);
         } catch (Exception e) {
-            log.debug("Exception getting registration results for " +
+            log.error("Exception getting registration results for " +
                       "reg with id = " + reg.getId() + 
                       " cloud id = " + reg.getScormCloudId(), e);
         }
