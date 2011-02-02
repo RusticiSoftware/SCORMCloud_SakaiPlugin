@@ -330,7 +330,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
 
         try {
-            String cloudRegId = "sakai-reg-" + userDisplayId + "-" + UUID.randomUUID().toString();
+            String unclean = "sakai-reg-" + userDisplayId + "-" + UUID.randomUUID().toString();
+            String cloudRegId = Utils.cleanRegistrationId(unclean);
+            log.debug(String.format("Attempting to create registration with ID %1$s (%2$s before clean) for user %3$s %4$s <%5$s> (%6$s)", cloudRegId, unclean, firstName, lastName, userEmail, userId));
 
             getScormEngineService(pkg.getContext())
                 .getRegistrationService().CreateRegistration(
