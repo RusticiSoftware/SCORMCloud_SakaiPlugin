@@ -30,4 +30,4 @@ To assist with the installation of the plugin, we have a [tutorial video](http:/
 To use and configure the plugin, you'll need to [sign up for a SCORM Cloud account](https://cloud.scorm.com/sc/guest/SignUpForm).
 
 ### Help
-If you have and questions or comments about the Sakai plugin or SCORM Cloud itself, please don't hesitate to contact us at [support@scorm.com](support@scorm.com).
+If you have and questions or comments about the Sakai plugin or SCORM Cloud itself, please don't hesitate to contact us at [support@scorm.com](mailto:support@scorm.com).
