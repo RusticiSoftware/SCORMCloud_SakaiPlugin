@@ -1,0 +1,3 @@
+[submodule "impl/src/java/com/rusticisoftware/JavaLibrary"]
+	path = impl/src/java/com/rusticisoftware/JavaLibrary
+	url = git://github.com/RusticiSoftware/SCORMCloud_JavaLibrary.git

@@ -40,7 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 
-import com.rusticisoftware.hostedengine.client.LaunchInfo;
+import com.rusticisoftware.hostedengine.client.datatypes.LaunchInfo;
 
 public class LaunchHistoryReportHelper {
     

@@ -16,6 +16,7 @@
 package com.rusticisoftware.scormcloud.logic;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +38,13 @@ import org.sakaiproject.genericdao.api.search.Search;
 import org.w3c.dom.Document;
 
 import com.rusticisoftware.hostedengine.client.Configuration;
-import com.rusticisoftware.hostedengine.client.LaunchInfo;
-import com.rusticisoftware.hostedengine.client.RegistrationSummary;
+import com.rusticisoftware.hostedengine.client.datatypes.LaunchInfo;
+import com.rusticisoftware.hostedengine.client.datatypes.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
 import com.rusticisoftware.hostedengine.client.Utils;
 import com.rusticisoftware.hostedengine.client.XmlUtils;
-import com.rusticisoftware.hostedengine.client.Enums.RegistrationResultsFormat;
-import com.rusticisoftware.hostedengine.client.Enums.ReportageNavPermission;
+import com.rusticisoftware.hostedengine.client.datatypes.Enums.RegistrationResultsFormat;
+import com.rusticisoftware.hostedengine.client.datatypes.Enums.ReportageNavPermission;
 import com.rusticisoftware.scormcloud.dao.ScormCloudDao;
 import com.rusticisoftware.scormcloud.logic.ExternalLogic;
 import com.rusticisoftware.scormcloud.logic.ScormCloudLogic;
@@ -664,9 +665,10 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
     
     public String getReportDate(){
         try {
-            return getScormEngineService(externalLogic.getCurrentContext())
+            SimpleDateFormat reportageDateFormat = new SimpleDateFormat("yyyy-M-d k:mm:ss");
+            return reportageDateFormat.format(getScormEngineService(externalLogic.getCurrentContext())
                         .getReportingService()
-                            .GetReportDate();
+                            .GetReportDate());
         } catch (Exception e) {
             log.warn("Exception calling getReportDate: " + e.getMessage(), e);
             return null;
