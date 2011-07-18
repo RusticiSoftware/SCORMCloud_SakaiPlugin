@@ -1,5 +1,5 @@
 #!/bin/sh
 
-VERSION=0.8.8_sakai-2.7.x
-CATALINA_HOME=/opt/apache-tomcat-5.5.26/
+VERSION=0.9.0_sakai-2.8.x
+CATALINA_HOME=/opt/tomcat
 OUTPUT_NAME=scormcloud-plugin-${VERSION}
