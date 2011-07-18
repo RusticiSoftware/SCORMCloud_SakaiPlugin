@@ -1,3 +1,6 @@
+# NOTICE
+The SCORM Cloud plugin for Sakai series 2.6.x is no longer developed or supported by Rustici Software. As of the release of the Sakai 2.8 series, Sakai 2.6 and earlier no longer receive official Community support. We will continue to target officially supported Sakai releases (which currently include 2.7 and 2.8) and the source code for earlier versions of the Sakai plugin will remain available here.
+
 # License
 >   Copyright 2009-2010 Rustici Software. Licensed under the
 >   Educational Community License, Version 2.0 (the "License"); you may
