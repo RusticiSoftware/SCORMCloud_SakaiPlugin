@@ -20,6 +20,7 @@ import java.util.Observer;
 
 import org.sakaiproject.assignment.api.Assignment;
 import org.sakaiproject.assignment.api.AssignmentSubmission;
+import org.sakaiproject.tool.api.SessionManager;
 
 
 /**
@@ -38,6 +39,8 @@ public interface ExternalLogic {
 	 * @return the current sakai user id (not username)
 	 */
 	public String getCurrentUserId();
+	
+	public SessionManager getSessionManager();
 
 	/**
 	 * Get the display name for a user by their unique id

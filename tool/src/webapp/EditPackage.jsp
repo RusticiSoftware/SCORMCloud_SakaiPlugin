@@ -35,7 +35,9 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
+<c:if test="${empty hideMenu or hideMenu == false}">
 <%@ include file="Menu.jsp" %>
+</c:if>
 
 <h3 class="insColor insBak insBorder">Editing SCORM Cloud Package Properties for ${pkg.title}</h3>
 

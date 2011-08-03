@@ -44,6 +44,7 @@ import org.sakaiproject.content.api.ContentHostingService;
 import org.sakaiproject.entity.api.Entity;
 import org.sakaiproject.entity.api.ResourceProperties;
 import org.sakaiproject.entity.api.ResourcePropertiesEdit;
+import org.sakaiproject.entity.cover.EntityManager;
 import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.api.ToolSession;
 import org.sakaiproject.tool.cover.SessionManager;
@@ -177,6 +178,9 @@ public class RequestController extends HttpServlet {
             else if(action.equals("updatePackage")){
                 processUpdatePackageRequest(request, response);
             }
+            else if(action.equals("updatePackageResource")){
+            	processUpdatePackageResourceRequest(request, response);
+            }
             else if(action.equals("configurePackageResource")){
                 processConfigurePackageResourceRequest(request, response);
             }
@@ -214,6 +218,9 @@ public class RequestController extends HttpServlet {
             else if(action.equals("viewPackageProperties")){
 				processViewPackagePropertiesRequest(request, response);
 			}
+            else if(action.equals("viewUpdatePackage")){
+            	processViewUpdatePackageRequest(request, response);
+            }
             
             
             //Reportage actions / pages
@@ -486,12 +493,34 @@ public class RequestController extends HttpServlet {
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_SIGNUP);
         rd.forward(request, response);
     }
+    
+    private void processUpdatePackageResourceRequest(
+    		HttpServletRequest request, HttpServletResponse response) {
+    	try {
+    		ToolSession toolSession = SessionManager.getCurrentToolSession();
+    		ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+    		ContentEntity contentEntity = pipe.getContentEntity();
+    		
+    		String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
+    		String entityId = contentEntity.getId();
+    		String context = extLogic.getCurrentContext();
+    		log.debug("In processUpdatePackageResourceRequest: current context: " + context + " packageId = " + packageId);
+    		String returnUrl = endToolHelperSession(toolSession, pipe);
+    		returnUrl = URLEncoder.encode(returnUrl);
+
+            response.sendRedirect("/scormcloud-tool/controller?action=viewUpdatePackage&id=" + packageId + "&returnUrl=" + returnUrl + "&entityId=" + entityId + " &context=" + context);
+    		}
+    	catch (Exception e) {
+    		throw new RuntimeException(e);
+    	}
+    }
 
     private void processConfigurePackageResourceRequest(
             HttpServletRequest request, HttpServletResponse response) {
         try {
             ToolSession toolSession = SessionManager.getCurrentToolSession();
             ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+            
             ContentEntity contentEntity = pipe.getContentEntity();
             
             String packageId = (String)contentEntity.getProperties().get(PROP_SCORMCLOUD_PACKAGE_ID);
@@ -507,7 +536,7 @@ public class RequestController extends HttpServlet {
             String returnUrl = endToolHelperSession(toolSession, pipe);
             returnUrl = URLEncoder.encode(returnUrl);
             //response.sendRedirect(getAbsoluteUrlTo(request, "/scormcloud-tool/controller?action=viewPackageProperties&id=" + packageId));
-            response.sendRedirect("/scormcloud-tool/controller?action=viewPackageProperties&id=" + packageId + "&returnUrl=" + returnUrl);
+            response.sendRedirect("/scormcloud-tool/controller?action=viewPackageProperties&hideMenu=true&id=" + packageId + "&returnUrl=" + returnUrl);
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -637,6 +666,7 @@ public class RequestController extends HttpServlet {
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         String packageId = request.getParameter("id");
         String returnUrl = request.getParameter("returnUrl");
+        String hideMenu = request.getParameter("hideMenu");
         
         ScormCloudPackage pkg = logic.getPackageById(packageId);
         String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg, 
@@ -644,12 +674,40 @@ public class RequestController extends HttpServlet {
         
         request.setAttribute("pkg", pkg);
         request.setAttribute("packagePropertiesUrl", packagePropertiesUrl);
+        request.setAttribute("hideMenu", Boolean.parseBoolean(hideMenu));
         if(returnUrl != null){
             request.setAttribute("returnUrl", returnUrl);
         } else {
             request.setAttribute("returnUrl", request.getHeader("referer"));
         }
         RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_EDIT);
+        rd.forward(request, response);
+    }
+    
+    private void processViewUpdatePackageRequest(
+    		HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	String packageId = request.getParameter("id");
+    	String context = request.getParameter("context");
+        String returnUrl = request.getParameter("returnUrl");
+        String entityId = request.getParameter("entityId");
+        
+        ScormCloudPackage pkg = logic.getPackageById(packageId);
+        String packagePropertiesUrl = logic.getPackagePropertiesUrl(pkg, 
+                getAbsoluteUrlTo(request, "/scormcloud-tool/css/PackagePropertyEditor.css"));
+        
+        log.debug("In processViewUpdatePackageRequest: got context: " + request.getParameter("context"));
+        pkg.setContext(request.getParameter("context"));
+        
+        SessionManager.getCurrentSession();
+        
+        request.setAttribute("pkg", pkg);
+        request.setAttribute("packagePropertiesUrl", packagePropertiesUrl);
+        //if(returnUrl != null){
+        //    request.setAttribute("returnUrl", returnUrl);
+        //} else {
+        //    request.setAttribute("returnUrl", request.getHeader("referer"));
+        //}
+        RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_UPDATE);
         rd.forward(request, response);
     }
 
@@ -828,51 +886,53 @@ public class RequestController extends HttpServlet {
      * Update the specified package, possibly creating a new version.
      */
     public void processUpdatePackageRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//        //These params will be set to the request params after we parse the file upload request
-//        HashMap<String, String> params = new HashMap<String, String>();
-//        
-//        //Write upload data to temp file
-//        File tempFile = File.createTempFile("sakai-scorm-cloud-", ".zip");
-//        FileUploadUtils.parseFileUploadRequest(request, tempFile, params);
-//        
-//        //Create new package object
-//        ScormCloudPackage pkg = new ScormCloudPackage();
-//        pkg.setTitle(params.get("package-title"));
-//        
-//        //Does the package contribute to associated assignments?
-//        String contributes = params.get("contribute-to-assigment-grade");
-//        pkg.setContributesToAssignmentGrade(Boolean.parseBoolean(contributes));
-//        
-//        //Allow the package to be launched outside of an assignment?
-//        String allowNonAssignmentLaunch = params.get("allow-non-assignment-launch");
-//        pkg.setAllowLaunchOutsideAssignment(Boolean.parseBoolean(allowNonAssignmentLaunch));
-//        
-//        //Create new cloud id for package
-//        String cloudId = UUID.randomUUID().toString();
-//        pkg.setScormCloudId("sakai-" + cloudId);
-//        
-//        //Add package through packages bean
-//        logic.addNewPackage(pkg, tempFile);     
-//        
-//        //Clean up the temp file now that we're done
-//        tempFile.delete();
-//
-//        String helper = params.get("helper");
-//        log.debug("helper = " + helper);
-//        if ("true".equals(helper)) {
-//            log.debug("Helper mode for import, creating resource type");
-//            processImportHelperActions(pkg, request, response);
-//            return;
-//        }
-//        //Send the user back to the package list page
-//        response.sendRedirect(PAGE_PACKAGE_LIST);
-        RequestDispatcher rd = request.getRequestDispatcher(PAGE_PACKAGE_UPDATE);
-        rd.forward(request, response);
+        //These params will be set to the request params after we parse the file upload request
+        HashMap<String, String> params = new HashMap<String, String>();
+        
+        //Write upload data to temp file
+        File tempFile = File.createTempFile("sakai-scorm-cloud-", ".zip");
+        FileUploadUtils.parseFileUploadRequest(request, tempFile, params);
+        
+        log.debug("In processUpdatePackageRequest: got context: " + params.get("context"));
+        
+        String context = params.get("context");
+        String entityId = params.get("entityId");
+        String returnUrl = params.get("returnUrl");
+        
+        //Create new package object
+        //ScormCloudPackage pkg = new ScormCloudPackage();
+        ScormCloudPackage pkg = logic.getPackageById(params.get("packageId"));
+        pkg.setTitle(params.get("package-title"));
+        
+        //Does the package contribute to associated assignments?
+        String contributes = params.get("contribute-to-assigment-grade");
+        pkg.setContributesToAssignmentGrade(Boolean.parseBoolean(contributes));
+        
+        //Allow the package to be launched outside of an assignment?
+        String allowNonAssignmentLaunch = params.get("allow-non-assignment-launch");
+        pkg.setAllowLaunchOutsideAssignment(Boolean.parseBoolean(allowNonAssignmentLaunch));
+        
+        //Create new cloud id for package
+        //String cloudId = UUID.randomUUID().toString();
+        //pkg.setScormCloudId("sakai-" + cloudId);
+        
+        //Add package through packages bean
+        logic.updatePackage(pkg, tempFile);     
+        
+        //Clean up the temp file now that we're done
+        tempFile.delete();
+
+        
+        updateResourceForScormCloudEntity(entityId, pkg);
+        
+        response.sendRedirect(returnUrl);
     }
 	
 	
 	private void addResourceForScormCloudEntity(ContentEntity contentEntity, ScormCloudPackage pkg) throws Exception {
-	    ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), pkg.getTitle(), "scormcloud", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
+		//ContentResourceEdit resource = getContentHostingService().addResource(contentEntity.getId());
+		log.debug("addResource contentEntityId = " + contentEntity.getId());
+	    ContentResourceEdit  resource = getContentHostingService().addResource(contentEntity.getId(), pkg.getScormCloudId(), "scormcloud", ContentHostingService.MAXIMUM_ATTEMPTS_FOR_UNIQUENESS);
         ResourcePropertiesEdit properties = resource.getPropertiesEdit();
         properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, pkg.getTitle());
         properties.addProperty(org.sakaiproject.content.api.ContentHostingService.PROP_ALTERNATE_REFERENCE, Entity.SEPARATOR + "scormcloud");
@@ -882,6 +942,19 @@ public class RequestController extends HttpServlet {
         resource.setResourceType("scormcloud.type");
         //resource.setHidden();
         getContentHostingService().commitResource(resource);
+	}
+	
+	private void updateResourceForScormCloudEntity(String contentEntityId, ScormCloudPackage pkg) throws Exception {
+		log.debug("updateResource contentEntityId = " + contentEntityId);
+		getContentHostingService().removeAllLocks(contentEntityId);
+		//ContentCollectionEdit collection = getContentHostingService().editCollection(contentEntityId);
+		ContentResourceEdit resource = getContentHostingService().editResource(contentEntityId);
+		
+		ResourcePropertiesEdit properties = resource.getPropertiesEdit();
+		properties.removeProperty(ResourceProperties.PROP_DISPLAY_NAME);
+		properties.addProperty(ResourceProperties.PROP_DISPLAY_NAME, pkg.getTitle());
+		getContentHostingService().commitResource(resource);
+		//getContentHostingService().commitCollection(collection);
 	}
 	
 	private String endToolHelperSession(ToolSession toolSession, ResourceToolActionPipe pipe) {
@@ -915,6 +988,23 @@ public class RequestController extends HttpServlet {
        }
        
        response.sendRedirect(endToolHelperSession(toolSession, pipe));
+	}
+	
+	private void processUpdateHelperActions(ScormCloudPackage pkg, HttpServletRequest request, HttpServletResponse response) throws Exception {
+		
+		ToolSession toolSession = extLogic.getSessionManager().getCurrentToolSession();
+	       ResourceToolActionPipe pipe = (ResourceToolActionPipe) toolSession.getAttribute(ResourceToolAction.ACTION_PIPE);
+	       ContentEntity contentEntity = pipe.getContentEntity();
+
+	       try {
+	          // Update the resource
+	           updateResourceForScormCloudEntity(contentEntity.getId(), pkg);
+	       }
+	       catch (Exception e) {
+	           throw new RuntimeException(e);
+	       }
+	       
+	       response.sendRedirect(endToolHelperSession(toolSession, pipe));
 	}
 	
 	

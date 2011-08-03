@@ -10,11 +10,29 @@
 <%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml" %>
 <%
 	// Get the backing bean from the spring context
-	WebApplicationContext context = 
+	/*WebApplicationContext context = 
 		WebApplicationContextUtils.getWebApplicationContext(application);
 	ScormCloudToolBean bean = (ScormCloudToolBean) context.getBean("scormCloudToolBean");
 
-    bean.doPageChecks(request, response);
+    bean.doPageChecks(request, response);*/
+    
+    
+    WebApplicationContext context = 
+        WebApplicationContextUtils.getWebApplicationContext(application);
+    ScormCloudToolBean bean = (ScormCloudToolBean)context.getBean("scormCloudToolBean");
+
+    bean.allowOnlyAdmin(request, response);
+    
+    pageContext.setAttribute("bean", bean);
+    pageContext.setAttribute("isConfigured", bean.isPluginConfigured());
+    pageContext.setAttribute("canConfigure", bean.canConfigurePlugin());
+    
+    String pkgTitle = "Unknown";
+    ScormCloudPackage pkg = (ScormCloudPackage)request.getAttribute("pkg");
+    if (pkg != null) {
+    	pkgTitle = pkg.getTitle();
+    }
+    
 %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -44,12 +62,16 @@
 <body onload="<%= request.getAttribute("sakai.html.body.onload") %>">
 <div class="portletBody">
 
-<h3 class="insColor insBak insBorder">Update Package for [Existing Package Title Here]</h3>
+<h3 class="insColor insBak insBorder">Update Package for <%= pkgTitle %></h3>
 
 <div class="instruction">Choose a zip file containing SCORM content</div>
 
-<form name="importPackageForm" action="controller?action=importPackage" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+<form name="importPackageForm" action="controller?action=updatePackage" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
 	<input name="helper" id="helper" type="hidden" value="${param.helper}" />
+	<input name="packageId" id="packageId" type="hidden" value="<%= pkg.getId() %>" />
+	<input name="context" id="context" type="hidden" value="<%= pkg.getContext() %>" />
+	<input name="entityId" id="entityId" type="hidden" value="<%= request.getParameter("entityId") %>" />
+	<input name="returnUrl" id="returnUrl" type="hidden" value="<%= request.getParameter("returnUrl") %>" />
 	<p class="shorttext">
 			<span class="reqStar">*</span>
 			<span style="padding-right: 20px">	
@@ -63,10 +85,45 @@
 			<span style="padding-right: 20px">
 				New Title
 			</span>	
-			<input name="package-title" id="package-title" type="text" size="28" value="[Existing Package Title Here]" />
+			<input name="package-title" id="package-title" type="text" size="28" value="<%= pkgTitle %>" />
 	</p>
 	<br />
 	
+	<h4>Grading</h4>
+	<p class="checkbox  indnt2">
+		<input type="radio" 
+			name="contribute-to-assigment-grade"
+			id="contribute-to-assigment-grade-false"
+			value="false" 
+			<% if (!pkg.getContributesToAssignmentGrade()) { %>checked="checked"<% } %> />
+		<label for="contribute-to-assigment-grade-false">Do NOT allow this content to contribute to assignment grade</label>
+		<br />
+		<input type="radio" 
+			name="contribute-to-assigment-grade"
+			id="contribute-to-assigment-grade-true"
+			value="true"
+			<% if (pkg.getContributesToAssignmentGrade()) { %>checked="checked"<% } %> />
+		<label for="contribute-to-assigment-grade-true">Allow this content to automatically contribute to assignment grade</label>
+	</p>
+	
+	<h4>Launch Behavior</h4>
+	<p class="checkbox  indnt2">
+		<input type="radio" 
+			name="allow-non-assignment-launch"
+			id="allow-non-assignment-launch-false"
+			value="false" 
+			<% if (!pkg.getAllowLaunchOutsideAssignment()) { %>checked="checked"<% } %> />
+		<label for="allow-non-assignment-launch-false">Do NOT allow this content to be launched outside of the context of an assignment</label>
+		<br />
+		<input type="radio" 
+			name="allow-non-assignment-launch"
+			id="allow-non-assignment-launch-true"
+			value="true"
+			<% if (pkg.getAllowLaunchOutsideAssignment()) { %>checked="checked"<% } %> />
+		<label for="allow-non-assignment-launch-true">Allow this content to to be launched in any context</label>
+	</p>
+	
+	<!--
 	<h4>New File Behavior</h4>
 	<p class="checkbox  indnt2">
 		<input type="radio" 
@@ -98,6 +155,7 @@
 			value="true" />
 		<label for="allow-non-assignment-launch-true">Force existing registrations to restart with this update. (If you're creating a new version of a course, registrations will be reset to the new version.)</label>
 	</p>
+	-->
 
 	<p class="act">
 		<input name="import-package" type="submit" value="Update" />

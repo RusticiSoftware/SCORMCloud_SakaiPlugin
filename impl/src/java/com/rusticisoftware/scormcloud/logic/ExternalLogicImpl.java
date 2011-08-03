@@ -35,6 +35,7 @@ import org.sakaiproject.site.api.Site;
 import org.sakaiproject.site.api.SiteService;
 import org.sakaiproject.tool.api.Placement;
 import org.sakaiproject.tool.api.SessionManager;
+import org.sakaiproject.tool.api.Tool;
 import org.sakaiproject.tool.api.ToolManager;
 import org.sakaiproject.user.api.UserDirectoryService;
 import org.sakaiproject.user.api.UserNotDefinedException;
@@ -69,6 +70,9 @@ public class ExternalLogicImpl implements ExternalLogic {
 	private SessionManager sessionManager;
 	public void setSessionManager(SessionManager sessionManager) {
 		this.sessionManager = sessionManager;
+	}
+	public SessionManager getSessionManager() {
+		return this.sessionManager;
 	}
 
 	private SiteService siteService;
@@ -206,6 +210,13 @@ public class ExternalLogicImpl implements ExternalLogic {
 	
     
     public String getCurrentContext(){
+    	Tool tool = toolManager.getCurrentTool();
+    	if (tool == null) {
+    		log.info("DEBUG: Tool is null.");
+    	} else {
+    		log.info("DEBUG: Tool: " + tool.getTitle());
+    	}
+    	
         Placement cur = toolManager.getCurrentPlacement();
         if(cur == null){
             log.warn("In getCurrentContext, no current placement found, returning null context");

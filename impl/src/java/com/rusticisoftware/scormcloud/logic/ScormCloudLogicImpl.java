@@ -95,6 +95,8 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
 
     
     private ScormEngineService getScormEngineService(String context){
+    	log.debug("In getScormEngineService: context is " + context);
+    	log.debug("In getScormEngineService: current context is " + externalLogic.getCurrentContext());
         ScormCloudConfiguration cloudConfig = getScormCloudConfigurationInternal(context);
         if(cloudConfig != null){
             log.debug("Found cloud config in database, returning scorm engine service");
@@ -254,8 +256,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         }
     }
 
-    public void updatePackage(ScormCloudPackage pkg) {
-        log.debug("In saveItem with item:" + pkg.getTitle());
+    public void updatePackage(ScormCloudPackage pkg, File packageZip) throws Exception {
+        log.debug("In updatePackage with package:" + pkg.getTitle());
+        
         // set the owner and site to current if they are not set
         if (pkg.getOwnerId() == null) {
             pkg.setOwnerId(externalLogic.getCurrentUserId());
@@ -269,10 +272,14 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
         if (pkg.getDateCreated() == null) {
             pkg.setDateCreated(new Date());
         }
+        
+        getScormEngineService(pkg.getContext())
+        	.getCourseService()
+        		.UpdateAssets(pkg.getScormCloudId(), packageZip.getAbsolutePath(), externalLogic.getUserEmail(externalLogic.getCurrentUserId()), true);
         // save pkg if new OR check if the current user can update the existing
         // pkg
         dao.save(pkg);
-        log.info("Saving package: " + pkg.getId() + ":" + pkg.getTitle());
+        log.info("Saved package after update: " + pkg.getId() + ":" + pkg.getTitle());
     }
     
     public String getPackagePropertiesUrl(ScormCloudPackage pkg, String styleSheetUrl){

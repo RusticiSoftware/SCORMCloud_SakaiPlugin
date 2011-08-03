@@ -38,7 +38,7 @@ public interface ScormCloudLogic {
    public ScormCloudPackage getPackageById(String id);
    public List<ScormCloudPackage> getAllSitePackages();
    public void addNewPackage(ScormCloudPackage pkg, File packageZip) throws Exception;
-   public void updatePackage(ScormCloudPackage pkg);
+   public void updatePackage(ScormCloudPackage pkg, File packageZip) throws Exception;
    public void removePackage(ScormCloudPackage pkg);
    public String getPackagePropertiesUrl(ScormCloudPackage pkg, String styleSheetUrl);
    public String getPackagePreviewUrl(ScormCloudPackage pkg, String redirectOnExitUrl);

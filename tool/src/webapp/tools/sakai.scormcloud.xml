@@ -25,4 +25,8 @@
 		title="SCORM Cloud Configure Resource Helper"
 		description="SCORM Cloud Resource Type Helper">
 	</tool>
+	<tool id="sakai.scormcloud.update.helper"
+		title="SCORM Cloud Update Resource Helper"
+		description="SCORM Cloud Resource Type Helper">
+	</tool>
 </registration>

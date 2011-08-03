@@ -104,6 +104,17 @@
 	</servlet>
 	
 	<servlet>
+		<servlet-name>sakai.scormcloud.update.helper</servlet-name>
+		<servlet-class>
+			com.rusticisoftware.scormcloud.tool.RequestController
+		</servlet-class>
+		<init-param>
+			<param-name>action</param-name>
+			<param-value>updatePackageResource</param-value>
+		</init-param>
+	</servlet>
+	
+	<servlet>
 		<description>Servlet for processing requests</description>
 		<display-name>ScormCloudRequestController</display-name>
 		<servlet-name>ScormCloudRequestController</servlet-name>
