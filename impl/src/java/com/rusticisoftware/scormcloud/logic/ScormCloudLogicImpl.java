@@ -41,6 +41,7 @@ import com.rusticisoftware.hostedengine.client.Configuration;
 import com.rusticisoftware.hostedengine.client.datatypes.LaunchInfo;
 import com.rusticisoftware.hostedengine.client.datatypes.RegistrationSummary;
 import com.rusticisoftware.hostedengine.client.ScormEngineService;
+import com.rusticisoftware.hostedengine.client.ScormEngineUtilities;
 import com.rusticisoftware.hostedengine.client.Utils;
 import com.rusticisoftware.hostedengine.client.XmlUtils;
 import com.rusticisoftware.hostedengine.client.datatypes.Enums.RegistrationResultsFormat;
@@ -101,7 +102,9 @@ public class ScormCloudLogicImpl implements ScormCloudLogic, Observer {
             return new ScormEngineService(
                     new Configuration(cloudConfig.getServiceUrl(), 
                             cloudConfig.getAppId(),
-                            cloudConfig.getSecretKey()));
+                            cloudConfig.getSecretKey(),
+			    ScormEngineUtilities.getCanonicalOriginString("Rustici Software",
+			    "Sakai", "2.8-0.8.91")));
         } else {
             log.debug("Couldn't find existing config, returning null");
             return null;

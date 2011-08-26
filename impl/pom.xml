@@ -32,6 +32,12 @@
             <artifactId>scormcloud-api</artifactId>
         </dependency>
 
+	<dependency>
+		<groupId>com.rusticisoftware.hostedengine.client</groupId>
+		<artifactId>scormcloud-java-lib</artifactId>
+		<version>1.1.2</version>
+	</dependency>
+
         <!-- generic DAO -->
         <dependency>
             <groupId>org.sakaiproject</groupId>
